@@ -1,5 +1,5 @@
 app:
-  telegram-token: ${TELEGRAM_TOKEN} # env variable
+  telegram-token: ${TELEGRAM_TOKEN}
 
 spring:
   application:
@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  config:
+    import: file:.env[.properties]
 
 server:
   port: 8080
