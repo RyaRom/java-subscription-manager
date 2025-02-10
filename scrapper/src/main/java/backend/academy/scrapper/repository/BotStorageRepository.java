@@ -1,7 +1,9 @@
 package backend.academy.scrapper.repository;
 
+import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
+@Repository
 public interface BotStorageRepository {
     Optional<User> saveUser(User user);
 

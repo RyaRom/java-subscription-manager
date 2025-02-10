@@ -1,4 +1,4 @@
 package backend.academy.bot.repository;
 
-public interface BotStorageRepository {
+public enum BotState {
 }
