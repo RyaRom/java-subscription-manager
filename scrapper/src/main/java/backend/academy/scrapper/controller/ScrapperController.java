@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ScrapperController {
     @PostMapping("/tg-chat/{chatId}")
-    public ResponseEntity<String> registerChat(@PathVariable Long chatId) {
-        return ResponseEntity.ok("Чат зарегистрирован");
+    public ResponseEntity<Void> registerChat(@PathVariable Long chatId) {
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/tg-chat/{chatId}")
-    public ResponseEntity<String> deleteChat(@PathVariable Long chatId) {
-        return ResponseEntity.ok("Чат успешно удалён");
+    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId) {
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/links")

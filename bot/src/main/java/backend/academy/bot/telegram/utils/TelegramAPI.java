@@ -1,16 +1,16 @@
-package backend.academy.bot.config;
+package backend.academy.bot.telegram.utils;
 
-import backend.academy.bot.MessageHandler;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
-@Configuration
-public class BotHandlers {
+@Component
+@RequiredArgsConstructor
+public class TelegramAPI {
 
     @Lazy
     @Autowired
@@ -23,12 +23,4 @@ public class BotHandlers {
         telegramBot.execute(request);
     }
 
-    @Bean
-    public MessageHandler messageHandler() {
-        return message -> {
-            if (message != null && message.text() != null) {
-                sendMessage(message.chat().id(), message.text());
-            }
-        };
-    }
 }

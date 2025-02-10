@@ -1,9 +1,8 @@
 package backend.academy.bot.config;
 
-import backend.academy.bot.MessageHandler;
+import backend.academy.bot.telegram.utils.UpdateProcessor;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Message;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,13 +13,10 @@ import org.springframework.validation.annotation.Validated;
 public record BotConfig(@NotEmpty String telegramToken) {
 
     @Bean
-    public TelegramBot telegramBot(MessageHandler messageHandler) {
+    public TelegramBot telegramBot(UpdateProcessor updateProcessor) {
         var telegramBot = new TelegramBot(telegramToken);
         telegramBot.setUpdatesListener(updates -> {
-                updates.forEach(update -> {
-                    Message message = update.message();
-                    messageHandler.handle(message);
-                });
+                updates.forEach(updateProcessor::consumeUpdate);
                 return UpdatesListener.CONFIRMED_UPDATES_ALL;
             },
             e -> {
