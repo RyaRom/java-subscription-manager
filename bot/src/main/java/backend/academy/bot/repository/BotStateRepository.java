@@ -1,5 +1,6 @@
 package backend.academy.bot.repository;
 
+import backend.academy.bot.telegram.utils.fsm.BotState;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 

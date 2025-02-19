@@ -1,9 +1,12 @@
 package backend.academy.bot.repository;
 
+import backend.academy.bot.telegram.utils.fsm.BotState;
+import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Repository
 public class InMemoryStateCache implements BotStateRepository {
     private final Map<Long, BotState> userStates = new HashMap<>();
 

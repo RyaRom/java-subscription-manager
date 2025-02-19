@@ -1,6 +1,9 @@
 package backend.academy.bot.telegram.utils.annotations;
 
+import backend.academy.bot.telegram.utils.filters.FilterParameter;
+
 public @interface FilterParam {
-    String key();
+    FilterParameter key();
+
     String[] value();
 }

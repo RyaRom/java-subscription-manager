@@ -1,7 +1,7 @@
-package backend.academy.bot.telegram.utils;
+package backend.academy.bot.telegram.utils.filters;
 
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
-import backend.academy.bot.telegram.utils.annotations.Handler;
+import backend.academy.bot.telegram.utils.annotations.Router;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.PostConstruct;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UpdateProcessor {
-
+    private final FilterRegister filterRegister;
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();
 
@@ -58,14 +58,14 @@ public class UpdateProcessor {
 
     private void registerHandler(Object bean, Method method) {
         var messageHandler = method.getAnnotation(backend.academy.bot.telegram.utils.annotations.MessageHandler.class);
-        Map<String, Object> params = new HashMap<>();
+        Map<FilterParameter, Object> params = new HashMap<>();
         for (FilterParam param : messageHandler.params()) {
             params.put(param.key(), param.value());
         }
 
         List<Predicate<Message>> filters = new ArrayList<>();
         for (var filterClass : messageHandler.filters()) {
-            MessageFilterGenerator filterGenerator = FilterRegister.getFilterInstance(filterClass);
+            MessageFilterGenerator filterGenerator = filterRegister.getFilterInstance(filterClass);
             filters.add(filterGenerator.filter(params));
         }
         messageHandlers.add(new MessageHandler(
@@ -81,7 +81,7 @@ public class UpdateProcessor {
 
     private Map<Object, List<Method>> getAllHandlers() {
         Map<Object, List<Method>> methods = new HashMap<>();
-        String[] beanNames = applicationContext.getBeanNamesForAnnotation(Handler.class);
+        String[] beanNames = applicationContext.getBeanNamesForAnnotation(Router.class);
         for (String beanName : beanNames) {
             Object bean = applicationContext.getBean(beanName);
             List<Method> beanMethods = new ArrayList<>(Arrays.asList(bean.getClass().getMethods()));

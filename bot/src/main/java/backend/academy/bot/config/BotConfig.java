@@ -1,6 +1,6 @@
 package backend.academy.bot.config;
 
-import backend.academy.bot.telegram.utils.UpdateProcessor;
+import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import jakarta.validation.constraints.NotEmpty;

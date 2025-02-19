@@ -1,6 +1,6 @@
 package backend.academy.bot.telegram.utils.annotations;
 
-import backend.academy.bot.telegram.utils.MessageFilterGenerator;
+import backend.academy.bot.telegram.utils.filters.MessageFilterGenerator;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

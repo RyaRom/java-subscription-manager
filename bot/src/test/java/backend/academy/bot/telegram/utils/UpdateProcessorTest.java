@@ -1,8 +1,11 @@
 package backend.academy.bot.telegram.utils;
 
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
-import backend.academy.bot.telegram.utils.annotations.Handler;
+import backend.academy.bot.telegram.utils.annotations.Router;
 import backend.academy.bot.telegram.utils.annotations.MessageHandler;
+import backend.academy.bot.telegram.utils.filters.FilterParameter;
+import backend.academy.bot.telegram.utils.filters.FilterRegister;
+import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import java.util.List;
@@ -29,7 +32,7 @@ class UpdateProcessorTest {
 
     @BeforeEach
     void setUp() {
-        when(applicationContext.getBeanNamesForAnnotation(Handler.class))
+        when(applicationContext.getBeanNamesForAnnotation(Router.class))
             .thenReturn(new String[]{"TestHandlers1", "TestHandlers2"});
         when(applicationContext.getBean("TestHandlers1")).thenReturn(new TestHandlers1());
         when(applicationContext.getBean("TestHandlers2")).thenReturn(new TestHandlers2());
@@ -77,7 +80,7 @@ class UpdateProcessorTest {
     private class TestHandlers1 {
         @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
-            params = @FilterParam(key = "commands", value = {"/cmd1", "cmd2"}),
+            params = @FilterParam(key = FilterParameter.COMMANDS, value = {"/cmd1", "cmd2"}),
             isFinal = false)
         public void allCommandsEverytime(Message message) {
             telegramAPI.sendMessage(1L, "allCommandsEverytime");
@@ -85,7 +88,7 @@ class UpdateProcessorTest {
 
         @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
-            params = @FilterParam(key = "commands", value = {"cmd2"}),
+            params = @FilterParam(key = FilterParameter.COMMANDS, value = {"cmd2"}),
             priority = 6,
             isFinal = false)
         public void cmd2After(Message message) {
@@ -97,7 +100,7 @@ class UpdateProcessorTest {
         @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
             priority = 5,
-            params = @FilterParam(key = "commands", value = {"cmd1", "cmd2"}))
+            params = @FilterParam(key = FilterParameter.COMMANDS, value = {"cmd1", "cmd2"}))
         public void allCommandsFinal(Message message) {
             telegramAPI.sendMessage(1L, "allCommandsFinal");
         }

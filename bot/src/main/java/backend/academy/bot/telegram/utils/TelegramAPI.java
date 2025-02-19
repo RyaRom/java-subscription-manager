@@ -1,6 +1,7 @@
 package backend.academy.bot.telegram.utils;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,15 @@ public class TelegramAPI {
     //field injection to avoid circular dependency
     private TelegramBot telegramBot;
 
+    public void sendMessage(Message message, String text) {
+        SendMessage request = new SendMessage(message.chat().id(), text)
+            .parseMode(ParseMode.HTML);
+        telegramBot.execute(request);
+    }
+
     public void sendMessage(Long chatId, String text) {
         SendMessage request = new SendMessage(chatId, text)
             .parseMode(ParseMode.HTML);
         telegramBot.execute(request);
     }
-
 }
