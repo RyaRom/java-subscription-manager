@@ -83,4 +83,21 @@ public class FilterRegister {
             };
         }
     }
+
+    public static class UrlFilter implements MessageFilterGenerator {
+
+        @Override
+        public Predicate<Message> filter(Map<FilterParameter, Object> kwargs) {
+            return message -> {
+                String text = message.text();
+                return notEmpty(text)
+                    && text.matches(
+                    "(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]" +
+                        "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|" +
+                        "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-" +
+                        "Z0-9]+\\.[^\\s]{2,})"
+                );
+            };
+        }
+    }
 }

@@ -1,9 +1,9 @@
-package backend.academy.scrapper.controller;
+package backend.academy.scrapper.rest;
 
-import backend.academy.scrapper.dto.AddLinkRequest;
-import backend.academy.scrapper.dto.LinkResponse;
-import backend.academy.scrapper.dto.ListLinkResponse;
-import backend.academy.scrapper.dto.RemoveLinkRequest;
+import backend.academy.scrapper.rest.dto.AddLinkRequest;
+import backend.academy.scrapper.rest.dto.LinkResponse;
+import backend.academy.scrapper.rest.dto.ListLinkResponse;
+import backend.academy.scrapper.rest.dto.RemoveLinkRequest;
 import java.util.ArrayList;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/scrapper/api")
 public class ScrapperController {
     @PostMapping("/tg-chat/{chatId}")
     public ResponseEntity<Void> registerChat(@PathVariable Long chatId) {

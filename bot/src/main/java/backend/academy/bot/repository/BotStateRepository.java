@@ -1,14 +1,18 @@
 package backend.academy.bot.repository;
 
 import backend.academy.bot.telegram.utils.fsm.BotState;
+import backend.academy.bot.telegram.utils.fsm.DefaultStates;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
 
 @Repository
 public interface BotStateRepository {
-    Optional<BotState> updateState(Long chatId, BotState state);
+    BotState updateState(Long chatId, BotState state);
 
-    Optional<BotState> getState(Long chatId);
+    BotState getState(Long chatId);
 
-    Optional<BotState> clearState(Long chatId);
+    BotState clearState(Long chatId);
+
+    default BotState getEmptyState() {
+        return DefaultStates.NONE;
+    }
 }

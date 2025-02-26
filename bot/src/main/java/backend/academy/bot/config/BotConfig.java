@@ -4,13 +4,35 @@ import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import jakarta.validation.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public record BotConfig(@NotEmpty String telegramToken) {
+public record BotConfig(
+    @NotEmpty String telegramToken,
+    @NotEmpty String helpMessage,
+    @NotEmpty String scrapperUrl
+) {
+
+    @Bean
+    @Qualifier("helpMessage")
+    public String helpMessage() {
+        return helpMessage;
+    }
+
+    @Bean
+    @Qualifier("scrapperHttpClient")
+    public WebClient scrapperHttpClient() {
+        return WebClient.builder()
+            .baseUrl(scrapperUrl)
+            .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .build();
+    }
 
     @Bean
     public TelegramBot telegramBot(UpdateProcessor updateProcessor) {

@@ -1,8 +1,9 @@
-package backend.academy.bot.repository;
+package backend.academy.bot;
 
 import backend.academy.bot.telegram.utils.fsm.BotState;
 
 public enum SubscriptionBotState implements BotState {
-    REGISTRATION,
-    SENDING
+    WAITING_FOR_LINK,
+    WAITING_FOR_TAGS,
+    WAITING_FOR_FILTERS
 }

@@ -1,4 +1,4 @@
-package backend.academy.bot.controller;
+package backend.academy.bot.rest.dto;
 
 import java.util.List;
 

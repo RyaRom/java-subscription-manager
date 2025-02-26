@@ -1,5 +1,12 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN}
+  help-message: "
+            /start - Начать работу с ботом\n
+            /help- Список команд\n
+            /track - Начать отслеживание ссылки\n
+            /untrack - Остановить отслеживание ссылки\n
+            /list - Список отслеживаемых ссылок\n"
+  scrapper-url: http://localhost:8080/scrapper/api
 
 spring:
   application:

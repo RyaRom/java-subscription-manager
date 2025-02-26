@@ -1,4 +1,4 @@
-package backend.academy.scrapper.dto;
+package backend.academy.bot.rest.dto;
 
 import java.util.List;
 

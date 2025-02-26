@@ -16,11 +16,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class UpdateProcessor {
     private final FilterRegister filterRegister;
     private final ApplicationContext applicationContext;
@@ -74,6 +76,7 @@ public class UpdateProcessor {
                 try {
                     method.invoke(bean, message);
                 } catch (IllegalAccessException | InvocationTargetException e) {
+                    log.error("Unable to invoke message handler {}", method.getName(), e);
                     throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
                 }
             }, messageHandler.priority(), messageHandler.isFinal()));

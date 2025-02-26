@@ -1,5 +1,6 @@
-package backend.academy.bot.controller;
+package backend.academy.bot.rest;
 
+import backend.academy.bot.rest.dto.LinkUpdate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
