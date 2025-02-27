@@ -26,7 +26,7 @@ public @interface MessageHandler {
     /**
      * Priority of the handler.
      */
-    int priority() default 0;
+    int priority() default 5;
 
     /**
      * If set to true, this handler will be the last one to be called.
