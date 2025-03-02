@@ -5,7 +5,7 @@ import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import java.time.Instant;
-import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,7 +41,7 @@ public class UpdatePollingJob {
             }
             return githubClient.getRepoActivities(link.githubInfo().owner(), link.githubInfo().repo())
                 .flatMapMany(res -> Flux.fromIterable(res.activities()))
-                .filter(activity -> activity.timestamp().isAfter(OffsetDateTime.from(lastUpdated)))
+                .filter(activity -> activity.timestamp().isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                 .flatMap(activity -> botClient.sendUpdate(activity, link))
                 .then();
         } else if (linkType == Link.Type.STACK_OVERFLOW) {

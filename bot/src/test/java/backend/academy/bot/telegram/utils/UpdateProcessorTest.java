@@ -1,8 +1,8 @@
 package backend.academy.bot.telegram.utils;
 
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
-import backend.academy.bot.telegram.utils.annotations.Router;
 import backend.academy.bot.telegram.utils.annotations.MessageHandler;
+import backend.academy.bot.telegram.utils.annotations.Router;
 import backend.academy.bot.telegram.utils.filters.FilterParameter;
 import backend.academy.bot.telegram.utils.filters.FilterRegister;
 import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
@@ -17,18 +17,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
+import static java.lang.Thread.sleep;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings({"DirectInvocationOnMock", "UnusedMethod"})
 class UpdateProcessorTest {
     @Mock
-    TelegramAPI telegramAPI;
+    private TelegramAPI telegramAPI;
     @Mock
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
+    @Mock
+    private FilterRegister filterRegister;
     @InjectMocks
-    UpdateProcessor updateProcessor;
+    private UpdateProcessor updateProcessor;
 
     @BeforeEach
     void setUp() {
@@ -36,6 +40,7 @@ class UpdateProcessorTest {
             .thenReturn(new String[]{"TestHandlers1", "TestHandlers2"});
         when(applicationContext.getBean("TestHandlers1")).thenReturn(new TestHandlers1());
         when(applicationContext.getBean("TestHandlers2")).thenReturn(new TestHandlers2());
+        when(filterRegister.getFilterInstance(FilterRegister.CommandFilter.class)).thenReturn(new FilterRegister.CommandFilter());
 
         updateProcessor.init();
     }
@@ -49,20 +54,21 @@ class UpdateProcessorTest {
     }
 
     @Test
-    void noCommands() {
+    void noCommands() throws InterruptedException {
         List<Update> input = List.of(
-            mockMessage(""),
+            mockMessage("a"),
             mockMessage("nothing"),
             mockMessage("     ")
         );
 
         input.forEach(updateProcessor::consumeUpdate);
+        sleep(1000L);
 
         Mockito.verify(telegramAPI, Mockito.times(3)).sendMessage(1L, "defaultHandler");
     }
 
     @Test
-    void commands() {
+    void commands() throws InterruptedException {
         List<Update> input = List.of(
             mockMessage("/cmd1"),
             mockMessage("/cmd2"),
@@ -70,6 +76,7 @@ class UpdateProcessorTest {
         );
 
         input.forEach(updateProcessor::consumeUpdate);
+        sleep(1000L);
 
         Mockito.verify(telegramAPI, Mockito.times(2)).sendMessage(1L, "allCommandsEverytime");
         Mockito.verify(telegramAPI, Mockito.times(0)).sendMessage(1L, "cmd2");
@@ -77,7 +84,7 @@ class UpdateProcessorTest {
         Mockito.verify(telegramAPI, Mockito.times(1)).sendMessage(1L, "defaultHandler");
     }
 
-    private class TestHandlers1 {
+    public class TestHandlers1 {
         @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
             params = @FilterParam(key = FilterParameter.COMMANDS, value = {"/cmd1", "cmd2"}),
@@ -96,7 +103,7 @@ class UpdateProcessorTest {
         }
     }
 
-    private class TestHandlers2 {
+    public class TestHandlers2 {
         @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
             priority = 5,
