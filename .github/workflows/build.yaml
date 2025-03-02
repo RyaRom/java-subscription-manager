@@ -21,6 +21,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: build
+        run: maven install -N
+
       - name: maven build
         run: mvn verify
 
@@ -50,5 +53,5 @@ jobs:
           java-version: '23'
           distribution: 'temurin'
           cache: maven
-
+      - run: maven install -N
       - run: mvn compile -am spotless:check modernizer:modernizer spotbugs:check pmd:check pmd:cpd-check
