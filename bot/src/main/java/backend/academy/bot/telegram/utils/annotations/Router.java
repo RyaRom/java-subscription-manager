@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
  * Marks a class as a handler for telegram updates.
  * <p>
  * Each public method of a handler class should be annotated with {@link MessageHandler}
- * or other update handler annotations.
+ * or other update handler annotations
+ * and return {@link reactor.core.publisher.Mono} or void.
  */
 @Component
 @Retention(RetentionPolicy.RUNTIME)

@@ -100,4 +100,12 @@ public class FilterRegister {
             };
         }
     }
+
+    public static class NotEmptyTextFilter implements MessageFilterGenerator {
+
+        @Override
+        public Predicate<Message> filter(Map<FilterParameter, Object> kwargs) {
+            return message -> notEmpty(message.text());
+        }
+    }
 }

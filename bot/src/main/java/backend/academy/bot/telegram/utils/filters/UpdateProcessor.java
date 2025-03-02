@@ -13,12 +13,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,27 @@ public class UpdateProcessor {
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();
 
+    private static Mono<Void> handleAsyncOrNotHandler(Object bean, Method method, Message message) throws IllegalAccessException, InvocationTargetException {
+        if (method.getReturnType().equals(Void.TYPE)) {
+            log.warn("Blocking call in {}", method.getName());
+            return Mono.fromRunnable(() -> {
+                    try {
+                        method.invoke(bean, message);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).subscribeOn(Schedulers.boundedElastic())
+                .then();
+        }
+        Object result = method.invoke(bean, message);
+        if (result instanceof Mono) {
+            return ((Mono<Void>) result);
+        } else {
+            log.error("Method {} must return Mono<Void> or void", method.getName());
+            throw new IllegalArgumentException("Method " + method.getName() + " must return Mono<Void> or void");
+        }
+    }
+
     public final void consumeUpdate(Update update) {
         if (update.message() == null) {
             //Possible logic for other update types
@@ -36,7 +59,13 @@ public class UpdateProcessor {
         Message message = update.message();
         for (var handler : messageHandlers) {
             if (handler.filter.test(message)) {
-                handler.handler.accept(message);
+                Mono<Void> resultAsync = handler.handler.apply(message);
+                resultAsync
+                    .onErrorResume(e -> {
+                        log.error("Error in handler", e);
+                        return Mono.empty();
+                    })
+                    .subscribe();
                 if (handler.isFinal) {
                     return;
                 }
@@ -74,7 +103,7 @@ public class UpdateProcessor {
             message -> filters.stream().allMatch(filter -> filter.test(message)),
             message -> {
                 try {
-                    method.invoke(bean, message);
+                    return handleAsyncOrNotHandler(bean, method, message);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     log.error("Unable to invoke message handler {}", method.getName(), e);
                     throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
@@ -95,7 +124,7 @@ public class UpdateProcessor {
 
     public record MessageHandler(
         Predicate<Message> filter,
-        Consumer<Message> handler,
+        Function<Message, Mono<Void>> handler,
         int priority,
         boolean isFinal
     ) {

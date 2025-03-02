@@ -15,6 +15,7 @@ import com.pengrad.telegrambot.model.Message;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Mono;
 import static backend.academy.bot.BotKeyboards.SKIP_TEXT;
 import static backend.academy.bot.BotKeyboards.getSkipButton;
 import static backend.academy.bot.telegram.utils.filters.FilterParameter.COMMANDS;
@@ -33,11 +34,11 @@ public class TrackRouter {
         params = @FilterParam(key = COMMANDS, value = "track"),
         priority = 0
     )
-    public void track(Message message) {
+    public Mono<Void> track(Message message) {
         log.info("In handler track {}", message.chat().id());
-        userDataCacheRepository.clearUser(message.chat().id());
-        fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_LINK);
-        telegramAPI.sendMessage(message, "Send link to track");
+        return userDataCacheRepository.clearUser(message.chat().id())
+            .then(fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_LINK))
+            .then(telegramAPI.sendMessageAsync(message, "Send link to track"));
     }
 
     @MessageHandler(
@@ -45,11 +46,11 @@ public class TrackRouter {
         //weird compilation error with Enum.name()
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_LINK")
     )
-    public void parseLink(Message message) {
+    public Mono<Void> parseLink(Message message) {
         log.info("In handler parseLink {}", message.chat().id());
-        userDataCacheRepository.updateLink(message.chat().id(), message.text());
-        fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_TAGS);
-        telegramAPI.sendMessage(message, "Send personal tags for this link (optional)", getSkipButton());
+        return userDataCacheRepository.updateLink(message.chat().id(), message.text())
+            .then(fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_TAGS))
+            .then(telegramAPI.sendMessageAsync(message, "Send personal tags for this link (optional)", getSkipButton()));
     }
 
     @MessageHandler(
@@ -57,44 +58,48 @@ public class TrackRouter {
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_LINK"),
         priority = 10
     )
-    public void failedToParseLink(Message message) {
+    public Mono<Void> failedToParseLink(Message message) {
         log.info("In handler failedToParseLink {}", message.chat().id());
-        telegramAPI.sendMessage(message, "Incorrect url, try again");
+        return telegramAPI.sendMessageAsync(message, "Incorrect url, try again");
     }
 
     @MessageHandler(
         filters = FilterRegister.StateFilter.class,
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_TAGS")
     )
-    public void parseTags(Message message) {
+    public Mono<Void> parseTags(Message message) {
         log.info("In handler parseTags {}", message.chat().id());
+        Mono<Void> result = Mono.empty();
         if (!message.text().equals(SKIP_TEXT)) {
-            userDataCacheRepository.updateTags(message.chat().id(), message.text());
+            result = result.then(userDataCacheRepository.updateTags(message.chat().id(), message.text()));
         }
-        fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_FILTERS);
-        telegramAPI.sendMessage(message, "Send personal filters for this link (optional)", getSkipButton());
+        return result.then(fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_FILTERS))
+            .then(telegramAPI.sendMessageAsync(message, "Send personal filters for this link (optional)", getSkipButton()));
     }
 
     @MessageHandler(
         filters = FilterRegister.StateFilter.class,
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_FILTERS")
     )
-    public void parseFilters(Message message) {
+    public Mono<Void> parseFilters(Message message) {
         log.info("In handler parseFilters {}", message.chat().id());
+        Mono<Void> result = Mono.empty();
         if (!message.text().equals(SKIP_TEXT)) {
-            userDataCacheRepository.updateFilters(message.chat().id(), message.text());
+            result = result.then(userDataCacheRepository.updateFilters(message.chat().id(), message.text()));
         }
-        var data = userDataCacheRepository.getUser(message.chat().id());
-        scrapperClient.addLink(
-            message.chat().id(),
-            AddLinkRequest.builder()
-                .link(data.link())
-                .filters(List.of(data.filters().split(" ")))
-                .tags(List.of(data.tags().split(" ")))
-                .build()
-        ).subscribe();
-        userDataCacheRepository.clearUser(message.chat().id());
-        telegramAPI.sendMessage(message, "Subscribed");
+        return result
+            .then(Mono.defer(() -> userDataCacheRepository.getUser(message.chat().id())))
+            .flatMap(data ->
+                scrapperClient.addLink(
+                    message.chat().id(),
+                    AddLinkRequest.builder()
+                        .link(data.link())
+                        .filters(List.of(data.filters().split(" ")))
+                        .tags(List.of(data.tags().split(" ")))
+                        .build()
+                ))
+            .then(userDataCacheRepository.clearUser(message.chat().id()))
+            .then(telegramAPI.sendMessageAsync(message, "Subscribed"));
     }
 
     @MessageHandler(
@@ -102,22 +107,21 @@ public class TrackRouter {
         params = @FilterParam(key = COMMANDS, value = "untrack"),
         priority = 0
     )
-    public void untrack(Message message) {
+    public Mono<Void> untrack(Message message) {
         log.info("In handler unsubscribe {}", message.chat().id());
-        telegramAPI.sendMessage(message, "Enter the link. Your current links: /list");
-        fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_LINK_UNSUBSCRIBE);
+        return telegramAPI.sendMessageAsync(message, "Enter the link. Your current links: /list")
+            .then(fsmContext.setState(message, SubscriptionBotState.WAITING_FOR_LINK_UNSUBSCRIBE));
     }
 
     @MessageHandler(
         filters = {FilterRegister.StateFilter.class, FilterRegister.UrlFilter.class},
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_LINK_UNSUBSCRIBE")
     )
-    public void unsubscribeParseLink(Message message) {
+    public Mono<Void> unsubscribeParseLink(Message message) {
         log.info("In handler unsubscribeParseLink {}", message.chat().id());
-        scrapperClient.removeLink(message.chat().id(), message.text())
-            .subscribe();
-        userDataCacheRepository.clearUser(message.chat().id());
-        telegramAPI.sendMessage(message, "Unsubscribed");
+        return scrapperClient.removeLink(message.chat().id(), message.text()).
+            then(userDataCacheRepository.clearUser(message.chat().id()))
+            .then(telegramAPI.sendMessageAsync(message, "Unsubscribed"));
     }
 
     @MessageHandler(
@@ -125,8 +129,8 @@ public class TrackRouter {
         params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_LINK_UNSUBSCRIBE"),
         priority = 10
     )
-    public void unsubscribeFailedToParseLink(Message message) {
+    public Mono<Void> unsubscribeFailedToParseLink(Message message) {
         log.info("In handler unsubscribeFailedToParseLink {}", message.chat().id());
-        telegramAPI.sendMessage(message, "Incorrect url, try again");
+        return telegramAPI.sendMessageAsync(message, "Incorrect url, try again");
     }
 }

@@ -4,6 +4,7 @@ import backend.academy.bot.telegram.utils.fsm.BotState;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 @Repository
 public class InMemoryUserCache implements UserDataCacheRepository {
@@ -11,36 +12,41 @@ public class InMemoryUserCache implements UserDataCacheRepository {
 
 
     @Override
-    public void updateState(Long chatId, BotState state) {
+    public Mono<Void> updateState(Long chatId, BotState state) {
         userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
             .botState(state);
+        return Mono.empty();
     }
 
     @Override
-    public void updateLink(Long chatId, String link) {
+    public Mono<Void> updateLink(Long chatId, String link) {
         userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
             .link(link);
+        return Mono.empty();
     }
 
     @Override
-    public void updateFilters(Long chatId, String filters) {
+    public Mono<Void> updateFilters(Long chatId, String filters) {
         userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
             .filters(filters);
+        return Mono.empty();
     }
 
     @Override
-    public void updateTags(Long chatId, String tags) {
+    public Mono<Void> updateTags(Long chatId, String tags) {
         userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
             .tags(tags);
+        return Mono.empty();
     }
 
     @Override
-    public UserCache getUser(Long chatId) {
-        return userMap.getOrDefault(chatId, UserCache.builder().build());
+    public Mono<UserCache> getUser(Long chatId) {
+        return Mono.just(userMap.getOrDefault(chatId, UserCache.builder().build()));
     }
 
     @Override
-    public void clearUser(Long chatId) {
+    public Mono<Void> clearUser(Long chatId) {
         userMap.remove(chatId);
+        return Mono.empty();
     }
 }
