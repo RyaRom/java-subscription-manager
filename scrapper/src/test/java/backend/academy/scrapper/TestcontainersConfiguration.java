@@ -1,17 +1,17 @@
-//package backend.academy.scrapper;
+// package backend.academy.scrapper;
 //
-//import org.springframework.boot.devtools.restart.RestartScope;
-//import org.springframework.boot.test.context.TestConfiguration;
-//import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-//import org.springframework.context.annotation.Bean;
-//import org.testcontainers.containers.GenericContainer;
-//import org.testcontainers.containers.PostgreSQLContainer;
-//import org.testcontainers.kafka.KafkaContainer;
-//import org.testcontainers.utility.DockerImageName;
+// import org.springframework.boot.devtools.restart.RestartScope;
+// import org.springframework.boot.test.context.TestConfiguration;
+// import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+// import org.springframework.context.annotation.Bean;
+// import org.testcontainers.containers.GenericContainer;
+// import org.testcontainers.containers.PostgreSQLContainer;
+// import org.testcontainers.kafka.KafkaContainer;
+// import org.testcontainers.utility.DockerImageName;
 //
 //// isolated from the "bot" module's containers!
-//@TestConfiguration(proxyBeanMethods = false)
-//class TestcontainersConfiguration {
+// @TestConfiguration(proxyBeanMethods = false)
+// class TestcontainersConfiguration {
 //
 //    @Bean
 //    @RestartScope
@@ -37,4 +37,4 @@
 //    KafkaContainer kafkaContainer() {
 //        return new KafkaContainer("apache/kafka-native:3.8.1").withExposedPorts(9092);
 //    }
-//}
+// }

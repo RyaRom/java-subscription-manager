@@ -30,17 +30,19 @@ public class UpdateProcessor {
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();
 
-    private static Mono<Void> handleAsyncOrNotHandler(Object bean, Method method, Message message) throws IllegalAccessException, InvocationTargetException {
+    private static Mono<Void> handleAsyncOrNotHandler(Object bean, Method method, Message message)
+            throws IllegalAccessException, InvocationTargetException {
         if (method.getReturnType().equals(Void.TYPE)) {
             log.warn("Blocking call in {}", method.getName());
             return Mono.fromRunnable(() -> {
-                    try {
-                        method.invoke(bean, message);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).subscribeOn(Schedulers.boundedElastic())
-                .then();
+                        try {
+                            method.invoke(bean, message);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .then();
         }
         Object result = method.invoke(bean, message);
         if (result instanceof Mono) {
@@ -53,7 +55,7 @@ public class UpdateProcessor {
 
     public final void consumeUpdate(Update update) {
         if (update.message() == null) {
-            //Possible logic for other update types
+            // Possible logic for other update types
             return;
         }
         Message message = update.message();
@@ -61,11 +63,11 @@ public class UpdateProcessor {
             if (handler.filter.test(message)) {
                 Mono<Void> resultAsync = handler.handler.apply(message);
                 resultAsync
-                    .onErrorResume(e -> {
-                        log.error("Error in handler", e);
-                        return Mono.empty();
-                    })
-                    .subscribe();
+                        .onErrorResume(e -> {
+                            log.error("Error in handler", e);
+                            return Mono.empty();
+                        })
+                        .subscribe();
                 if (handler.isFinal) {
                     return;
                 }
@@ -100,15 +102,17 @@ public class UpdateProcessor {
             filters.add(filterGenerator.filter(params));
         }
         messageHandlers.add(new MessageHandler(
-            message -> filters.stream().allMatch(filter -> filter.test(message)),
-            message -> {
-                try {
-                    return handleAsyncOrNotHandler(bean, method, message);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    log.error("Unable to invoke message handler {}", method.getName(), e);
-                    throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
-                }
-            }, messageHandler.priority(), messageHandler.isFinal()));
+                message -> filters.stream().allMatch(filter -> filter.test(message)),
+                message -> {
+                    try {
+                        return handleAsyncOrNotHandler(bean, method, message);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        log.error("Unable to invoke message handler {}", method.getName(), e);
+                        throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
+                    }
+                },
+                messageHandler.priority(),
+                messageHandler.isFinal()));
     }
 
     private Map<Object, List<Method>> getAllHandlers() {
@@ -116,17 +120,13 @@ public class UpdateProcessor {
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(Router.class);
         for (String beanName : beanNames) {
             Object bean = applicationContext.getBean(beanName);
-            List<Method> beanMethods = new ArrayList<>(Arrays.asList(bean.getClass().getMethods()));
+            List<Method> beanMethods =
+                    new ArrayList<>(Arrays.asList(bean.getClass().getMethods()));
             methods.put(bean, beanMethods);
         }
         return methods;
     }
 
     public record MessageHandler(
-        Predicate<Message> filter,
-        Function<Message, Mono<Void>> handler,
-        int priority,
-        boolean isFinal
-    ) {
-    }
+            Predicate<Message> filter, Function<Message, Mono<Void>> handler, int priority, boolean isFinal) {}
 }

@@ -1,5 +1,7 @@
 package backend.academy.scrapper.service;
 
+import static backend.academy.scrapper.repository.dto.GithubInfo.getGithubInfo;
+
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.repository.LinkRepository;
@@ -28,9 +30,9 @@ public class UpdatePollingJob {
         lastUpdated = Instant.now();
         log.info("Polling all links");
         Flux.fromIterable(linkRepository.findAll())
-            .flatMap(this::updateLink)
-            .then()
-            .subscribe();
+                .flatMap(this::updateLink)
+                .then()
+                .subscribe();
     }
 
     public Mono<Void> updateLink(Link link) {

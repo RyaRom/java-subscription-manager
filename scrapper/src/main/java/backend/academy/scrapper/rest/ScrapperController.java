@@ -40,22 +40,21 @@ public class ScrapperController {
     @GetMapping("/links")
     public Mono<ResponseEntity<ListLinkResponse>> getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
         log.info("Get links for chat {}", chatId);
-        return scrapperService.getLinks(chatId)
-            .map(ResponseEntity::ok);
+        return scrapperService.getLinks(chatId).map(ResponseEntity::ok);
     }
-    //TODO finish operations for bot
+    // TODO finish operations for bot
 
     @PostMapping("/links")
-    public ResponseEntity<LinkResponse> addLink(@RequestHeader("Tg-Chat-Id") Long chatId,
-                                                @RequestBody AddLinkRequest request) {
+    public ResponseEntity<LinkResponse> addLink(
+            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody AddLinkRequest request) {
         log.info("Add link for chat {}", chatId);
         log.info("request {}", request);
         return ResponseEntity.ok(new LinkResponse(null, null, null, null));
     }
 
     @DeleteMapping("/links")
-    public ResponseEntity<LinkResponse> removeLink(@RequestHeader("Tg-Chat-Id") Long chatId,
-                                                   @RequestBody RemoveLinkRequest request) {
+    public ResponseEntity<LinkResponse> removeLink(
+            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody RemoveLinkRequest request) {
         log.info("Remove link for chat {}", chatId);
         return ResponseEntity.ok(new LinkResponse(null, null, null, null));
     }

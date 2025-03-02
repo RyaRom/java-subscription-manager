@@ -10,10 +10,13 @@ import lombok.Data;
 public final class UserCache {
     @Builder.Default
     private BotState botState = DefaultStates.NONE;
+
     @Builder.Default
     private String link = "";
+
     @Builder.Default
     private String tags = "";
+
     @Builder.Default
     private String filters = "";
 }

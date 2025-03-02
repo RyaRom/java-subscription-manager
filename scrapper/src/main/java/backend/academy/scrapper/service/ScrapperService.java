@@ -15,8 +15,9 @@ public class ScrapperService {
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findAll().stream()
-                .filter(link -> link.chatIds().contains(chatId))
-                .map(Link::toLinkResponse).toList();
+                    .filter(link -> link.chatIds().contains(chatId))
+                    .map(Link::toLinkResponse)
+                    .toList();
             return new ListLinkResponse(links, links.size());
         });
     }
