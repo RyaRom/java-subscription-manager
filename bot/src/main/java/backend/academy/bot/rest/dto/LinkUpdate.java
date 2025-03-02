@@ -3,7 +3,7 @@ package backend.academy.bot.rest.dto;
 import java.util.List;
 
 public record LinkUpdate(
-    Long chatId,
+    Long linkId,
     String url,
     String description,
     List<Long> tgChatIds

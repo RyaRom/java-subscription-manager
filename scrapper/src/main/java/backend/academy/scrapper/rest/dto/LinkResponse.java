@@ -3,7 +3,7 @@ package backend.academy.scrapper.rest.dto;
 import java.util.List;
 
 public record LinkResponse(
-    Long chatId,
+    Long linkId,
     String url,
     List<String> tags,
     List<String> filters

@@ -13,30 +13,34 @@ public class InMemoryUserCache implements UserDataCacheRepository {
 
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {
-        userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-            .botState(state);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> {
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
+                .botState(state);
+        });
     }
 
     @Override
     public Mono<Void> updateLink(Long chatId, String link) {
-        userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-            .link(link);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> {
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
+                .link(link);
+        });
     }
 
     @Override
     public Mono<Void> updateFilters(Long chatId, String filters) {
-        userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-            .filters(filters);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> {
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
+                .filters(filters);
+        });
     }
 
     @Override
     public Mono<Void> updateTags(Long chatId, String tags) {
-        userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-            .tags(tags);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> {
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
+                .tags(tags);
+        });
     }
 
     @Override
@@ -46,7 +50,8 @@ public class InMemoryUserCache implements UserDataCacheRepository {
 
     @Override
     public Mono<Void> clearUser(Long chatId) {
-        userMap.remove(chatId);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> {
+            userMap.remove(chatId);
+        });
     }
 }

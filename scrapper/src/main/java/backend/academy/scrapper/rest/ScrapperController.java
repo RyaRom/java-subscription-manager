@@ -42,6 +42,7 @@ public class ScrapperController {
     public ResponseEntity<LinkResponse> addLink(@RequestHeader("Tg-Chat-Id") Long chatId,
                                                 @RequestBody AddLinkRequest request) {
         log.info("Add link for chat {}", chatId);
+        log.info("request {}", request);
         return ResponseEntity.ok(new LinkResponse(null, null, null, null));
     }
 

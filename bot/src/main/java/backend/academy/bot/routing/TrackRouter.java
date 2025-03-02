@@ -13,6 +13,7 @@ import backend.academy.bot.telegram.utils.filters.FilterRegister;
 import backend.academy.bot.telegram.utils.fsm.FSMContext;
 import com.pengrad.telegrambot.model.Message;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
@@ -94,8 +95,8 @@ public class TrackRouter {
                     message.chat().id(),
                     AddLinkRequest.builder()
                         .link(data.link())
-                        .filters(List.of(data.filters().split(" ")))
-                        .tags(List.of(data.tags().split(" ")))
+                        .filters(Stream.of(data.filters().split(" ")).filter(s -> !s.isEmpty()).toList())
+                        .tags(Stream.of(data.tags().split(" ")).filter(s -> !s.isEmpty()).toList())
                         .build()
                 ))
             .then(userDataCacheRepository.clearUser(message.chat().id()))

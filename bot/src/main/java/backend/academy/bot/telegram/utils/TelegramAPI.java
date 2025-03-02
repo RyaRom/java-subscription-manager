@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,8 @@ public class TelegramAPI {
         log.error("Error sending message: {}", e.getMessage());
     }
 
-    public Flux<Void> sendMessagesAsync(List<Long> chatIds, String text) {
-        return Flux.fromIterable(chatIds)
-            .flatMap(chatId -> sendMessageAsync(chatId, text));
+    public Flux<Void> sendMessagesAsync(Flux<Long> chatIds, String text) {
+        return chatIds.flatMap(chatId -> sendMessageAsync(chatId, text));
     }
 
     public Mono<Void> sendMessageAsync(Long chatId, String text) {
