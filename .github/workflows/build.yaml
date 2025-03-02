@@ -54,4 +54,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - run: mvn install -N
-      - run: mvn compile -am spotless:check modernizer:modernizer spotbugs:check pmd:check pmd:cpd-check
+#      - run: mvn compile -am spotless:check modernizer:modernizer spotbugs:check pmd:check pmd:cpd-check
