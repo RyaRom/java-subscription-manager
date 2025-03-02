@@ -1,4 +1,4 @@
-package backend.academy.bot.rest.dto;
+package backend.academy.dto;
 
 public record RemoveLinkRequest(
     String link

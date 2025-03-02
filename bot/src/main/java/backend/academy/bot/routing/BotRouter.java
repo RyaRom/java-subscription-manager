@@ -2,12 +2,12 @@ package backend.academy.bot.routing;
 
 import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.repository.UserDataCacheRepository;
-import backend.academy.bot.rest.dto.LinkResponse;
 import backend.academy.bot.telegram.utils.TelegramAPI;
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
 import backend.academy.bot.telegram.utils.annotations.MessageHandler;
 import backend.academy.bot.telegram.utils.annotations.Router;
 import backend.academy.bot.telegram.utils.filters.FilterRegister;
+import backend.academy.dto.LinkResponse;
 import com.pengrad.telegrambot.model.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

@@ -1,8 +1,7 @@
 package backend.academy.bot.clients;
-
-import backend.academy.bot.rest.dto.AddLinkRequest;
-import backend.academy.bot.rest.dto.ListLinkResponse;
-import backend.academy.bot.rest.dto.RemoveLinkRequest;
+import backend.academy.dto.AddLinkRequest;
+import backend.academy.dto.ListLinkResponse;
+import backend.academy.dto.RemoveLinkRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;

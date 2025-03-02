@@ -1,7 +1,7 @@
 package backend.academy.bot.rest;
 
-import backend.academy.bot.rest.dto.LinkUpdate;
 import backend.academy.bot.telegram.utils.TelegramAPI;
+import backend.academy.dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;

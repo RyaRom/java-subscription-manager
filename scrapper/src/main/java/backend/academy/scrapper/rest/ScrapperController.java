@@ -1,10 +1,10 @@
 package backend.academy.scrapper.rest;
 
-import backend.academy.scrapper.rest.dto.AddLinkRequest;
-import backend.academy.scrapper.rest.dto.LinkResponse;
-import backend.academy.scrapper.rest.dto.ListLinkResponse;
-import backend.academy.scrapper.rest.dto.RemoveLinkRequest;
 import java.util.ArrayList;
+import backend.academy.dto.AddLinkRequest;
+import backend.academy.dto.LinkResponse;
+import backend.academy.dto.ListLinkResponse;
+import backend.academy.dto.RemoveLinkRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
