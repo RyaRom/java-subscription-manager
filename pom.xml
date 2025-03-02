@@ -226,6 +226,9 @@
                                 <style>PALANTIR</style>
                                 <formatJavadoc>true</formatJavadoc>
                             </palantirJavaFormat>
+                            <excludes>
+                                <exclude>common/src/main/java/backend/academy/dto/ApiErrorResponse.java</exclude>
+                            </excludes>
                         </java>
                         <pom>
                             <sortPom>

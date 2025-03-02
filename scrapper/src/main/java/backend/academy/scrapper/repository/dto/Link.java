@@ -9,8 +9,10 @@ import org.jspecify.annotations.Nullable;
 public final class Link {
     private Long linkId;
     private String url;
+
     @Nullable
     private GithubInfo githubInfo;
+
     private Type linkType;
     private List<Long> chatIds;
     private List<String> tags;
@@ -18,12 +20,12 @@ public final class Link {
 
     public LinkResponse toLinkResponse() {
         return new LinkResponse(
-            linkId, url,
-            tags, filters
-        );
+                linkId, url,
+                tags, filters);
     }
 
     public enum Type {
-        GITHUB, STACK_OVERFLOW
+        GITHUB,
+        STACK_OVERFLOW
     }
 }

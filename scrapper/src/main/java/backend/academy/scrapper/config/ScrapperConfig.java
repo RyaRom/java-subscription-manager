@@ -10,9 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 public record ScrapperConfig(
-        @NotEmpty String githubToken,
-        StackOverflowCredentials stackOverflow,
-        @NotEmpty String botUrl) {
+        @NotEmpty String githubToken, StackOverflowCredentials stackOverflow, @NotEmpty String botUrl) {
     @Bean
     @Qualifier("githubHttpClient")
     public WebClient githubHttpClient() {
@@ -26,7 +24,7 @@ public record ScrapperConfig(
 
     @Bean
     @Qualifier("botHttpClient")
-    public WebClient botHttpClient(){
+    public WebClient botHttpClient() {
         return WebClient.builder()
                 .baseUrl(botUrl)
                 .defaultHeader("Content-Type", "application/json")
@@ -36,11 +34,8 @@ public record ScrapperConfig(
     @Bean
     @Qualifier("stackoverflowHttpClient")
     public WebClient stackoverflowHttpClient() {
-        return WebClient.builder()
-                .baseUrl("https://api.stackexchange.com")
-                .build();
+        return WebClient.builder().baseUrl("https://api.stackexchange.com").build();
     }
 
-    public record StackOverflowCredentials(@NotEmpty String key, @NotEmpty String accessToken) {
-    }
+    public record StackOverflowCredentials(@NotEmpty String key, @NotEmpty String accessToken) {}
 }

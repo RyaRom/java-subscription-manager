@@ -7,8 +7,8 @@ public class BotKeyboards {
 
     public static ReplyKeyboardMarkup getSkipButton() {
         return new ReplyKeyboardMarkup(SKIP_TEXT)
-            .oneTimeKeyboard(true)
-            .resizeKeyboard(true)
-            .selective(true);
+                .oneTimeKeyboard(true)
+                .resizeKeyboard(true)
+                .selective(true);
     }
 }

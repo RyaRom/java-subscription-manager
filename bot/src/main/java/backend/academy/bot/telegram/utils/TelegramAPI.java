@@ -21,7 +21,7 @@ public class TelegramAPI {
 
     @Lazy
     @Autowired
-    //field injection to avoid circular dependency
+    // field injection to avoid circular dependency
     private TelegramBot telegramBot;
 
     private static void logTelegramError(Throwable e) {
@@ -34,11 +34,12 @@ public class TelegramAPI {
 
     public Mono<Void> sendMessageAsync(Long chatId, String text) {
         return Mono.fromRunnable(() -> sendMessage(chatId, text))
-            .subscribeOn(Schedulers.boundedElastic())
-            .onErrorResume(e -> {
-                logTelegramError(e);
-                return Mono.empty();
-            }).then();
+                .subscribeOn(Schedulers.boundedElastic())
+                .onErrorResume(e -> {
+                    logTelegramError(e);
+                    return Mono.empty();
+                })
+                .then();
     }
 
     public Mono<Void> sendMessageAsync(Message message, String text) {
@@ -47,23 +48,22 @@ public class TelegramAPI {
 
     public Mono<Void> sendMessageAsync(Message message, String text, Keyboard keyboard) {
         return Mono.fromRunnable(() -> sendMessage(message.chat().id(), text, keyboard))
-            .subscribeOn(Schedulers.boundedElastic())
-            .onErrorResume(e -> {
-                logTelegramError(e);
-                return Mono.empty();
-            }).then();
+                .subscribeOn(Schedulers.boundedElastic())
+                .onErrorResume(e -> {
+                    logTelegramError(e);
+                    return Mono.empty();
+                })
+                .then();
     }
 
     public void sendMessage(Long chatId, String text) {
-        SendMessage request = new SendMessage(chatId, text)
-            .parseMode(ParseMode.HTML);
+        SendMessage request = new SendMessage(chatId, text).parseMode(ParseMode.HTML);
         telegramBot.execute(request);
     }
 
     public void sendMessage(Long chatId, String text, Keyboard keyboard) {
-        SendMessage request = new SendMessage(chatId, text)
-            .parseMode(ParseMode.HTML)
-            .replyMarkup(keyboard);
+        SendMessage request =
+                new SendMessage(chatId, text).parseMode(ParseMode.HTML).replyMarkup(keyboard);
         telegramBot.execute(request);
     }
 }

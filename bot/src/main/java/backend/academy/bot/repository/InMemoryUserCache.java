@@ -11,36 +11,31 @@ public class InMemoryUserCache implements UserDataCacheRepository {
     private final Map<Long, UserCache> userMap = new HashMap<>();
     private final Map<Long, SubscriptionCache> subscriptionCacheMap = new HashMap<>();
 
-
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-                .botState(state);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).botState(state);
         });
     }
 
     @Override
     public Mono<Void> updateLink(Long chatId, String link) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-                .link(link);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).link(link);
         });
     }
 
     @Override
     public Mono<Void> updateFilters(Long chatId, String filters) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-                .filters(filters);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).filters(filters);
         });
     }
 
     @Override
     public Mono<Void> updateTags(Long chatId, String tags) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build())
-                .tags(tags);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).tags(tags);
         });
     }
 
@@ -58,7 +53,8 @@ public class InMemoryUserCache implements UserDataCacheRepository {
 
     @Override
     public Mono<SubscriptionCache> getSubscription(Long chatId) {
-        return Mono.just(subscriptionCacheMap.getOrDefault(chatId, SubscriptionCache.builder().build()));
+        return Mono.just(subscriptionCacheMap.getOrDefault(
+                chatId, SubscriptionCache.builder().build()));
     }
 
     @Override

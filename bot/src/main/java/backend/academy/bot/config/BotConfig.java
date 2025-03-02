@@ -13,11 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public record BotConfig(
-    @NotEmpty String telegramToken,
-    @NotEmpty String helpMessage,
-    @NotEmpty String scrapperUrl
-) {
+public record BotConfig(@NotEmpty String telegramToken, @NotEmpty String helpMessage, @NotEmpty String scrapperUrl) {
 
     @Bean
     @Qualifier("helpMessage")
@@ -29,26 +25,27 @@ public record BotConfig(
     @Qualifier("scrapperHttpClient")
     public WebClient scrapperHttpClient() {
         return WebClient.builder()
-            .baseUrl(scrapperUrl)
-            .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .baseUrl(scrapperUrl)
+                .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     public TelegramBot telegramBot(UpdateProcessor updateProcessor) {
         var telegramBot = new TelegramBot(telegramToken);
-        telegramBot.setUpdatesListener(updates -> {
-                updates.forEach(updateProcessor::consumeUpdate);
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            },
-            e -> {
-                if (e.response() != null) {
-                    e.response().errorCode();
-                    e.response().description();
-                } else {
-                    e.printStackTrace();
-                }
-            });
+        telegramBot.setUpdatesListener(
+                updates -> {
+                    updates.forEach(updateProcessor::consumeUpdate);
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                },
+                e -> {
+                    if (e.response() != null) {
+                        e.response().errorCode();
+                        e.response().description();
+                    } else {
+                        e.printStackTrace();
+                    }
+                });
         return telegramBot;
     }
 }

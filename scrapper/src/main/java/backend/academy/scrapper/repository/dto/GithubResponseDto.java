@@ -27,40 +27,36 @@ public record GithubResponseDto(List<Activity> activities) {
     }
 
     public record Activity(
-        int id,
-        String nodeId,
-        String before,
-        String after,
-        String ref,
-        OffsetDateTime timestamp,
-        ActivityType activityType,
-        Actor actor
-    ) {
-    }
+            int id,
+            String nodeId,
+            String before,
+            String after,
+            String ref,
+            OffsetDateTime timestamp,
+            ActivityType activityType,
+            Actor actor) {}
 
     public record Actor(
-        String name,
-        String email,
-        String login,
-        long id,
-        String nodeId,
-        URI avatarUrl,
-        String gravatarId,
-        URI url,
-        URI htmlUrl,
-        URI followersUrl,
-        URI followingUrl,
-        URI gistsUrl,
-        URI starredUrl,
-        URI subscriptionsUrl,
-        URI organizationsUrl,
-        URI reposUrl,
-        URI eventsUrl,
-        URI receivedEventsUrl,
-        String type,
-        boolean siteAdmin,
-        String starredAt,
-        String userViewType
-    ) {
-    }
+            String name,
+            String email,
+            String login,
+            long id,
+            String nodeId,
+            URI avatarUrl,
+            String gravatarId,
+            URI url,
+            URI htmlUrl,
+            URI followersUrl,
+            URI followingUrl,
+            URI gistsUrl,
+            URI starredUrl,
+            URI subscriptionsUrl,
+            URI organizationsUrl,
+            URI reposUrl,
+            URI eventsUrl,
+            URI receivedEventsUrl,
+            String type,
+            boolean siteAdmin,
+            String starredAt,
+            String userViewType) {}
 }

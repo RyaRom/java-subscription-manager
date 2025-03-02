@@ -17,24 +17,26 @@ public class BotClient {
     private final WebClient webClient;
 
     public static String getGithubUpdate(Activity activity) {
-        return String.format("type: %s; timestamp: %s; author: %s",
-            activity.activityType().toString(),
-            activity.timestamp().toString(),
-            activity.actor().login());
+        return String.format(
+                "type: %s; timestamp: %s; author: %s",
+                activity.activityType().toString(),
+                activity.timestamp().toString(),
+                activity.actor().login());
     }
 
     public Mono<Void> sendUpdate(Activity activity, Link link) {
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.linkId())
-            .url(link.url())
-            .tgChatIds(link.chatIds())
-            .description(getGithubUpdate(activity))
-            .build();
-        return webClient.post()
-            .uri("/updates")
-            .body(BodyInserters.fromValue(linkUpdate))
-            .retrieve()
-            .toBodilessEntity()
-            .then();
+                .linkId(link.linkId())
+                .url(link.url())
+                .tgChatIds(link.chatIds())
+                .description(getGithubUpdate(activity))
+                .build();
+        return webClient
+                .post()
+                .uri("/updates")
+                .body(BodyInserters.fromValue(linkUpdate))
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 }

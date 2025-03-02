@@ -1,13 +1,14 @@
 package backend.academy.bot.telegram.utils.filters;
 
-import com.pengrad.telegrambot.model.Message;
-import java.util.Map;
-import java.util.function.Predicate;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.pengrad.telegrambot.model.Message;
+import java.util.Map;
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 
 class FilterRegisterTest {
 

@@ -7,5 +7,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Log4j2
 @RequestMapping("/scrapper/api")
-public class AdminController {
-}
+public class AdminController {}

@@ -20,10 +20,9 @@ public class BotController {
 
     @PostMapping("/updates")
     public Mono<ResponseEntity<Void>> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
-        return telegramAPI.sendMessagesAsync(
-            Flux.fromIterable(linkUpdate.tgChatIds()),
-            getUpdateInfo(linkUpdate)
-        ).then(Mono.just(ResponseEntity.ok().build()));
+        return telegramAPI
+                .sendMessagesAsync(Flux.fromIterable(linkUpdate.tgChatIds()), getUpdateInfo(linkUpdate))
+                .then(Mono.just(ResponseEntity.ok().build()));
     }
 
     public static @NotNull String getUpdateInfo(LinkUpdate linkUpdate) {

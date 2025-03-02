@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static backend.academy.scrapper.repository.dto.GithubInfo.getGithubInfo;
 
 @Component
 @Log4j2
@@ -41,15 +40,16 @@ public class UpdatePollingJob {
             if (link.githubInfo() == null) {
                 link.githubInfo(getGithubInfo(link.url()));
             }
-            return githubClient.getRepoActivities(link.githubInfo().owner(), link.githubInfo().repo())
-                .flatMapMany(res -> Flux.fromIterable(res.activities()))
-                .filter(activity -> activity.timestamp().isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-                .flatMap(activity -> botClient.sendUpdate(activity, link))
-                .then();
+            return githubClient
+                    .getRepoActivities(
+                            link.githubInfo().owner(), link.githubInfo().repo())
+                    .flatMapMany(res -> Flux.fromIterable(res.activities()))
+                    .filter(activity -> activity.timestamp().isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                    .flatMap(activity -> botClient.sendUpdate(activity, link))
+                    .then();
         } else if (linkType == Link.Type.STACK_OVERFLOW) {
             // TODO: STACK OVERFLOW Client
         }
         return Mono.empty();
     }
-
 }

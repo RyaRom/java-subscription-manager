@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class FilterRegister {
-    private static final Map<Class<? extends MessageFilterGenerator>, MessageFilterGenerator> FILTER_CACHE = new HashMap<>();
+    private static final Map<Class<? extends MessageFilterGenerator>, MessageFilterGenerator> FILTER_CACHE =
+            new HashMap<>();
     private final ApplicationContext applicationContext;
 
     private static boolean notEmpty(String text) {
@@ -56,8 +57,7 @@ public class FilterRegister {
             }
             return message -> {
                 String text = message.text();
-                return notEmpty(text)
-                    && commandsSet.contains(text);
+                return notEmpty(text) && commandsSet.contains(text);
             };
         }
     }
@@ -78,8 +78,7 @@ public class FilterRegister {
             return message -> {
                 String text = message.text();
                 String stateName = fsmContext.getCurrentStateName(message.chat().id());
-                return notEmpty(text)
-                    && states.contains(stateName);
+                return notEmpty(text) && states.contains(stateName);
             };
         }
     }
@@ -91,12 +90,10 @@ public class FilterRegister {
             return message -> {
                 String text = message.text();
                 return notEmpty(text)
-                    && text.matches(
-                    "(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]" +
-                        "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|" +
-                        "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-" +
-                        "Z0-9]+\\.[^\\s]{2,})"
-                );
+                        && text.matches("(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]"
+                                + "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|"
+                                + "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-"
+                                + "Z0-9]+\\.[^\\s]{2,})");
             };
         }
     }

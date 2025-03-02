@@ -1,4 +1,5 @@
 package backend.academy.bot.clients;
+
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
@@ -18,44 +19,47 @@ public class ScrapperClient {
     private final WebClient webClient;
 
     public Mono<Void> registerChat(Long chatId) {
-        return webClient.post()
-            .uri("/tg-chat/{chatId}", chatId)
-            .retrieve()
-            .toBodilessEntity()
-            .then()
-            .publishOn(Schedulers.boundedElastic());
+        return webClient
+                .post()
+                .uri("/tg-chat/{chatId}", chatId)
+                .retrieve()
+                .toBodilessEntity()
+                .then()
+                .publishOn(Schedulers.boundedElastic());
     }
 
     public Mono<ListLinkResponse> getLinks(Long chatId) {
-        return webClient.get()
-            .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
-            .retrieve()
-            .bodyToMono(ListLinkResponse.class)
-            .publishOn(Schedulers.boundedElastic());
+        return webClient
+                .get()
+                .uri("/links")
+                .header("Tg-Chat-Id", chatId.toString())
+                .retrieve()
+                .bodyToMono(ListLinkResponse.class)
+                .publishOn(Schedulers.boundedElastic());
     }
 
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
-        return webClient.post()
-            .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
-            .body(BodyInserters.fromValue(addLinkRequest))
-            .retrieve()
-            .toBodilessEntity()
-            .then()
-            .publishOn(Schedulers.boundedElastic());
+        return webClient
+                .post()
+                .uri("/links")
+                .header("Tg-Chat-Id", chatId.toString())
+                .body(BodyInserters.fromValue(addLinkRequest))
+                .retrieve()
+                .toBodilessEntity()
+                .then()
+                .publishOn(Schedulers.boundedElastic());
     }
 
     public Mono<Void> removeLink(Long chatId, String link) {
         return webClient
-            //body in delete is not allowed by default
-            .method(HttpMethod.DELETE)
-            .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
-            .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
-            .retrieve()
-            .toBodilessEntity()
-            .then()
-            .publishOn(Schedulers.boundedElastic());
+                // body in delete is not allowed by default
+                .method(HttpMethod.DELETE)
+                .uri("/links")
+                .header("Tg-Chat-Id", chatId.toString())
+                .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
+                .retrieve()
+                .toBodilessEntity()
+                .then()
+                .publishOn(Schedulers.boundedElastic());
     }
 }
