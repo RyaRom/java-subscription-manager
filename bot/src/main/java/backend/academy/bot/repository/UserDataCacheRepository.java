@@ -17,4 +17,10 @@ public interface UserDataCacheRepository {
     Mono<UserCache> getUser(Long chatId);
 
     Mono<Void> clearUser(Long chatId);
+
+    Mono<SubscriptionCache> getSubscription(Long chatId);
+
+    Mono<Void> updateSubscription(Long chatId, SubscriptionCache subscription);
+
+    Mono<Void> clearSubscription(Long chatId);
 }

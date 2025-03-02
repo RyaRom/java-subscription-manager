@@ -1,10 +1,11 @@
 package backend.academy.scrapper.rest;
 
-import java.util.ArrayList;
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
+import backend.academy.scrapper.service.ScrapperService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,11 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
+@RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/scrapper/api")
 public class ScrapperController {
+    private final ScrapperService scrapperService;
+
     @PostMapping("/tg-chat/{chatId}")
     public ResponseEntity<Void> registerChat(@PathVariable Long chatId) {
         log.info("Chat registered {}", chatId);
@@ -33,10 +38,12 @@ public class ScrapperController {
     }
 
     @GetMapping("/links")
-    public ResponseEntity<ListLinkResponse> getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
+    public Mono<ResponseEntity<ListLinkResponse>> getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
         log.info("Get links for chat {}", chatId);
-        return ResponseEntity.ok(new ListLinkResponse(new ArrayList<>(), 0));
+        return scrapperService.getLinks(chatId)
+            .map(ResponseEntity::ok);
     }
+    //TODO finish operations for bot
 
     @PostMapping("/links")
     public ResponseEntity<LinkResponse> addLink(@RequestHeader("Tg-Chat-Id") Long chatId,

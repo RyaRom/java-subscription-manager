@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserCache {
+public final class UserCache {
     @Builder.Default
     private BotState botState = DefaultStates.NONE;
     @Builder.Default
