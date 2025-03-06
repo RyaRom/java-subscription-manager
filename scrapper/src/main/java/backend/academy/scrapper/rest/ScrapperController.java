@@ -26,15 +26,15 @@ public class ScrapperController {
     private final ScrapperService scrapperService;
 
     @PostMapping("/tg-chat/{chatId}")
-    public ResponseEntity<Void> registerChat(@PathVariable Long chatId) {
+    public Mono<ResponseEntity<Void>> registerChat(@PathVariable Long chatId) {
         log.info("Chat registered {}", chatId);
-        return ResponseEntity.ok().build();
+        return Mono.just(ResponseEntity.ok().build());
     }
 
     @DeleteMapping("/tg-chat/{chatId}")
-    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId) {
+    public Mono<ResponseEntity<Void>> deleteChat(@PathVariable Long chatId) {
         log.info("Chat deleted {}", chatId);
-        return ResponseEntity.ok().build();
+        return Mono.just(ResponseEntity.ok().build());
     }
 
     @GetMapping("/links")
@@ -42,20 +42,19 @@ public class ScrapperController {
         log.info("Get links for chat {}", chatId);
         return scrapperService.getLinks(chatId).map(ResponseEntity::ok);
     }
-    // TODO finish operations for bot
 
     @PostMapping("/links")
-    public ResponseEntity<LinkResponse> addLink(
+    public Mono<ResponseEntity<LinkResponse>> addLink(
             @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody AddLinkRequest request) {
         log.info("Add link for chat {}", chatId);
         log.info("request {}", request);
-        return ResponseEntity.ok(new LinkResponse(null, null, null, null));
+        return scrapperService.addLink(chatId, request).map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/links")
-    public ResponseEntity<LinkResponse> removeLink(
+    public Mono<ResponseEntity<LinkResponse>> removeLink(
             @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody RemoveLinkRequest request) {
         log.info("Remove link for chat {}", chatId);
-        return ResponseEntity.ok(new LinkResponse(null, null, null, null));
+        return scrapperService.removeLink(request.link()).map(ResponseEntity::ok);
     }
 }

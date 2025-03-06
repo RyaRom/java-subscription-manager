@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public class InMemoryUserCache implements UserDataCacheRepository {
     private final Map<Long, UserCache> userMap = new HashMap<>();
-    private final Map<Long, SubscriptionCache> subscriptionCacheMap = new HashMap<>();
 
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {
@@ -48,26 +47,6 @@ public class InMemoryUserCache implements UserDataCacheRepository {
     public Mono<Void> clearUser(Long chatId) {
         return Mono.fromRunnable(() -> {
             userMap.remove(chatId);
-        });
-    }
-
-    @Override
-    public Mono<SubscriptionCache> getSubscription(Long chatId) {
-        return Mono.just(subscriptionCacheMap.getOrDefault(
-                chatId, SubscriptionCache.builder().build()));
-    }
-
-    @Override
-    public Mono<Void> updateSubscription(Long chatId, SubscriptionCache subscription) {
-        return Mono.fromRunnable(() -> {
-            subscriptionCacheMap.put(chatId, subscription);
-        });
-    }
-
-    @Override
-    public Mono<Void> clearSubscription(Long chatId) {
-        return Mono.fromRunnable(() -> {
-            subscriptionCacheMap.remove(chatId);
         });
     }
 }

@@ -27,7 +27,14 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void delete(Long linkId) {
-        storage.remove(linkId);
+    public Optional<Link> delete(Long linkId) {
+        return Optional.ofNullable(storage.remove(linkId));
+    }
+
+    @Override
+    public Optional<Link> delete(String url) {
+        return findAll().stream()
+            .filter(l -> l.url().equals(url))
+            .findFirst();
     }
 }

@@ -2,12 +2,16 @@ package backend.academy.scrapper.repository.dto;
 
 import backend.academy.dto.LinkResponse;
 import java.util.List;
+import java.util.UUID;
+import lombok.Builder;
 import lombok.Data;
 import org.jspecify.annotations.Nullable;
 
 @Data
+@Builder
 public final class Link {
-    private Long linkId;
+    @Builder.Default
+    private Long linkId = UUID.randomUUID().timestamp();
     private String url;
 
     @Nullable
@@ -15,13 +19,11 @@ public final class Link {
 
     private Type linkType;
     private List<Long> chatIds;
-    private List<String> tags;
-    private List<String> filters;
 
     public LinkResponse toLinkResponse() {
         return new LinkResponse(
                 linkId, url,
-                tags, filters);
+                List.of(), List.of());
     }
 
     public enum Type {
