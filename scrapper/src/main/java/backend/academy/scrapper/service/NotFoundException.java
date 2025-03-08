@@ -1,4 +1,3 @@
 package backend.academy.scrapper.service;
 
-public class NotFoundException extends RuntimeException{
-}
+public class NotFoundException extends RuntimeException {}

@@ -17,19 +17,21 @@ public class TgBotTest extends BaseIntegrationTest {
 
     @Test
     void register() {
-        webTestClient.post()
-            .uri("/tg-chat/{chatId}", 1)
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .post()
+                .uri("/tg-chat/{chatId}", 1)
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 
     @Test
     void delete() {
-        webTestClient.delete()
-            .uri("/tg-chat/{chatId}", 1)
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .delete()
+                .uri("/tg-chat/{chatId}", 1)
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 }

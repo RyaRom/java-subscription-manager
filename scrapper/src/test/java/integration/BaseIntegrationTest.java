@@ -22,8 +22,10 @@ public class BaseIntegrationTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     protected WebTestClient webTestClient;
+
     @LocalServerPort
     protected int port;
+
     protected String apiUrl;
 
     protected static String asJsonString(final Object obj) {
@@ -37,10 +39,7 @@ public class BaseIntegrationTest {
     @BeforeEach
     public void setup() {
         apiUrl = "http://localhost:" + port + "/scrapper/api";
-        webTestClient = WebTestClient
-            .bindToServer()
-            .baseUrl(apiUrl)
-            .build();
+        webTestClient = WebTestClient.bindToServer().baseUrl(apiUrl).build();
     }
 
     @TestConfiguration

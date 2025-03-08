@@ -24,30 +24,30 @@ public class StackOverflowClient {
 
         if (credentials.tokenDisabled()) {
             return builder.uri(uriBuilder -> {
-                    var uri = uriBuilder
-                        .path("/questions/{questionId}/answers")
-                        .queryParam("sort", "activity")
-                        .queryParam("site", "stackoverflow")
-                        .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-                        .queryParam("order", "desc")
-                        .build(questionId);
-                    log.info("uri {}", uri);
-                    return uri;
-                })
-                .retrieve()
-                .bodyToMono(StackResponseDto.class);
+                        var uri = uriBuilder
+                                .path("/questions/{questionId}/answers")
+                                .queryParam("sort", "activity")
+                                .queryParam("site", "stackoverflow")
+                                .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
+                                .queryParam("order", "desc")
+                                .build(questionId);
+                        log.info("uri {}", uri);
+                        return uri;
+                    })
+                    .retrieve()
+                    .bodyToMono(StackResponseDto.class);
         } else {
             return builder.uri(uriBuilder -> uriBuilder
-                    .path("/questions/{questionId}/answers")
-                    .queryParam("sort", "activity")
-                    .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-                    .queryParam("order", "desc")
-                    .queryParam("site", "stackoverflow")
-                    .queryParam("key", credentials.key())
-                    .queryParam("access_token", credentials.accessToken())
-                    .build(questionId))
-                .retrieve()
-                .bodyToMono(StackResponseDto.class);
+                            .path("/questions/{questionId}/answers")
+                            .queryParam("sort", "activity")
+                            .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
+                            .queryParam("order", "desc")
+                            .queryParam("site", "stackoverflow")
+                            .queryParam("key", credentials.key())
+                            .queryParam("access_token", credentials.accessToken())
+                            .build(questionId))
+                    .retrieve()
+                    .bodyToMono(StackResponseDto.class);
         }
     }
 }

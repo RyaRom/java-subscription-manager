@@ -8,8 +8,10 @@ import lombok.Data;
 @Data
 public final class AddLinkRequest {
     private final String link;
+
     @Builder.Default
     private List<String> tags = List.of();
+
     @Builder.Default
     private List<String> filters = List.of();
 }

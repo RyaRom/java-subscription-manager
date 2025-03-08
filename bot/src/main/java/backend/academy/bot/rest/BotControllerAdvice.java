@@ -21,22 +21,25 @@ public class BotControllerAdvice {
     })
     public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequestExceptions(Exception e) {
         log.error("Bad request error: {}", e.getMessage());
-        return Mono.just(ResponseEntity.badRequest().body(ApiErrorResponse.builder()
-            .code("400")
-            .exceptionName(e.getClass().getName())
-            .exceptionMessage(e.getMessage())
-            .build()));
+        return Mono.just(ResponseEntity.badRequest()
+                .body(ApiErrorResponse.builder()
+                        .code("400")
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
     }
-
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ApiErrorResponse>> unknownException(Exception e) {
         log.error(e.getMessage());
-        return Mono.just(ResponseEntity.internalServerError().body(ApiErrorResponse.builder()
-            .code("500")
-            .exceptionName(e.getClass().getName())
-            .stackTrace(Stream.of(e.getStackTrace()).map(StackTraceElement::toString).toList())
-            .exceptionMessage(e.getMessage())
-            .build()));
+        return Mono.just(ResponseEntity.internalServerError()
+                .body(ApiErrorResponse.builder()
+                        .code("500")
+                        .exceptionName(e.getClass().getName())
+                        .stackTrace(Stream.of(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
     }
 }

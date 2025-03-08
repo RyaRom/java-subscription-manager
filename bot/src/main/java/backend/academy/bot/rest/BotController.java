@@ -26,6 +26,6 @@ public class BotController {
     }
 
     public static @NotNull String getUpdateInfo(LinkUpdate linkUpdate) {
-        return "Update in %s\n\n%s".formatted(linkUpdate.url(), linkUpdate.description());
+        return "Update in %s%n%n%s".formatted(linkUpdate.url(), linkUpdate.description());
     }
 }

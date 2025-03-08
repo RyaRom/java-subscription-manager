@@ -1,5 +1,11 @@
 package integration.polling;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
@@ -19,11 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class PollingTest extends BaseIntegrationTest {
     @Autowired
@@ -37,20 +38,21 @@ public class PollingTest extends BaseIntegrationTest {
 
     @MockitoBean
     private StackOverflowClient stackOverflowClient;
+
     @MockitoBean
     private BotClient botClient;
 
     private Link githubLink = Link.builder()
-        .url("https://github.com/academy-frontend/academy-frontend")
-        .linkType(Link.Type.GITHUB)
-        .chatIds(Set.of(1L, 2L))
-        .build();
+            .url("https://github.com/academy-frontend/academy-frontend")
+            .linkType(Link.Type.GITHUB)
+            .chatIds(Set.of(1L, 2L))
+            .build();
 
     private Link soLink = Link.builder()
-        .url("https://stackoverflow.com/questions/1732348/text")
-        .chatIds(Set.of(1L, 2L))
-        .linkType(Link.Type.STACK_OVERFLOW)
-        .build();
+            .url("https://stackoverflow.com/questions/1732348/text")
+            .chatIds(Set.of(1L, 2L))
+            .linkType(Link.Type.STACK_OVERFLOW)
+            .build();
 
     @BeforeEach
     void setUp() {
@@ -70,22 +72,18 @@ public class PollingTest extends BaseIntegrationTest {
         linkRepository.save(List.of(githubLink, soLink));
         updatePollingJob.update();
 
-        verify(githubClient, times(1))
-            .getRepoActivities("academy-frontend", "academy-frontend");
-        verify(stackOverflowClient, times(1))
-            .getStackOverflowNewAnswers(eq(1732348L), any());
+        verify(githubClient, times(1)).getRepoActivities("academy-frontend", "academy-frontend");
+        verify(stackOverflowClient, times(1)).getStackOverflowNewAnswers(eq(1732348L), any());
     }
 
     @Test
     void botUpdateTest() {
-        var response = new StackResponseDto(List.of(
-            new StackAnswersResponseDto(1L)
-        ), false);
-        when(stackOverflowClient.getStackOverflowNewAnswers(eq(1732348L), any())).thenReturn(Mono.just(response));
+        var response = new StackResponseDto(List.of(new StackAnswersResponseDto(1L)), false);
+        when(stackOverflowClient.getStackOverflowNewAnswers(eq(1732348L), any()))
+                .thenReturn(Mono.just(response));
         linkRepository.save(soLink);
         updatePollingJob.update();
 
-        verify(botClient, times(1))
-            .sendUpdate(response.items().getFirst(), soLink);
+        verify(botClient, times(1)).sendUpdate(response.items().getFirst(), soLink);
     }
 }

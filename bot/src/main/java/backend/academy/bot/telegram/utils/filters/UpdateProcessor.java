@@ -46,7 +46,7 @@ public class UpdateProcessor {
         }
         Object result = method.invoke(bean, message);
         if (result instanceof Mono) {
-            return ((Mono<Void>) result);
+            return (Mono<Void>) result;
         } else {
             log.error("Method {} must return Mono<Void> or void", method.getName());
             throw new IllegalArgumentException("Method " + method.getName() + " must return Mono<Void> or void");

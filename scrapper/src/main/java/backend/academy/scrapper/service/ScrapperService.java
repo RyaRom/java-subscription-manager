@@ -1,19 +1,19 @@
 package backend.academy.scrapper.service;
 
+import static backend.academy.scrapper.repository.dto.Link.GithubInfo.parseGithubInfo;
+import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
+
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import static backend.academy.scrapper.repository.dto.Link.GithubInfo.parseGithubInfo;
-import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
 
 @RequiredArgsConstructor
 @Service
@@ -24,25 +24,28 @@ public class ScrapperService {
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findAll().stream()
-                .filter(link -> link.getChatIds().contains(chatId))
-                .map(Link::toLinkResponse)
-                .toList();
+                    .filter(link -> link.getChatIds().contains(chatId))
+                    .map(Link::toLinkResponse)
+                    .toList();
             return new ListLinkResponse(links, links.size());
         });
     }
 
     public Mono<LinkResponse> addLink(Long chatId, AddLinkRequest request) {
-        var savedLink = linkRepository.find(request.getLink());
-        if (savedLink.isPresent()) {
-            Link link = savedLink.get();
-            link.getChatIds().add(chatId);
-            linkRepository.save(link);
-            return Mono.just(link.toLinkResponse());
-        }
+        var savedLink = linkRepository
+                .find(request.getLink())
+                .map(link -> {
+                    link.getChatIds().add(chatId);
+                    linkRepository.save(link);
+                    return link;
+                })
+                .orElseGet(() -> {
+                    Link link = generateLink(request, chatId);
+                    linkRepository.save(link);
+                    return link;
+                });
 
-        Link link = generateLink(request, chatId);
-        linkRepository.save(link);
-        return Mono.just(link.toLinkResponse());
+        return Mono.just(savedLink.toLinkResponse());
     }
 
     private Link generateLink(AddLinkRequest request, Long chatId) {
@@ -66,10 +69,7 @@ public class ScrapperService {
 
     public Mono<LinkResponse> removeLink(String link) {
         log.info("Remove link {}", link);
-        var deletedLink = linkRepository.delete(link);
-        if (deletedLink.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return Mono.just(deletedLink.get().toLinkResponse());
+        var deletedLink = linkRepository.delete(link).orElseThrow(NotFoundException::new);
+        return Mono.just(deletedLink.toLinkResponse());
     }
 }

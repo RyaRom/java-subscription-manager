@@ -6,16 +6,14 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 
 public record GithubActivity(
-    Long id,
-    @JsonProperty("node_id")
-    String nodeId,
-    String before,
-    String after,
-    String ref,
-    OffsetDateTime timestamp,
-    @JsonProperty("activity_type")
-    ActivityType activityType,
-    Actor actor) {
+        Long id,
+        @JsonProperty("node_id") String nodeId,
+        String before,
+        String after,
+        String ref,
+        OffsetDateTime timestamp,
+        @JsonProperty("activity_type") ActivityType activityType,
+        Actor actor) {
     public enum ActivityType {
         PUSH("push"),
         FORCE_PUSH("force_push"),
@@ -30,10 +28,9 @@ public record GithubActivity(
             this.value = value;
         }
 
-
         @JsonCreator
         public static ActivityType fromValue(String value) {
-            for (ActivityType type : ActivityType.values()) {
+            for (ActivityType type : values()) {
                 if (type.value.equalsIgnoreCase(value)) {
                     return type;
                 }
@@ -48,27 +45,26 @@ public record GithubActivity(
     }
 
     public record Actor(
-        String name,
-        String email,
-        String login,
-        Long id,
-        String nodeId,
-        URI avatarUrl,
-        String gravatarId,
-        URI url,
-        URI htmlUrl,
-        URI followersUrl,
-        URI followingUrl,
-        URI gistsUrl,
-        URI starredUrl,
-        URI subscriptionsUrl,
-        URI organizationsUrl,
-        URI reposUrl,
-        URI eventsUrl,
-        URI receivedEventsUrl,
-        String type,
-        boolean siteAdmin,
-        String starredAt,
-        String userViewType) {
-    }
+            String name,
+            String email,
+            String login,
+            Long id,
+            String nodeId,
+            URI avatarUrl,
+            String gravatarId,
+            URI url,
+            URI htmlUrl,
+            URI followersUrl,
+            URI followingUrl,
+            URI gistsUrl,
+            URI starredUrl,
+            URI subscriptionsUrl,
+            URI organizationsUrl,
+            URI reposUrl,
+            URI eventsUrl,
+            URI receivedEventsUrl,
+            String type,
+            boolean siteAdmin,
+            String starredAt,
+            String userViewType) {}
 }
