@@ -68,6 +68,7 @@ public class UpdatePollingJob {
                 return stackOverflowClient
                     .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
                     .flatMapMany(res -> Flux.fromIterable(res.items()))
+                    .doOnNext(activity -> log.info("so update {}", activity))
                     .flatMap(answer -> botClient.sendUpdate(answer, link))
                     .then();
             }

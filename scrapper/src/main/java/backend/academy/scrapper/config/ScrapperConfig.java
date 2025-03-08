@@ -2,7 +2,6 @@ package backend.academy.scrapper.config;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,15 +33,12 @@ public record ScrapperConfig(
     public WebClient stackOverflowHttpClient() {
         var builder = WebClient.builder()
             .baseUrl("https://api.stackexchange.com/2.3");
-        if (stackOverflow.key != null && stackOverflow.accessToken != null) {
-            builder.defaultUriVariables(
-                Map.of(
-                    "key", stackOverflow.key,
-                    "access_token", stackOverflow.accessToken
-                )
-            );
-        }
         return builder.build();
+    }
+
+    @Bean
+    public StackOverflowCredentials stackOverflowCredentials() {
+        return stackOverflow;
     }
 
     @Bean
@@ -54,6 +50,9 @@ public record ScrapperConfig(
             .build();
     }
 
-    public record StackOverflowCredentials(@Nullable String key, @Nullable String accessToken) {
+    public record StackOverflowCredentials(
+        @Nullable String key,
+        @Nullable String accessToken,
+        @NotEmpty Boolean tokenDisabled) {
     }
 }

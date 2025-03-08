@@ -3,6 +3,7 @@ app:
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
+    token-disabled: true
   bot-url: http://localhost:8080/bot/api
 
 
