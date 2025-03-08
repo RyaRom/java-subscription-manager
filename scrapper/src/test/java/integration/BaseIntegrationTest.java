@@ -20,6 +20,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 @ContextConfiguration(classes = BaseIntegrationTest.TestConfig.class)
 public class BaseIntegrationTest {
     private static final ObjectMapper mapper = new ObjectMapper();
+
     protected WebTestClient webTestClient;
     @LocalServerPort
     protected int port;

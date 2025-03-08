@@ -1,11 +1,15 @@
 package integration;
 
 import backend.academy.dto.AddLinkRequest;
+import backend.academy.dto.LinkResponse;
+import backend.academy.dto.ListLinkResponse;
+import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AddLinksTest extends BaseIntegrationTest {
@@ -90,5 +94,96 @@ public class AddLinksTest extends BaseIntegrationTest {
                 assertThat(link.getChatIds()).contains(1L);
                 assertThat(link.getLinkType()).isEqualTo(Link.Type.STACK_OVERFLOW);
             });
+    }
+
+    @Test
+    void getLinksSameId() {
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(stackOverflowLink))
+            .exchange()
+            .expectStatus().isOk();
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(githubLink))
+            .exchange()
+            .expectStatus().isOk();
+        var links = webTestClient.get()
+            .uri("/links")
+            .header("Tg-Chat-Id", "1")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(ListLinkResponse.class)
+            .returnResult()
+            .getResponseBody()
+            .links();
+
+        assertThat(links)
+            .hasSize(2)
+            .map(LinkResponse::url)
+            .containsExactlyInAnyOrder(
+                githubLink.getLink(),
+                stackOverflowLink.getLink()
+            );
+        assertThat(linkRepository.findAll())
+            .hasSize(2)
+            .allMatch(
+                link -> link.getChatIds().size() == 1
+                    && link.getChatIds().getFirst() == 1
+            );
+    }
+
+    @Test
+    void getLinkDiffIds() {
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(stackOverflowLink))
+            .exchange()
+            .expectStatus().isOk();
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "2")
+            .bodyValue(asJsonString(stackOverflowLink))
+            .exchange()
+            .expectStatus().isOk();
+
+        assertThat(linkRepository.findAll())
+            .singleElement()
+            .satisfies(link -> {
+                assertThat(link.getChatIds())
+                    .hasSize(2)
+                    .containsExactlyInAnyOrder(1L, 2L);
+                assertThat(link.getUrl())
+                    .isEqualTo(stackOverflowLink.getLink());
+            });
+    }
+
+    @Test
+    void removeLink() {
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(githubLink))
+            .exchange()
+            .expectStatus().isOk();
+
+        webTestClient.method(HttpMethod.DELETE)
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(new RemoveLinkRequest(githubLink.getLink()))
+            .exchange()
+            .expectStatus().isOk();
+
+        assertThat(linkRepository.findAll())
+            .isEmpty();
     }
 }

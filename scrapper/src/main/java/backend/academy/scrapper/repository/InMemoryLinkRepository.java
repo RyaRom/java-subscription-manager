@@ -17,6 +17,13 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
+    public Optional<Link> find(String url) {
+        return storage.values().stream()
+            .filter(l -> l.getUrl().equals(url))
+            .findFirst();
+    }
+
+    @Override
     public List<Link> findAll() {
         return storage.values().stream().toList();
     }
@@ -33,9 +40,15 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public Optional<Link> delete(String url) {
-        return findAll().stream()
+        var link = findAll().stream()
             .filter(l -> l.getUrl().equals(url))
             .findFirst();
+        if (link.isEmpty()) {
+            return Optional.empty();
+        }
+
+        storage.remove(link.get().getLinkId());
+        return link;
     }
 
     @Override

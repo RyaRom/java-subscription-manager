@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface LinkRepository {
     Optional<Link> find(Long linkId);
 
+    Optional<Link> find(String url);
+
     List<Link> findAll();
 
     void save(Link link);
