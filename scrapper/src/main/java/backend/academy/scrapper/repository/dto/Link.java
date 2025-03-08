@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Data
@@ -13,6 +14,7 @@ public final class Link {
     //replace with spring data id
     @Builder.Default
     private Long linkId = (long) (Math.random() * 1000L);
+    @NonNull
     private String url;
 
     @Nullable
@@ -20,7 +22,9 @@ public final class Link {
     @Nullable
     private StackOverflowInfo stackOverflowInfo;
 
+    @NonNull
     private Type linkType;
+    @NonNull
     private List<Long> chatIds;
 
     public LinkResponse toLinkResponse() {

@@ -15,6 +15,8 @@ public interface LinkRepository {
 
     void save(Link link);
 
+    void save(List<Link> links);
+
     Optional<Link> delete(Long linkId);
 
     Optional<Link> delete(String url);

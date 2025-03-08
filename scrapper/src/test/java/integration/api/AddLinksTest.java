@@ -1,4 +1,4 @@
-package integration;
+package integration.api;
 
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
@@ -6,6 +6,7 @@ import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
+import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

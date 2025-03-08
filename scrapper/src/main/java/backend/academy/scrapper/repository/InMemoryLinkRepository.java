@@ -34,6 +34,11 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
+    public void save(List<Link> links) {
+        links.forEach(this::save);
+    }
+
+    @Override
     public Optional<Link> delete(Long linkId) {
         return Optional.ofNullable(storage.remove(linkId));
     }
