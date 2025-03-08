@@ -44,9 +44,9 @@ public class BotClient {
 
     public Mono<Void> sendUpdate(GithubActivity githubActivity, Link link) {
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.linkId())
-            .url(link.url())
-            .tgChatIds(link.chatIds())
+            .linkId(link.getLinkId())
+            .url(link.getUrl())
+            .tgChatIds(link.getChatIds())
             .description(getGithubUpdate(githubActivity))
             .build();
         return sendUpdate(linkUpdate);
@@ -54,9 +54,9 @@ public class BotClient {
 
     public Mono<Void> sendUpdate(StackAnswersResponseDto answer, Link link) {
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.linkId())
-            .url(link.url())
-            .tgChatIds(link.chatIds())
+            .linkId(link.getLinkId())
+            .url(link.getUrl())
+            .tgChatIds(link.getChatIds())
             .description(getStackAnswerUpdate(answer))
             .build();
         return sendUpdate(linkUpdate);

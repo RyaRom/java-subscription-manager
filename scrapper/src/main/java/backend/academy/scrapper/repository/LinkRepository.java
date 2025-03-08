@@ -16,4 +16,6 @@ public interface LinkRepository {
     Optional<Link> delete(Long linkId);
 
     Optional<Link> delete(String url);
+
+    void drop();
 }

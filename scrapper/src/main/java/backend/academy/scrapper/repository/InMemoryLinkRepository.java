@@ -23,7 +23,7 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public void save(Link link) {
-        storage.put(link.linkId(), link);
+        storage.put(link.getLinkId(), link);
     }
 
     @Override
@@ -34,7 +34,12 @@ public class InMemoryLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> delete(String url) {
         return findAll().stream()
-            .filter(l -> l.url().equals(url))
+            .filter(l -> l.getUrl().equals(url))
             .findFirst();
+    }
+
+    @Override
+    public void drop() {
+        storage.clear();
     }
 }

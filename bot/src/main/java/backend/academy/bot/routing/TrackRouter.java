@@ -94,11 +94,11 @@ public class TrackRouter {
                 .flatMap(data -> scrapperClient.addLink(
                         message.chat().id(),
                         AddLinkRequest.builder()
-                                .link(data.link())
-                                .filters(Stream.of(data.filters().split(" "))
+                                .link(data.getLink())
+                                .filters(Stream.of(data.getFilters().split(" "))
                                         .filter(s -> !s.isEmpty())
                                         .toList())
-                                .tags(Stream.of(data.tags().split(" "))
+                                .tags(Stream.of(data.getTags().split(" "))
                                         .filter(s -> !s.isEmpty())
                                         .toList())
                                 .build()))

@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static backend.academy.scrapper.repository.dto.Link.GithubInfo.getGithubInfo;
+import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
 
 @Component
 @Log4j2
@@ -37,33 +37,34 @@ public class UpdatePollingJob {
 
     //TODO refactor
     public Mono<Void> updateLink(Link link) {
-        Link.Type linkType = link.linkType();
-        switch (linkType) {
+        log.info("polling link {}", link.getUrl());
+        Link.Type getLinkType = link.getLinkType();
+        switch (getLinkType) {
             case GITHUB -> {
-                if (link.githubInfo() == null) {
-                    link.githubInfo(getGithubInfo(link.url()));
+                if (link.getGithubInfo() == null) {
+                    link.setGithubInfo(Link.GithubInfo.parseGithubInfo(link.getUrl()));
                 }
                 return githubClient
                     .getRepoActivities(
-                        link.githubInfo().owner(), link.githubInfo().repo())
+                        link.getGithubInfo().owner(), link.getGithubInfo().repo())
                     .flatMapMany(res -> Flux.fromIterable(res.activities()))
                     .filter(activity -> activity.timestamp().isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                     .flatMap(activity -> botClient.sendUpdate(activity, link))
                     .then();
             }
             case STACK_OVERFLOW -> {
-                if (link.stackOverflowInfo() == null) {
-                    link.stackOverflowInfo(Link.StackOverflowInfo.getStackOverflowInfo(link.url()));
+                if (link.getStackOverflowInfo() == null) {
+                    link.setStackOverflowInfo(parseStackOverflowInfo(link.getUrl()));
                 }
                 return stackOverflowClient
-                    .getStackOverflowNewAnswers(link.stackOverflowInfo().questionId(), lastUpdated)
+                    .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
                     .flatMapMany(res -> Flux.fromIterable(res.items()))
                     .flatMap(answer -> botClient.sendUpdate(answer, link))
                     .then();
             }
             default -> {
-                log.error("Unknown link type {}", link.linkId());
-                throw new IllegalArgumentException("Unknown link type " + link.linkId());
+                log.error("Unknown link type {}", link.getLinkId());
+                throw new IllegalArgumentException("Unknown link type " + link.getLinkId());
             }
         }
     }

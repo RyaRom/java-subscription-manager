@@ -17,7 +17,7 @@ public class FSMContext {
 
     public String getCurrentStateName(Long id) {
         var user = userDataCacheRepository.getUser(id).block();
-        var state = Optional.ofNullable(user).map(UserCache::botState).orElse(DefaultStates.NONE);
+        var state = Optional.ofNullable(user).map(UserCache::getBotState).orElse(DefaultStates.NONE);
         return state.toString();
     }
 

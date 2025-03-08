@@ -10,8 +10,9 @@ import org.jspecify.annotations.Nullable;
 @Data
 @Builder
 public final class Link {
+    //replace with spring data id
     @Builder.Default
-    private Long linkId = UUID.randomUUID().timestamp();
+    private Long linkId = (long) (Math.random() * 1000L);
     private String url;
 
     @Nullable
@@ -36,7 +37,7 @@ public final class Link {
     public record StackOverflowInfo(
         Long questionId
     ) {
-        public static StackOverflowInfo getStackOverflowInfo(String url) {
+        public static StackOverflowInfo parseStackOverflowInfo(String url) {
             var tokens = List.of(url.split("/"));
             if (tokens.contains("stackoverflow.com")) {
                 int site = tokens.indexOf("stackoverflow.com");
@@ -53,7 +54,7 @@ public final class Link {
         String owner,
         String repo
     ) {
-        public static GithubInfo getGithubInfo(String url) {
+        public static GithubInfo parseGithubInfo(String url) {
             var tokens = List.of(url.split("/"));
             if (tokens.contains("github.com")) {
                 int site = tokens.indexOf("github.com");

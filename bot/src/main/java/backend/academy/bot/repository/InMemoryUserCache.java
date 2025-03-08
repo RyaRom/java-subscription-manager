@@ -13,28 +13,28 @@ public class InMemoryUserCache implements UserDataCacheRepository {
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).botState(state);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).setBotState(state);
         });
     }
 
     @Override
     public Mono<Void> updateLink(Long chatId, String link) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).link(link);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).setLink(link);
         });
     }
 
     @Override
     public Mono<Void> updateFilters(Long chatId, String filters) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).filters(filters);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).setFilters(filters);
         });
     }
 
     @Override
     public Mono<Void> updateTags(Long chatId, String tags) {
         return Mono.fromRunnable(() -> {
-            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).tags(tags);
+            userMap.computeIfAbsent(chatId, k -> UserCache.builder().build()).setTags(tags);
         });
     }
 

@@ -10,8 +10,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import static backend.academy.scrapper.repository.dto.Link.GithubInfo.getGithubInfo;
-import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.getStackOverflowInfo;
+import static backend.academy.scrapper.repository.dto.Link.GithubInfo.parseGithubInfo;
+import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +21,7 @@ public class ScrapperService {
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findAll().stream()
-                .filter(link -> link.chatIds().contains(chatId))
+                .filter(link -> link.getChatIds().contains(chatId))
                 .map(Link::toLinkResponse)
                 .toList();
             return new ListLinkResponse(links, links.size());
@@ -32,7 +32,7 @@ public class ScrapperService {
         var savedLink = linkRepository.find(chatId);
         if (savedLink.isPresent()) {
             Link link = savedLink.get();
-            link.chatIds().add(chatId);
+            link.getChatIds().add(chatId);
             linkRepository.save(link);
             return Mono.just(link.toLinkResponse());
         }
@@ -44,16 +44,16 @@ public class ScrapperService {
 
     private Link generateLink(AddLinkRequest request, Long chatId) {
         var builder = Link.builder();
-        String url = request.link();
+        String url = request.getLink();
         builder.url(url);
         builder.chatIds(new ArrayList<>(List.of(chatId)));
         List<String> parsed = List.of(url.split("/"));
         if (parsed.contains("github.com")) {
             builder.linkType(Link.Type.GITHUB);
-            builder.githubInfo(getGithubInfo(url));
+            builder.githubInfo(parseGithubInfo(url));
         } else if (parsed.contains("stackoverflow.com")) {
             builder.linkType(Link.Type.STACK_OVERFLOW);
-            builder.stackOverflowInfo(getStackOverflowInfo(url));
+            builder.stackOverflowInfo(parseStackOverflowInfo(url));
         } else {
             throw new IllegalArgumentException("Not a valid link");
         }
