@@ -5,12 +5,13 @@ import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import java.util.ArrayList;
-import java.util.List;
-import static backend.academy.scrapper.repository.dto.GithubInfo.getGithubInfo;
+import static backend.academy.scrapper.repository.dto.Link.GithubInfo.getGithubInfo;
+import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.getStackOverflowInfo;
 
 @RequiredArgsConstructor
 @Service
@@ -20,9 +21,9 @@ public class ScrapperService {
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findAll().stream()
-                    .filter(link -> link.chatIds().contains(chatId))
-                    .map(Link::toLinkResponse)
-                    .toList();
+                .filter(link -> link.chatIds().contains(chatId))
+                .map(Link::toLinkResponse)
+                .toList();
             return new ListLinkResponse(links, links.size());
         });
     }
@@ -47,11 +48,14 @@ public class ScrapperService {
         builder.url(url);
         builder.chatIds(new ArrayList<>(List.of(chatId)));
         List<String> parsed = List.of(url.split("/"));
-        if (parsed.contains("github.com")){
+        if (parsed.contains("github.com")) {
             builder.linkType(Link.Type.GITHUB);
             builder.githubInfo(getGithubInfo(url));
-        }else if (parsed.contains("stackoverflow.com")) {
+        } else if (parsed.contains("stackoverflow.com")) {
             builder.linkType(Link.Type.STACK_OVERFLOW);
+            builder.stackOverflowInfo(getStackOverflowInfo(url));
+        } else {
+            throw new IllegalArgumentException("Not a valid link");
         }
 
         return builder.build();
@@ -59,7 +63,7 @@ public class ScrapperService {
 
     public Mono<LinkResponse> removeLink(String link) {
         var deletedLink = linkRepository.delete(link);
-        if (deletedLink.isEmpty()){
+        if (deletedLink.isEmpty()) {
             throw new NotFoundException();
         }
         return Mono.just(deletedLink.get().toLinkResponse());

@@ -1,8 +1,9 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
-import backend.academy.scrapper.repository.dto.GithubResponseDto.Activity;
+import backend.academy.scrapper.repository.dto.GithubResponseDto.GithubActivity;
 import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,27 +17,48 @@ public class BotClient {
     @Qualifier("botHttpClient")
     private final WebClient webClient;
 
-    public static String getGithubUpdate(Activity activity) {
+    public static String getGithubUpdate(GithubActivity githubActivity) {
         return String.format(
-                "type: %s; timestamp: %s; author: %s",
-                activity.activityType().toString(),
-                activity.timestamp().toString(),
-                activity.actor().login());
+            "Update in github repo:\n type: %s; timestamp: %s; author: %s",
+            githubActivity.activityType().toString(),
+            githubActivity.timestamp().toString(),
+            githubActivity.actor().login());
     }
 
-    public Mono<Void> sendUpdate(Activity activity, Link link) {
-        LinkUpdate linkUpdate = LinkUpdate.builder()
-                .linkId(link.linkId())
-                .url(link.url())
-                .tgChatIds(link.chatIds())
-                .description(getGithubUpdate(activity))
-                .build();
+    public static String getStackAnswerUpdate(StackAnswersResponseDto stackAnswersResponseDto) {
+        return String.format(
+            "New answer in so question:\n%s",
+            stackAnswersResponseDto.getLink()
+        );
+    }
+
+    public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return webClient
-                .post()
-                .uri("/updates")
-                .body(BodyInserters.fromValue(linkUpdate))
-                .retrieve()
-                .toBodilessEntity()
-                .then();
+            .post()
+            .uri("/updates")
+            .body(BodyInserters.fromValue(linkUpdate))
+            .retrieve()
+            .toBodilessEntity()
+            .then();
+    }
+
+    public Mono<Void> sendUpdate(GithubActivity githubActivity, Link link) {
+        LinkUpdate linkUpdate = LinkUpdate.builder()
+            .linkId(link.linkId())
+            .url(link.url())
+            .tgChatIds(link.chatIds())
+            .description(getGithubUpdate(githubActivity))
+            .build();
+        return sendUpdate(linkUpdate);
+    }
+
+    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, Link link) {
+        LinkUpdate linkUpdate = LinkUpdate.builder()
+            .linkId(link.linkId())
+            .url(link.url())
+            .tgChatIds(link.chatIds())
+            .description(getStackAnswerUpdate(answer))
+            .build();
+        return sendUpdate(linkUpdate);
     }
 }

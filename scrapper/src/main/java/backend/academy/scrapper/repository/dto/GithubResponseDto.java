@@ -4,7 +4,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public record GithubResponseDto(List<Activity> activities) {
+public record GithubResponseDto(List<GithubActivity> activities) {
 
     public enum ActivityType {
         PUSH("push"),
@@ -26,7 +26,7 @@ public record GithubResponseDto(List<Activity> activities) {
         }
     }
 
-    public record Activity(
+    public record GithubActivity(
             int id,
             String nodeId,
             String before,
