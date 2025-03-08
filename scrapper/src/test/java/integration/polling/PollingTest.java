@@ -11,6 +11,7 @@ import backend.academy.scrapper.repository.dto.StackResponseDto;
 import backend.academy.scrapper.service.UpdatePollingJob;
 import integration.BaseIntegrationTest;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,12 +43,12 @@ public class PollingTest extends BaseIntegrationTest {
     private Link githubLink = Link.builder()
         .url("https://github.com/academy-frontend/academy-frontend")
         .linkType(Link.Type.GITHUB)
-        .chatIds(List.of(1L, 2L))
+        .chatIds(Set.of(1L, 2L))
         .build();
 
     private Link soLink = Link.builder()
         .url("https://stackoverflow.com/questions/1732348/text")
-        .chatIds(List.of(1L, 2L))
+        .chatIds(Set.of(1L, 2L))
         .linkType(Link.Type.STACK_OVERFLOW)
         .build();
 

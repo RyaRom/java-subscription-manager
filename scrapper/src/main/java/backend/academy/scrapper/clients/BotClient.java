@@ -46,7 +46,7 @@ public class BotClient {
         LinkUpdate linkUpdate = LinkUpdate.builder()
             .linkId(link.getLinkId())
             .url(link.getUrl())
-            .tgChatIds(link.getChatIds())
+            .tgChatIds(link.getChatIds().stream().toList())
             .description(getGithubUpdate(githubActivity))
             .build();
         return sendUpdate(linkUpdate);
@@ -56,7 +56,7 @@ public class BotClient {
         LinkUpdate linkUpdate = LinkUpdate.builder()
             .linkId(link.getLinkId())
             .url(link.getUrl())
-            .tgChatIds(link.getChatIds())
+            .tgChatIds(link.getChatIds().stream().toList())
             .description(getStackAnswerUpdate(answer))
             .build();
         return sendUpdate(linkUpdate);

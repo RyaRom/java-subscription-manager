@@ -30,7 +30,9 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public void save(Link link) {
-        storage.put(link.getLinkId(), link);
+        if (find(link.getUrl()).isEmpty()) {
+            storage.put(link.getLinkId(), link);
+        }
     }
 
     @Override

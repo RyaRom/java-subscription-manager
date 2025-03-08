@@ -6,6 +6,7 @@ import backend.academy.dto.ListLinkResponse;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -48,7 +49,7 @@ public class ScrapperService {
         var builder = Link.builder();
         String url = request.getLink();
         builder.url(url);
-        builder.chatIds(new ArrayList<>(List.of(chatId)));
+        builder.chatIds(new HashSet<>(List.of(chatId)));
         List<String> parsed = List.of(url.split("/"));
         if (parsed.contains("github.com")) {
             builder.linkType(Link.Type.GITHUB);

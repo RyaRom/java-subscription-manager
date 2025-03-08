@@ -2,6 +2,7 @@ package backend.academy.scrapper.repository.dto;
 
 import backend.academy.dto.LinkResponse;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +26,7 @@ public final class Link {
     @NonNull
     private Type linkType;
     @NonNull
-    private List<Long> chatIds;
+    private Set<Long> chatIds;
 
     public LinkResponse toLinkResponse() {
         return new LinkResponse(

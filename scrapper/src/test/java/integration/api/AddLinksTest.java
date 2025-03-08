@@ -134,7 +134,47 @@ public class AddLinksTest extends BaseIntegrationTest {
             .hasSize(2)
             .allMatch(
                 link -> link.getChatIds().size() == 1
-                    && link.getChatIds().getFirst() == 1
+                    && link.getChatIds().contains(1L)
+            );
+    }
+
+    @Test
+    void getLinksSameUrl() {
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(stackOverflowLink))
+            .exchange()
+            .expectStatus().isOk();
+        webTestClient.post()
+            .uri("/links")
+            .header("Content-Type", "application/json")
+            .header("Tg-Chat-Id", "1")
+            .bodyValue(asJsonString(stackOverflowLink))
+            .exchange()
+            .expectStatus().isOk();
+        var links = webTestClient.get()
+            .uri("/links")
+            .header("Tg-Chat-Id", "1")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(ListLinkResponse.class)
+            .returnResult()
+            .getResponseBody()
+            .links();
+
+        assertThat(links)
+            .hasSize(1)
+            .map(LinkResponse::url)
+            .containsExactlyInAnyOrder(
+                stackOverflowLink.getLink()
+            );
+        assertThat(linkRepository.findAll())
+            .hasSize(1)
+            .allMatch(
+                link -> link.getChatIds().size() == 1
+                    && link.getChatIds().contains(1L)
             );
     }
 
