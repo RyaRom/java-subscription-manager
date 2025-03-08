@@ -4,7 +4,7 @@ import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
 import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.dto.GithubResponseDto.GithubActivity;
+import backend.academy.scrapper.repository.dto.GithubActivity;
 import backend.academy.scrapper.repository.dto.Link;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import backend.academy.scrapper.repository.dto.StackResponseDto;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,7 +53,7 @@ public class PollingTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        when(githubClient.getRepoActivities(any(), any())).thenReturn(Mono.empty());
+        when(githubClient.getRepoActivities(any(), any())).thenReturn(Flux.empty());
         when(stackOverflowClient.getStackOverflowNewAnswers(any(), any())).thenReturn(Mono.empty());
         when(botClient.sendUpdate(any(GithubActivity.class), any())).thenReturn(Mono.empty());
         when(botClient.sendUpdate(any(StackAnswersResponseDto.class), any())).thenReturn(Mono.empty());

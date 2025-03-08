@@ -27,11 +27,14 @@ public class UpdatePollingJob {
 
     @Scheduled(fixedRate = 1000 * 60 * 60 * 12)
     public void update() {
-        lastUpdated = Instant.now();
         log.info("Polling all links");
         Flux.fromIterable(linkRepository.findAll())
             .flatMap(this::updateLink)
             .then()
+            .doFinally(signal -> {
+                log.info("Polling finished");
+                lastUpdated = Instant.now();
+            })
             .subscribe();
     }
 
@@ -47,8 +50,14 @@ public class UpdatePollingJob {
                 return githubClient
                     .getRepoActivities(
                         link.getGithubInfo().owner(), link.getGithubInfo().repo())
-                    .flatMapMany(res -> Flux.fromIterable(res.activities()))
-                    .filter(activity -> activity.timestamp().isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                    .doOnNext(activity -> {
+                        log.info("activity {}", activity);
+                        log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
+                        log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
+                    })
+                    .filter(activity ->
+                        activity.timestamp().toInstant().atOffset(ZoneOffset.UTC)
+                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                     .flatMap(activity -> botClient.sendUpdate(activity, link))
                     .then();
             }

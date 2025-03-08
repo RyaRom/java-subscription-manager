@@ -1,7 +1,7 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
-import backend.academy.scrapper.repository.dto.GithubResponseDto.GithubActivity;
+import backend.academy.scrapper.repository.dto.GithubActivity;
 import backend.academy.scrapper.repository.dto.Link;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import lombok.RequiredArgsConstructor;
