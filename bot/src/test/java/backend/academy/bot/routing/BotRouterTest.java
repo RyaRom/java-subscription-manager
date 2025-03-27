@@ -4,7 +4,7 @@ import backend.academy.bot.BotKeyboards;
 import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.rest.BotController;
 import backend.academy.bot.telegram.utils.TelegramAPI;
-import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
+import backend.academy.bot.telegram.utils.BotContext;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.LinkUpdate;
 import backend.academy.dto.ListLinkResponse;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Mono;
 import static backend.academy.bot.rest.BotController.getUpdateInfo;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@TestPropertySource("classpath:application-test.yaml")
+@ActiveProfiles("test")
 class BotRouterTest {
     @Autowired
     private String helpMessage;
@@ -43,7 +43,7 @@ class BotRouterTest {
     private ScrapperClient scrapperClient;
 
     @Autowired
-    private UpdateProcessor updateProcessor;
+    private BotContext botContext;
 
     @Autowired
     private BotController botController;
@@ -105,17 +105,17 @@ class BotRouterTest {
         var untrack = mockMessageUpdate("/untrack", 1L);
         var defaultHandler = mockMessageUpdate("some text", 1L);
 
-        updateProcessor.consumeUpdate(start);
-        updateProcessor.consumeUpdate(help);
-        updateProcessor.consumeUpdate(list);
-        updateProcessor.consumeUpdate(track);
-        updateProcessor.consumeUpdate(incorrectLink);
-        updateProcessor.consumeUpdate(link);
-        updateProcessor.consumeUpdate(tags);
-        updateProcessor.consumeUpdate(filters);
-        updateProcessor.consumeUpdate(untrack);
-        updateProcessor.consumeUpdate(link);
-        updateProcessor.consumeUpdate(defaultHandler);
+        botContext.consumeUpdate(start);
+        botContext.consumeUpdate(help);
+        botContext.consumeUpdate(list);
+        botContext.consumeUpdate(track);
+        botContext.consumeUpdate(incorrectLink);
+        botContext.consumeUpdate(link);
+        botContext.consumeUpdate(tags);
+        botContext.consumeUpdate(filters);
+        botContext.consumeUpdate(untrack);
+        botContext.consumeUpdate(link);
+        botContext.consumeUpdate(defaultHandler);
 
         verify(telegramAPI, times(1)).sendMessage(1L, "Hello! Use /track command to start");
         verify(telegramAPI, times(1)).sendMessage(1L, helpMessage);

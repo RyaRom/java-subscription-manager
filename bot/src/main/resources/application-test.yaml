@@ -13,7 +13,7 @@ app:
         - command: /list
           description: Список отслеживаемых ссылок
   telegram:
-    telegram-token: ${TELEGRAM_TOKEN}
+    telegram-token: tg_token
   clients:
     scrapper-url: http://localhost:8081/scrapper/api
 
@@ -32,13 +32,3 @@ spring:
 
 server:
   port: 8080
-
-springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui
-
-logging:
-  structured:
-    format:
-      console: ecs

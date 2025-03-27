@@ -6,6 +6,8 @@ import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.par
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
+import backend.academy.exception.ResourceNotFoundException;
+import backend.academy.exception.ResourceAlreadyExistsException;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import java.util.HashSet;
@@ -72,7 +74,7 @@ public class ScrapperService {
 
     public Mono<LinkResponse> removeLink(String link) {
         log.info("Remove link {}", link);
-        var deletedLink = linkRepository.deleteByUrl(link).orElseThrow(NotFoundException::new);
+        var deletedLink = linkRepository.deleteByUrl(link).orElseThrow(() -> new ResourceNotFoundException("not found" + link));
         return Mono.just(deletedLink.toLinkResponse());
     }
 }

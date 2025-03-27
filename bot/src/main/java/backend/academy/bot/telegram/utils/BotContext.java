@@ -1,7 +1,10 @@
-package backend.academy.bot.telegram.utils.filters;
+package backend.academy.bot.telegram.utils;
 
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
 import backend.academy.bot.telegram.utils.annotations.Router;
+import backend.academy.bot.telegram.utils.filters.FilterParameter;
+import backend.academy.bot.telegram.utils.filters.FilterRegister;
+import backend.academy.bot.telegram.utils.filters.MessageFilterGenerator;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +28,7 @@ import reactor.core.scheduler.Schedulers;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class UpdateProcessor {
+public class BotContext {
     private final FilterRegister filterRegister;
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();

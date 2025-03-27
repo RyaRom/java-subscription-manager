@@ -26,7 +26,7 @@ public class UpdatePollingJob {
     private final StackOverflowClient stackOverflowClient;
     private Instant lastUpdated = Instant.now();
 
-    @Scheduled(fixedRate = 1000 * 60 * 60 * 12)
+    @Scheduled(cron = "#{@updateCron}")
     public void update() {
         log.info("Polling all links");
         Flux.fromIterable(linkRepository.findAll())

@@ -1,9 +1,9 @@
 package backend.academy.scrapper.rest;
 
 import backend.academy.dto.ApiErrorResponse;
-import backend.academy.scrapper.service.NotFoundException;
+import backend.academy.exception.ResourceNotFoundException;
 import java.util.stream.Stream;
-import backend.academy.scrapper.service.ResourceAlreadyExistsException;
+import backend.academy.exception.ResourceAlreadyExistsException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,8 +32,8 @@ public class ScrapperControllerAdvice {
                         .build()));
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public Mono<ResponseEntity<ApiErrorResponse>> notFoundLinkException(NotFoundException e) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> notFoundLinkException(ResourceNotFoundException e) {
         log.error(e.getMessage());
         return Mono.just(ResponseEntity.status(404)
                 .body(ApiErrorResponse.builder()

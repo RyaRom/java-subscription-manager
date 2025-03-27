@@ -2,14 +2,17 @@ package backend.academy.bot.config;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import backend.academy.configuration.AppConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 @Log4j2
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
+@Import(AppConfig.class)
+@ConfigurationProperties(prefix = "app.bot", ignoreUnknownFields = false)
 public record BotConfig(BotCommands settings) {
 
     @Bean

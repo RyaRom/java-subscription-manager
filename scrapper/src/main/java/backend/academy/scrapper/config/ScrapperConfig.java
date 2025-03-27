@@ -10,13 +10,19 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @Import(AppConfig.class)
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "app.main", ignoreUnknownFields = false)
 public record ScrapperConfig(
-    StackOverflowCredentials stackOverflow
+    @Nullable StackOverflowCredentials stackOverflow,
+    @NotEmpty String updateCron
 ) {
     @Bean
     public StackOverflowCredentials stackOverflowCredentials() {
         return stackOverflow;
+    }
+
+    @Bean
+    public String updateCron() {
+        return updateCron;
     }
 
     public record StackOverflowCredentials(

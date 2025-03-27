@@ -1,8 +1,10 @@
 app:
-  stackoverflow:
-    key: ${SO_TOKEN_KEY}
-    access-token: ${SO_ACCESS_TOKEN}
-    token-disabled: true
+  main:
+    stackoverflow:
+      key: ${SO_TOKEN_KEY}
+      access-token: ${SO_ACCESS_TOKEN}
+      token-disabled: true
+    update-cron: "0 0 */12 * * ?"
   clients:
     bot-url: http://localhost:8080/bot/api
     github-token: ${GITHUB_TOKEN}

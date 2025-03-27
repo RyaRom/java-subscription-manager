@@ -1,5 +1,6 @@
 package integration;
 
+import backend.academy.configuration.EnvType;
 import backend.academy.scrapper.ScrapperApplication;
 import backend.academy.scrapper.repository.InMemoryLinkRepository;
 import backend.academy.scrapper.repository.LinkRepository;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -16,7 +18,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 @EnableAutoConfiguration
 @SpringBootTest(classes = ScrapperApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:application-test.yaml")
+@ActiveProfiles("test")
 @ContextConfiguration(classes = BaseIntegrationTest.TestConfig.class)
 public class BaseIntegrationTest {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -46,7 +48,7 @@ public class BaseIntegrationTest {
     static class TestConfig {
         @Bean
         public LinkRepository linkRepository() {
-            return new InMemoryLinkRepository();
+            return new InMemoryLinkRepository(EnvType.TEST);
         }
     }
 }

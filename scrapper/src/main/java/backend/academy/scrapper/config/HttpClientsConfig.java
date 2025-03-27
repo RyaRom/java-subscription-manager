@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
+import static backend.academy.configuration.CustomHeaders.GITHUB_API_VERSION;
 
 @Validated
 @ConfigurationProperties(prefix = "app.clients", ignoreUnknownFields = false)
 public record HttpClientsConfig(
     @Nullable String githubToken, @NotEmpty String botUrl,
-    String stackOverflowUrl, String githubUrl
+    @NotEmpty String stackOverflowUrl, @NotEmpty String githubUrl
 ) {
-    public static final String GITHUB_API_VERSION = "X-GitHub-Api-Version";
 
     @Bean
     public WebClient githubHttpClient() {

@@ -1,5 +1,6 @@
 package integration.api;
 
+import static backend.academy.configuration.CustomHeaders.TG_CHAT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import backend.academy.dto.AddLinkRequest;
@@ -12,6 +13,7 @@ import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
 public class AddLinksTest extends BaseIntegrationTest {
@@ -37,8 +39,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(badLink))
                 .exchange()
                 .expectStatus()
@@ -47,7 +49,7 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .bodyValue(asJsonString(githubLink))
                 .exchange()
                 .expectStatus()
@@ -59,8 +61,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(githubLink))
                 .exchange()
                 .expectStatus()
@@ -82,8 +84,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
@@ -106,8 +108,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
@@ -115,8 +117,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(githubLink))
                 .exchange()
                 .expectStatus()
@@ -124,7 +126,7 @@ public class AddLinksTest extends BaseIntegrationTest {
         var links = webTestClient
                 .get()
                 .uri("/links")
-                .header("Tg-Chat-Id", "1")
+                .header(TG_CHAT_ID, "1")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -148,8 +150,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
@@ -157,16 +159,16 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .is4xxClientError();
         var links = webTestClient
                 .get()
                 .uri("/links")
-                .header("Tg-Chat-Id", "1")
+                .header(TG_CHAT_ID, "1")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -187,8 +189,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
@@ -196,8 +198,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "2")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "2")
                 .bodyValue(asJsonString(stackOverflowLink))
                 .exchange()
                 .expectStatus()
@@ -214,8 +216,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .post()
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(asJsonString(githubLink))
                 .exchange()
                 .expectStatus()
@@ -224,8 +226,8 @@ public class AddLinksTest extends BaseIntegrationTest {
         webTestClient
                 .method(HttpMethod.DELETE)
                 .uri("/links")
-                .header("Content-Type", "application/json")
-                .header("Tg-Chat-Id", "1")
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header(TG_CHAT_ID, "1")
                 .bodyValue(new RemoveLinkRequest(githubLink.getLink()))
                 .exchange()
                 .expectStatus()

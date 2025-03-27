@@ -1,0 +1,14 @@
+app:
+  main:
+    stackoverflow:
+      key: so_key
+      access-token: so_token
+      token-disabled: true
+  clients:
+    bot-url: bot
+    github-token: gh_token
+    stack-overflow-url: so
+    github-url: gh
+
+#server:
+#  port: 8081
