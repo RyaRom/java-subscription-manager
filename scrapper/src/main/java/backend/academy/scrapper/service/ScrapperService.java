@@ -33,8 +33,11 @@ public class ScrapperService {
 
     public Mono<LinkResponse> addLink(Long chatId, AddLinkRequest request) {
         var savedLink = linkRepository
-                .find(request.getLink())
+                .findByUrl(request.getLink())
                 .map(link -> {
+                    if (link.getChatIds().contains(chatId)){
+                        throw new ResourceAlreadyExistsException("Link already exists");
+                    }
                     link.getChatIds().add(chatId);
                     linkRepository.save(link);
                     return link;
@@ -69,7 +72,7 @@ public class ScrapperService {
 
     public Mono<LinkResponse> removeLink(String link) {
         log.info("Remove link {}", link);
-        var deletedLink = linkRepository.delete(link).orElseThrow(NotFoundException::new);
+        var deletedLink = linkRepository.deleteByUrl(link).orElseThrow(NotFoundException::new);
         return Mono.just(deletedLink.toLinkResponse());
     }
 }

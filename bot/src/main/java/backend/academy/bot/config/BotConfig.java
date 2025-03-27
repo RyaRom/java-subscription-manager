@@ -1,22 +1,16 @@
 package backend.academy.bot.config;
 
-import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
-import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Validated
 @Log4j2
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public record BotConfig(@NotEmpty String telegramToken, @NotEmpty String scrapperUrl, BotCommands settings) {
+public record BotConfig(BotCommands settings) {
 
     @Bean
     public String helpMessage() {
@@ -26,41 +20,6 @@ public record BotConfig(@NotEmpty String telegramToken, @NotEmpty String scrappe
     @Bean
     public BotCommands botCommands() {
         return settings;
-    }
-
-    @Bean
-    public WebClient scrapperHttpClient() {
-        return WebClient.builder()
-            .baseUrl(scrapperUrl)
-            .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .build();
-    }
-
-    @Bean
-    public WebClient botHttpClient() {
-        return WebClient.builder()
-            .baseUrl("https://api.telegram.org/bot" + telegramToken)
-            .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .build();
-    }
-
-    @Bean
-    public TelegramBot telegramBot(UpdateProcessor updateProcessor) {
-        var telegramBot = new TelegramBot(telegramToken);
-        telegramBot.setUpdatesListener(
-            updates -> {
-                updates.forEach(updateProcessor::consumeUpdate);
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            },
-            e -> {
-                if (e.response() != null) {
-                    log.error(e.response().errorCode());
-                    log.error(e.response().description());
-                } else {
-                    e.printStackTrace();
-                }
-            });
-        return telegramBot;
     }
 
     public record BotCommands(List<BotCommand> commands) {

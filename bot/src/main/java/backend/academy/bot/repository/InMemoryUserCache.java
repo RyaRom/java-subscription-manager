@@ -1,14 +1,14 @@
 package backend.academy.bot.repository;
 
 import backend.academy.bot.telegram.utils.fsm.BotState;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
 public class InMemoryUserCache implements UserDataCacheRepository {
-    private final Map<Long, UserCache> userMap = new HashMap<>();
+    private final Map<Long, UserCache> userMap = new ConcurrentHashMap<>();
 
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {

@@ -23,13 +23,14 @@ import static backend.academy.bot.telegram.utils.filters.FilterParameter.COMMAND
 public class BotRouter {
     private final TelegramAPI telegramAPI;
 
-    private final WebClient tgHttpClient;
+    private final WebClient botHttpClient;
 
     private final String helpMessage;
 
     private final BotCommands botCommands;
 
     private final ScrapperClient scrapperClient;
+
     private final UserDataCacheRepository userDataCacheRepository;
 
     @MessageHandler(
@@ -80,7 +81,7 @@ public class BotRouter {
         params = @FilterParam(key = COMMANDS, value = "setup"),
         priority = 0)
     public Mono<Void> setup(Message message) {
-        return tgHttpClient
+        return botHttpClient
             .post()
             .uri("/setMyCommands")
             .bodyValue(botCommands)

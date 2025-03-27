@@ -5,7 +5,6 @@ import backend.academy.scrapper.repository.dto.GithubActivity;
 import backend.academy.scrapper.repository.dto.Link;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;

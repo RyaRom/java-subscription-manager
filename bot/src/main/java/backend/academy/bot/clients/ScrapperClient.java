@@ -14,6 +14,7 @@ import reactor.core.scheduler.Schedulers;
 @Component
 @RequiredArgsConstructor
 public class ScrapperClient {
+    public static final String TG_CHAT_ID = "Tg-Chat-Id";
     private final WebClient scrapperHttpClient;
 
     public Mono<Void> registerChat(Long chatId) {
@@ -30,7 +31,7 @@ public class ScrapperClient {
         return scrapperHttpClient
             .get()
             .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
+            .header(TG_CHAT_ID, chatId.toString())
             .retrieve()
             .bodyToMono(ListLinkResponse.class)
             .publishOn(Schedulers.boundedElastic());
@@ -40,7 +41,7 @@ public class ScrapperClient {
         return scrapperHttpClient
             .post()
             .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
+            .header(TG_CHAT_ID, chatId.toString())
             .body(BodyInserters.fromValue(addLinkRequest))
             .retrieve()
             .toBodilessEntity()
@@ -53,7 +54,7 @@ public class ScrapperClient {
             // body in delete is not allowed by default
             .method(HttpMethod.DELETE)
             .uri("/links")
-            .header("Tg-Chat-Id", chatId.toString())
+            .header(TG_CHAT_ID, chatId.toString())
             .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
             .retrieve()
             .toBodilessEntity()

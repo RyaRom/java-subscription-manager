@@ -64,12 +64,12 @@ public class PollingTest extends BaseIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        linkRepository.drop();
+        linkRepository.dropForTest();
     }
 
     @Test
     void updateTest() {
-        linkRepository.save(List.of(githubLink, soLink));
+        linkRepository.saveAll(List.of(githubLink, soLink));
         updatePollingJob.update();
 
         verify(githubClient, times(1)).getRepoActivities("academy-frontend", "academy-frontend");

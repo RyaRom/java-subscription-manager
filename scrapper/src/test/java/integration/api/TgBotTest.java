@@ -12,7 +12,7 @@ public class TgBotTest extends BaseIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        linkRepository.drop();
+        linkRepository.dropForTest();
     }
 
     @Test

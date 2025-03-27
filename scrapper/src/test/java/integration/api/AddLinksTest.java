@@ -29,7 +29,7 @@ public class AddLinksTest extends BaseIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        linkRepository.drop();
+        linkRepository.dropForTest();
     }
 
     @Test

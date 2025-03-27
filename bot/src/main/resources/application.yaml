@@ -1,5 +1,4 @@
 app:
-  telegram-token: ${TELEGRAM_TOKEN}
   settings:
     commands:
       - command: /start
@@ -12,7 +11,11 @@ app:
         description: Остановить отслеживание ссылки
       - command: /list
         description: Список отслеживаемых ссылок
-  scrapper-url: http://localhost:8081/scrapper/api
+  telegram:
+    telegram-token: ${TELEGRAM_TOKEN}
+  clients:
+    scrapper-url: http://localhost:8081/scrapper/api
+
 
 spring:
   application:

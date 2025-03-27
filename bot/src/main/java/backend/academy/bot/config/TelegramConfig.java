@@ -1,0 +1,40 @@
+package backend.academy.bot.config;
+
+import backend.academy.bot.telegram.utils.filters.UpdateProcessor;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.UpdatesListener;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+@Log4j2
+@ConfigurationProperties(prefix = "app.telegram", ignoreUnknownFields = false)
+public record TelegramConfig(@NotEmpty String telegramToken) {
+
+    @Bean
+    public String telegramToken() {
+        return telegramToken;
+    }
+
+    @Bean
+    public TelegramBot telegramBot(UpdateProcessor updateProcessor) {
+        var telegramBot = new TelegramBot(telegramToken);
+        telegramBot.setUpdatesListener(
+            updates -> {
+                updates.forEach(updateProcessor::consumeUpdate);
+                return UpdatesListener.CONFIRMED_UPDATES_ALL;
+            },
+            e -> {
+                if (e.response() != null) {
+                    log.error("ERROR IN TELEGRAM {}", e.response().description());
+                } else {
+                    e.printStackTrace();
+                }
+            });
+        return telegramBot;
+    }
+
+}

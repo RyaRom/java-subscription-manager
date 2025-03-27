@@ -1,10 +1,13 @@
 app:
-  github-token: ${GITHUB_TOKEN}
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
     token-disabled: true
-  bot-url: http://localhost:8080/bot/api
+  clients:
+    bot-url: http://localhost:8080/bot/api
+    github-token: ${GITHUB_TOKEN}
+    stack-overflow-url: https://api.stackexchange.com/2.3
+    github-url: https://api.github.com
 
 
 spring:
