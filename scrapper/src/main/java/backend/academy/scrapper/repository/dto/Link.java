@@ -3,6 +3,7 @@ package backend.academy.scrapper.repository.dto;
 import backend.academy.dto.LinkResponse;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.Builder;
 import lombok.Data;
 import org.jspecify.annotations.NonNull;
@@ -10,10 +11,11 @@ import org.jspecify.annotations.Nullable;
 
 @Data
 @Builder
-public final class Link {
+public class Link {
+    private static final AtomicLong SIMULATE_COUNTER = new AtomicLong();
     // replace with spring data id
     @Builder.Default
-    private Long linkId = (long) (Math.random() * 1000L);
+    private Long linkId = SIMULATE_COUNTER.addAndGet(1L);
 
     @NonNull
     private String url;
