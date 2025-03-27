@@ -1,15 +1,5 @@
 package backend.academy.bot.routing;
 
-import static backend.academy.bot.rest.BotController.getUpdateInfo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import backend.academy.bot.BotKeyboards;
 import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.rest.BotController;
@@ -26,17 +16,24 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Mono;
+import static backend.academy.bot.rest.BotController.getUpdateInfo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.yaml")
 class BotRouterTest {
     @Autowired
-    @Qualifier("helpMessage")
     private String helpMessage;
 
     @MockitoBean
@@ -53,33 +50,33 @@ class BotRouterTest {
 
     private static ListLinkResponse getTestLinksData() {
         return new ListLinkResponse(
-                List.of(
-                        new LinkResponse(
-                                1L,
-                                "https://google.com",
-                                List.of("tag1, tag2"),
-                                List.of("filter1:value1", "filter2:value2")),
-                        new LinkResponse(
-                                2L,
-                                "https://github.com",
-                                List.of("tag1, tag2"),
-                                List.of("filter1:value1", "filter2:value2")),
-                        new LinkResponse(
-                                3L,
-                                "https://stackoverflow.com",
-                                List.of("tag1, tag2"),
-                                List.of("filter1:value1", "filter2:value2")),
-                        new LinkResponse(
-                                4L,
-                                "https://stackoverflow.com",
-                                List.of("tag1, tag2"),
-                                List.of("filter1:value1", "filter2:value2")),
-                        new LinkResponse(
-                                5L,
-                                "https://stackoverflow.com",
-                                List.of("tag1, tag2"),
-                                List.of("filter1:value1", "filter2:value2"))),
-                5);
+            List.of(
+                new LinkResponse(
+                    1L,
+                    "https://google.com",
+                    List.of("tag1, tag2"),
+                    List.of("filter1:value1", "filter2:value2")),
+                new LinkResponse(
+                    2L,
+                    "https://github.com",
+                    List.of("tag1, tag2"),
+                    List.of("filter1:value1", "filter2:value2")),
+                new LinkResponse(
+                    3L,
+                    "https://stackoverflow.com",
+                    List.of("tag1, tag2"),
+                    List.of("filter1:value1", "filter2:value2")),
+                new LinkResponse(
+                    4L,
+                    "https://stackoverflow.com",
+                    List.of("tag1, tag2"),
+                    List.of("filter1:value1", "filter2:value2")),
+                new LinkResponse(
+                    5L,
+                    "https://stackoverflow.com",
+                    List.of("tag1, tag2"),
+                    List.of("filter1:value1", "filter2:value2"))),
+            5);
     }
 
     @BeforeEach
@@ -88,7 +85,7 @@ class BotRouterTest {
         when(telegramAPI.sendMessageAsync(any(Message.class), anyString())).thenCallRealMethod();
         when(telegramAPI.sendMessagesAsync(any(), any())).thenCallRealMethod();
         when(telegramAPI.sendMessageAsync(any(Message.class), anyString(), any(Keyboard.class)))
-                .thenCallRealMethod();
+            .thenCallRealMethod();
         when(telegramAPI.sendMessageAsync(anyLong(), anyString())).thenCallRealMethod();
         when(scrapperClient.addLink(anyLong(), any())).thenReturn(Mono.empty());
         when(scrapperClient.registerChat(anyLong())).thenReturn(Mono.empty());

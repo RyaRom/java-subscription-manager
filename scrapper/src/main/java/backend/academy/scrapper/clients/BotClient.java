@@ -14,8 +14,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class BotClient {
-    @Qualifier("botHttpClient")
-    private final WebClient webClient;
+    private final WebClient botHttpClient;
 
     public static String getGithubUpdate(GithubActivity githubActivity) {
         return String.format(
@@ -30,7 +29,7 @@ public class BotClient {
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
-        return webClient
+        return botHttpClient
                 .post()
                 .uri("/updates")
                 .body(BodyInserters.fromValue(linkUpdate))
