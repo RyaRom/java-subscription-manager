@@ -17,7 +17,7 @@ public record BotConfig(BotCommands settings) {
 
     @Bean
     public String helpMessage() {
-        return settings.commands.stream().map(BotCommand::toString).collect(Collectors.joining("%n"));
+        return settings.commands.stream().map(BotCommand::toString).collect(Collectors.joining("\n"));
     }
 
     @Bean
