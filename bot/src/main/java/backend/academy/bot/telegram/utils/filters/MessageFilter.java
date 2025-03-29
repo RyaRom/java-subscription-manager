@@ -5,6 +5,5 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 @FunctionalInterface
-public interface MessageFilterGenerator {
-    Predicate<Message> filter(Map<FilterParameter, Object> kwargs);
+public interface MessageFilter extends AbstractFilter<Message>{
 }

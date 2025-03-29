@@ -1,9 +1,10 @@
 package backend.academy.bot.telegram.utils.middlewares;
 
+import com.pengrad.telegrambot.model.Update;
 import reactor.core.publisher.Mono;
 
-public interface AbstractMiddleware<REQUEST, RESPONSE> {
-    Mono<REQUEST> preHandle(Mono<REQUEST> chain);
+public interface AbstractMiddleware {
+    Mono<Update> preHandle(Mono<Update> chain);
 
-    Mono<RESPONSE> postHandle(Mono<RESPONSE> chain);
+    Mono<Update> postHandle(Mono<Update> chain);
 }

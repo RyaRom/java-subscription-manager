@@ -2,10 +2,9 @@ package backend.academy.bot.telegram.utils;
 
 import backend.academy.bot.telegram.utils.annotations.FilterParam;
 import backend.academy.bot.telegram.utils.annotations.Router;
-import backend.academy.bot.telegram.utils.exception.TelegramException;
 import backend.academy.bot.telegram.utils.filters.FilterParameter;
 import backend.academy.bot.telegram.utils.filters.FilterRegister;
-import backend.academy.bot.telegram.utils.filters.MessageFilterGenerator;
+import backend.academy.bot.telegram.utils.filters.MessageFilter;
 import backend.academy.bot.telegram.utils.middlewares.MiddlewaresContext;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -35,31 +34,23 @@ public class BotContext {
     private final FilterRegister filterRegister;
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();
-    /**
-     * possible rewrite all {@link Router} to return Update type but this app doesn't really need it now
-     */
-    private final MiddlewaresContext<Update, Void> middlewaresContext;
+    private final MiddlewaresContext middlewaresContext;
 
-    public static Mono<Void> handleAsyncOrNotConsumer(Object bean, Method method, Object... args)
+    public static <T> Mono<T> handleAsyncOrNotFunction(Object bean, Method method, Class<T> returnType, Object... args)
         throws IllegalAccessException, InvocationTargetException {
-        if (method.getReturnType().equals(Void.TYPE)) {
-            log.warn("Blocking call in {}", method.getName());
-            return Mono.fromRunnable(() -> {
-                    try {
-                        method.invoke(bean, args);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
-        }
         Object result = method.invoke(bean, args);
         if (result instanceof Mono) {
-            return (Mono<Void>) result;
+            return (Mono<T>) result;
         } else {
-            log.error("Method {} must return Mono<Void> or void", method.getName());
-            throw new IllegalArgumentException("Method " + method.getName() + " must return Mono<Void> or void");
+            log.warn("Blocking call in {}", method.getName());
+            return Mono.fromCallable(() -> {
+                    var uncasted = method.invoke(bean, args);
+                    if (returnType.isInstance(uncasted)) {
+                        return (T) returnType;
+                    }
+                    throw new RuntimeException("Method " + method.getName() + " must return " + returnType.getName());
+                })
+                .subscribeOn(Schedulers.boundedElastic());
         }
     }
 
@@ -89,16 +80,13 @@ public class BotContext {
         Message message = update.message();
         for (var handler : messageHandlers) {
             if (handler.filter.test(message)) {
-                Mono<Void> resultAsync = middlewaresContext.applyMiddlewares(
-                    Mono.just(update),
-                    u -> u.flatMap(it -> handler.handler.apply(it.message()))
-                        .onErrorMap(error ->{
-                            log.debug("Exception in chat {}. {}",
-                                message.chat().id(), error.getMessage());
-                            return new TelegramException(error, update, error.getMessage());
-                        })
-                );
-                resultAsync.subscribe();
+                    Mono<Update> pipeline = middlewaresContext.applyMiddlewares(
+                        Mono.just(update),
+                        handler.handler.apply(message)
+                            .thenReturn(update)
+                            .onErrorMap(throwable -> new TelegramException(update, throwable))
+                        );
+                pipeline.subscribe();
                 if (handler.isFinal) {
                     return;
                 }
@@ -131,14 +119,14 @@ public class BotContext {
 
         List<Predicate<Message>> filters = new ArrayList<>();
         for (var filterClass : messageHandler.filters()) {
-            MessageFilterGenerator filterGenerator = filterRegister.getFilterInstance(filterClass);
+            MessageFilter filterGenerator = filterRegister.getMessageFilterInstance(filterClass);
             filters.add(filterGenerator.filter(params));
         }
         messageHandlers.add(new MessageHandler(
             message -> filters.stream().allMatch(filter -> filter.test(message)),
             message -> {
                 try {
-                    return handleAsyncOrNotConsumer(bean, method, message);
+                    return handleAsyncOrNotFunction(bean, method, Void.TYPE, message);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     log.error("Unable to invoke message handler {}", method.getName(), e);
                     throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);

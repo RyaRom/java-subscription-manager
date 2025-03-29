@@ -27,13 +27,7 @@ public record TelegramConfig(@NotEmpty String telegramToken) {
                 updates.forEach(botContext::consumeUpdate);
                 return UpdatesListener.CONFIRMED_UPDATES_ALL;
             },
-            e -> {
-                if (e.response() != null) {
-                    log.error("ERROR IN TELEGRAM {}", e.response().description());
-                } else {
-                    e.printStackTrace();
-                }
-            });
+            e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
         return telegramBot;
     }
 

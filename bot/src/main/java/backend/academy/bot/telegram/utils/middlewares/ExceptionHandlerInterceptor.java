@@ -1,9 +1,9 @@
 package backend.academy.bot.telegram.utils.middlewares;
 
 import backend.academy.bot.telegram.utils.BotContext;
+import backend.academy.bot.telegram.utils.TelegramException;
 import backend.academy.bot.telegram.utils.annotations.BotRouterAdvice;
 import backend.academy.bot.telegram.utils.annotations.ExceptionHandler;
-import backend.academy.bot.telegram.utils.exception.TelegramException;
 import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
@@ -13,12 +13,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -27,9 +25,9 @@ import static backend.academy.bot.telegram.utils.BotContext.getAnnotatedMethods;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class ExceptionHandlerInterceptor implements AbstractMiddleware<Update, Void> {
+public class ExceptionHandlerInterceptor implements AbstractMiddleware {
     @Getter
-    private final Map<Class<? extends Throwable>, BiFunction<TelegramException, Update, Mono<Void>>> errorHandlers =
+    private final Map<Class<? extends Throwable>, BiFunction<Throwable, Update, Mono<Update>>> errorHandlers =
         new HashMap<>();
     private final ApplicationContext applicationContext;
 
@@ -40,33 +38,28 @@ public class ExceptionHandlerInterceptor implements AbstractMiddleware<Update, V
     }
 
     @Override
-    public Mono<Void> postHandle(Mono<Void> chain) {
-        return chain.onErrorResume(error -> {
-            log.info("Error caught {}. class = {}", error.getMessage(), error.getClass());
-            TelegramException exception;
-            try {
-                exception = (TelegramException) error;
-            } catch (Throwable e) {
-                log.error("Exception was not casted correctly. It needs to be fixed immediately");
-                SpringApplication.exit(applicationContext, () -> 1);
-                throw new Error();
-            }
-            var handlerFabric = getEscalatedByExceptionAncestorsResult(error.getClass());
-            if (handlerFabric == null){
-                return Mono.empty();
-            }
-            return handlerFabric.apply(exception, exception.getUpdate());
-        });
+    public Mono<Update> postHandle(Mono<Update> chain) {
+        return chain
+            .onErrorResume((exception) -> {
+                    var casted = ((TelegramException) exception);
+                    log.info("Error caught {}. class = {}", casted.getReason(), casted.getReason());
+                    var handlerFabric = getEscalatedByExceptionAncestorsResult(casted.getReason().getClass());
+                    if (handlerFabric == null) {
+                        return Mono.empty();
+                    }
+                    return handlerFabric.apply(casted.getReason(), casted.getUpdate());
+                }
+            );
     }
 
     @Nullable
-    private BiFunction<TelegramException, Update, Mono<Void>> getEscalatedByExceptionAncestorsResult
-        (Class<?> exceptionClass){
+    private BiFunction<Throwable, Update, Mono<Update>> getEscalatedByExceptionAncestorsResult
+        (Class<?> exceptionClass) {
         while (exceptionClass != null && exceptionClass != Throwable.class) {
-            for (Class<? extends Throwable> registeredClass : errorHandlers.keySet()) {
-                if (registeredClass.isAssignableFrom(exceptionClass)) {
-                    return errorHandlers.get(registeredClass);
-                }
+            log.info("Trying to find handler for {}", exceptionClass);
+            var found = errorHandlers.get(exceptionClass);
+            if (found != null) {
+                return found;
             }
             exceptionClass = exceptionClass.getSuperclass();
         }
@@ -103,10 +96,11 @@ public class ExceptionHandlerInterceptor implements AbstractMiddleware<Update, V
 //                    );
                 errorHandlers.putIfAbsent(errorClass, (exception, update) -> {
                     try {
-                        return BotContext.handleAsyncOrNotConsumer(bean, method, exception.getCause(), update);
+                        return BotContext.handleAsyncOrNotFunction(bean, method, Void.TYPE, exception, update)
+                            .thenReturn(update);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        log.error("Unable to invoke message handler {}", method.getName(), e);
-                        throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
+                        log.error("Unable to invoke message handler {}, {}", method.getName(), e);
+                        throw new RuntimeException(e);
                     }
                 });
             });

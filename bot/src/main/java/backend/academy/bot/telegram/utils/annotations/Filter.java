@@ -1,15 +1,13 @@
 package backend.academy.bot.telegram.utils.annotations;
 
+import org.springframework.stereotype.Component;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Should have parameters Exception and Update
- */
+@Component
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ExceptionHandler {
-    Class<? extends Throwable>[] value();
+@Target(ElementType.TYPE)
+public @interface Filter {
 }

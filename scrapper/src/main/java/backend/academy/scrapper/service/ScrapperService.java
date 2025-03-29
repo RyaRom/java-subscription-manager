@@ -7,7 +7,7 @@ import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.exception.ResourceNotFoundException;
-import backend.academy.exception.ResourceAlreadyExistsException;
+import backend.academy.exception.BadLinkException;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import java.util.HashSet;
@@ -38,7 +38,7 @@ public class ScrapperService {
                 .findByUrl(request.getLink())
                 .map(link -> {
                     if (link.getChatIds().contains(chatId)){
-                        throw new ResourceAlreadyExistsException("Link already exists");
+                        throw new BadLinkException("Link already exists");
                     }
                     link.getChatIds().add(chatId);
                     linkRepository.save(link);
@@ -66,7 +66,7 @@ public class ScrapperService {
             builder.linkType(Link.Type.STACK_OVERFLOW);
             builder.stackOverflowInfo(parseStackOverflowInfo(url));
         } else {
-            throw new IllegalArgumentException("Not a valid link");
+            throw new BadLinkException("Not a valid link");
         }
 
         return builder.build();

@@ -1,6 +1,7 @@
 package backend.academy.bot.telegram.utils.annotations;
 
-import backend.academy.bot.telegram.utils.filters.MessageFilterGenerator;
+import backend.academy.bot.telegram.utils.filters.AbstractFilter;
+import backend.academy.bot.telegram.utils.filters.MessageFilter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,15 +14,23 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface MessageHandler {
-    /** List of filter classes to apply before calling the annotated method. */
-    Class<? extends MessageFilterGenerator>[] filters() default {};
+    /**
+     * List of filter classes to apply before calling the annotated method.
+     */
+    Class<? extends AbstractFilter>[] filters() default {};
 
-    /** List of filter parameters to use when calling the annotated method. */
+    /**
+     * List of filter parameters to use when calling the annotated method.
+     */
     FilterParam[] params() default {};
 
-    /** Priority of the handler. */
+    /**
+     * Priority of the handler.
+     */
     int priority() default 5;
 
-    /** If set to true, this handler will be the last one to be called. */
+    /**
+     * If set to true, this handler will be the last one to be called.
+     */
     boolean isFinal() default true;
 }

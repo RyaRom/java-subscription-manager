@@ -3,6 +3,7 @@ package backend.academy.bot.clients;
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
+import backend.academy.exception.BadLinkException;
 import backend.academy.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -49,6 +50,10 @@ public class ScrapperClient {
             .body(BodyInserters.fromValue(addLinkRequest))
             .retrieve();
         return handleErrorsDefault(result)
+            .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response ->
+                response.bodyToMono(String.class)
+                    .flatMap(body -> Mono.error(new BadLinkException("Bad request: " + body)))
+            )
             .toBodilessEntity()
             .then()
             .publishOn(Schedulers.boundedElastic());

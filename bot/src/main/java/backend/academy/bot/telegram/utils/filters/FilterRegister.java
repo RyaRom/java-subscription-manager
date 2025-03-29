@@ -1,46 +1,47 @@
 package backend.academy.bot.telegram.utils.filters;
 
+import backend.academy.bot.telegram.utils.annotations.Filter;
 import backend.academy.bot.telegram.utils.fsm.FSMContext;
 import com.pengrad.telegrambot.model.Message;
+import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class FilterRegister {
-    private static final Map<Class<? extends MessageFilterGenerator>, MessageFilterGenerator> FILTER_CACHE =
-            new HashMap<>();
-    private final ApplicationContext applicationContext;
+    private final List<MessageFilter> filters;
+    private final Map<Class<? extends MessageFilter>, MessageFilter> filterMap = new HashMap<>();
 
     private static boolean notEmpty(String text) {
         return text != null && !text.isBlank();
     }
 
-    public MessageFilterGenerator getFilterInstance(Class<? extends MessageFilterGenerator> filterClass) {
-        return FILTER_CACHE.computeIfAbsent(filterClass, aClass -> {
-            try {
-                try {
-                    return applicationContext.getBean(filterClass);
-                } catch (Exception e) {
-                    return aClass.getDeclaredConstructor().newInstance();
-                }
-            } catch (Exception e) {
-                log.error("Unable to create filter instance {}", filterClass);
-                throw new RuntimeException("Unable to create filter instance", e);
-            }
-        });
+    public MessageFilter getMessageFilterInstance(Class<? extends AbstractFilter> filterClass) {
+        var instance = filterMap.get(filterClass);
+        if (instance == null) {
+            throw new RuntimeException("Filter " + filterClass.getSimpleName() + " not found. " +
+                "All filters should implement AbstractFilter interface");
+        }
+        return instance;
     }
 
-    public static class CommandFilter implements MessageFilterGenerator {
+    @PostConstruct
+    private void init() {
+        filters.forEach(filter -> filterMap.put(filter.getClass(), filter));
+    }
+
+    @Filter
+    public static class CommandFilter implements MessageFilter {
 
         @Override
         public Predicate<Message> filter(Map<FilterParameter, Object> kwargs) {
@@ -62,9 +63,9 @@ public class FilterRegister {
         }
     }
 
+    @Filter
     @RequiredArgsConstructor
-    @Component
-    public static class StateFilter implements MessageFilterGenerator {
+    public static class StateFilter implements MessageFilter {
         private final FSMContext fsmContext;
 
         @Override
@@ -83,22 +84,24 @@ public class FilterRegister {
         }
     }
 
-    public static class UrlFilter implements MessageFilterGenerator {
+    @Filter
+    public static class UrlFilter implements MessageFilter {
 
         @Override
         public Predicate<Message> filter(Map<FilterParameter, Object> kwargs) {
             return message -> {
                 String text = message.text();
                 return notEmpty(text)
-                        && text.matches("(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]"
-                                + "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|"
-                                + "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-"
-                                + "Z0-9]+\\.[^\\s]{2,})");
+                    && text.matches("(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]"
+                    + "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|"
+                    + "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-"
+                    + "Z0-9]+\\.[^\\s]{2,})");
             };
         }
     }
 
-    public static class NotEmptyTextFilter implements MessageFilterGenerator {
+    @Filter
+    public static class NotEmptyTextFilter implements MessageFilter {
 
         @Override
         public Predicate<Message> filter(Map<FilterParameter, Object> kwargs) {

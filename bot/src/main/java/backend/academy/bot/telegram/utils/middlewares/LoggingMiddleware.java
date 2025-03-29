@@ -10,17 +10,14 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @Log4j2
-public class LoggingMiddleware implements AbstractMiddleware<Update, Void>{
+public class LoggingMiddleware implements AbstractMiddleware{
     @Override
     public Mono<Update> preHandle(Mono<Update> chain) {
-        return chain.map(update -> {
-            log.info("Before update in chat {}", update.message().chat().id());
-            return update;
-        });
+        return chain.doOnSuccess(update -> log.info("Before update in chat {}", update.message().chat().id()));
     }
 
     @Override
-    public Mono<Void> postHandle(Mono<Void> chain) {
-        return chain.then(Mono.fromRunnable(() -> log.info("After update in chat")));
+    public Mono<Update> postHandle(Mono<Update> chain) {
+        return chain.doOnSuccess(update -> log.info("After update in chat {}", update.message().chat().id()));
     }
 }

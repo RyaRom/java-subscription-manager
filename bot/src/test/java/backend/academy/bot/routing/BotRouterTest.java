@@ -1,23 +1,16 @@
 package backend.academy.bot.routing;
 
+import backend.academy.bot.BaseIntegrationTest;
 import backend.academy.bot.BotKeyboards;
 import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.rest.BotController;
-import backend.academy.bot.telegram.utils.TelegramAPI;
-import backend.academy.bot.telegram.utils.BotContext;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.LinkUpdate;
 import backend.academy.dto.ListLinkResponse;
-import com.pengrad.telegrambot.model.Chat;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.Keyboard;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Mono;
 import static backend.academy.bot.rest.BotController.getUpdateInfo;
@@ -25,25 +18,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class BotRouterTest {
+class BotRouterTest extends BaseIntegrationTest {
     @Autowired
     private String helpMessage;
 
     @MockitoBean
-    private TelegramAPI telegramAPI;
-
-    @MockitoBean
     private ScrapperClient scrapperClient;
-
-    @Autowired
-    private BotContext botContext;
 
     @Autowired
     private BotController botController;
@@ -82,11 +66,6 @@ class BotRouterTest {
     @BeforeEach
     void setUp() {
         when(scrapperClient.getLinks(any())).thenReturn(Mono.just(getTestLinksData()));
-        when(telegramAPI.sendMessageAsync(any(Message.class), anyString())).thenCallRealMethod();
-        when(telegramAPI.sendMessagesAsync(any(), any())).thenCallRealMethod();
-        when(telegramAPI.sendMessageAsync(any(Message.class), anyString(), any(Keyboard.class)))
-            .thenCallRealMethod();
-        when(telegramAPI.sendMessageAsync(anyLong(), anyString())).thenCallRealMethod();
         when(scrapperClient.addLink(anyLong(), any())).thenReturn(Mono.empty());
         when(scrapperClient.registerChat(anyLong())).thenReturn(Mono.empty());
         when(scrapperClient.removeLink(anyLong(), anyString())).thenReturn(Mono.empty());
@@ -129,16 +108,6 @@ class BotRouterTest {
         verify(scrapperClient, times(1)).addLink(eq(1L), any());
     }
 
-    private Update mockMessageUpdate(String text, Long chatId) {
-        Update update = mock(Update.class);
-        Message message = mock(Message.class);
-        Chat chat = mock(Chat.class);
-        when(message.text()).thenReturn(text);
-        when(message.chat()).thenReturn(chat);
-        when(chat.id()).thenReturn(chatId);
-        when(update.message()).thenReturn(message);
-        return update;
-    }
 
     @Test
     void sendUpdate() {
