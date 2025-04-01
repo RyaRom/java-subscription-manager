@@ -21,10 +21,10 @@ public class GithubParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(Link link, List<String> tokens) {
+    public boolean parse(Link.LinkBuilder link, List<String> tokens, String url) {
         if (tokens.contains("github.com")) {
-            link.setLinkType(Link.Type.GITHUB);
-            link.setGithubInfo(parseGithubInfo(link.getUrl()));
+            link.linkType(Link.Type.GITHUB);
+            link.githubInfo(parseGithubInfo(url));
             return true;
         }
         return false;

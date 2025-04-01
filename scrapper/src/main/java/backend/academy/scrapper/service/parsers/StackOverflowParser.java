@@ -21,10 +21,10 @@ public class StackOverflowParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(Link link, List<String> tokens) {
+    public boolean parse(Link.LinkBuilder link, List<String> tokens, String url) {
         if (tokens.contains("stackoverflow.com")) {
-            link.setLinkType(Link.Type.STACK_OVERFLOW);
-            link.setStackOverflowInfo(parseStackOverflowInfo(link.getUrl()));
+            link.linkType(Link.Type.STACK_OVERFLOW);
+            link.stackOverflowInfo(parseStackOverflowInfo(url));
             return true;
         }
         return false;

@@ -23,11 +23,10 @@ public class LinkContext {
         var builder = Link.builder();
         builder.url(url);
         builder.chatIds(new HashSet<>(List.of(chatId)));
-        var link = builder.build();
         List<String> tokens = List.of(url.split("/"));
         for (var parser : parserChain) {
-            if (parser.parse(link, tokens)) {
-                return link;
+            if (parser.parse(builder, tokens, url)) {
+                return builder.build();
             }
         }
         throw new BadLinkException("Not a valid link");

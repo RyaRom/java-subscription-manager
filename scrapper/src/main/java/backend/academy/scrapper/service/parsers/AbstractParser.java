@@ -6,7 +6,7 @@ import java.util.List;
 import reactor.core.publisher.Mono;
 
 public interface AbstractParser {
-    boolean parse(Link link, List<String> tokens);
+    boolean parse(Link.LinkBuilder link, List<String> tokens, String url);
 
     Mono<Boolean> update(Link link, Instant lastUpdated);
 
