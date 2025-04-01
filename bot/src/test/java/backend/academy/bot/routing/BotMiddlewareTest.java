@@ -28,12 +28,14 @@ public class BotMiddlewareTest extends BaseIntegrationTest {
     }
 
     @Test
-    void assertErrorHandles() {
+    void assertErrorHandles() throws InterruptedException {
         var messageTest = mockMessageUpdate("/start", 1L);
         var messageTest2 = mockMessageUpdate("/list", 1L);
 
         botContext.consumeUpdate(messageTest);
         botContext.consumeUpdate(messageTest2);
+
+        Thread.sleep(2000L);
 
         verify(telegramAPI, times(1)).sendMessage(1L, "Can't connect to internal server");
         verify(telegramAPI, times(1))

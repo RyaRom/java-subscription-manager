@@ -41,7 +41,7 @@ public class ExceptionHandlerInterceptor implements AbstractMiddleware {
     @Override
     public Mono<Update> postHandle(Mono<Update> chain) {
         return chain.onErrorResume((exception) -> {
-            var casted = ((TelegramException) exception);
+            var casted = (TelegramException) exception;
             log.info("Error caught {}. class = {}", casted.getReason(), casted.getReason());
             var handlerFabric =
                     getEscalatedByExceptionAncestorsResult(casted.getReason().getClass());
