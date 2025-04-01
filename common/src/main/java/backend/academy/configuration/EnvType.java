@@ -1,7 +1,10 @@
 package backend.academy.configuration;
 
 public enum EnvType {
-    DEVELOPMENT, PRODUCTION, TEST, UNKNOWN;
+    DEVELOPMENT,
+    PRODUCTION,
+    TEST,
+    UNKNOWN;
 
     public static EnvType getFromType(String environment) {
         return switch (environment) {

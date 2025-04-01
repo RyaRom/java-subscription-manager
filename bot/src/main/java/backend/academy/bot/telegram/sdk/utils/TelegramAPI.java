@@ -1,13 +1,11 @@
-package backend.academy.bot.telegram.utils;
+package backend.academy.bot.telegram.sdk.utils;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -16,13 +14,12 @@ import reactor.core.scheduler.Schedulers;
 
 @Component
 @Log4j2
-@RequiredArgsConstructor
 public class TelegramAPI {
+    private final TelegramBot telegramBot;
 
-    @Lazy
-    @Autowired
-    // field injection to avoid circular dependency
-    private TelegramBot telegramBot;
+    public TelegramAPI(@Lazy TelegramBot telegramBot) {
+        this.telegramBot = telegramBot;
+    }
 
     private static void logTelegramError(Throwable e) {
         log.error("Error sending message: {}", e.getMessage());

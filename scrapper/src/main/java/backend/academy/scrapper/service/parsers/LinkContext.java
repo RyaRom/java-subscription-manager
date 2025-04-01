@@ -33,15 +33,15 @@ public class LinkContext {
         throw new BadLinkException("Not a valid link");
     }
 
-    public Mono<Void> updateLink(Link link, Instant lastUpdated){
+    public Mono<Void> updateLink(Link link, Instant lastUpdated) {
         log.info("polling link {}", link.getUrl());
         Mono<Boolean> wasUpdated = Flux.fromIterable(parserChain)
-            .concatMap(it -> it.update(link, lastUpdated))
-            .takeUntil(s -> s)
-            .last(false);
+                .concatMap(it -> it.update(link, lastUpdated))
+                .takeUntil(s -> s)
+                .last(false);
 
         return wasUpdated.handle((result, sink) -> {
-            if (!result){
+            if (!result) {
                 sink.error(new BadLinkException("Link was saved without a type " + link.getLinkId()));
             }
         });

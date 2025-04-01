@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import backend.academy.bot.telegram.sdk.filters.FilterRegister;
 import com.pengrad.telegrambot.model.Message;
 import java.util.Map;
 import java.util.function.Predicate;

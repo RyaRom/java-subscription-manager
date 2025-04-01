@@ -1,5 +1,7 @@
 package backend.academy.scrapper.service.parsers;
 
+import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
+
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
 import backend.academy.scrapper.repository.dto.Link;
@@ -10,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
 
 @Component
 @Log4j2
@@ -38,11 +39,11 @@ public class StackOverflowParser implements AbstractParser {
             link.setStackOverflowInfo(parseStackOverflowInfo(link.getUrl()));
         }
         return stackOverflowClient
-            .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
-            .flatMapMany(res -> Flux.fromIterable(res.items()))
-            .doOnNext(activity -> log.info("so update {}", activity))
-            .flatMap(answer -> botClient.sendUpdate(answer, link))
-            .then(Mono.just(true));
+                .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
+                .flatMapMany(res -> Flux.fromIterable(res.items()))
+                .doOnNext(activity -> log.info("so update {}", activity))
+                .flatMap(answer -> botClient.sendUpdate(answer, link))
+                .then(Mono.just(true));
     }
 
     @Override

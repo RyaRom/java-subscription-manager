@@ -1,7 +1,7 @@
-package backend.academy.bot.telegram.utils.filters;
+package backend.academy.bot.telegram.sdk.filters;
 
-import backend.academy.bot.telegram.utils.annotations.Filter;
-import backend.academy.bot.telegram.utils.fsm.FSMContext;
+import backend.academy.bot.telegram.sdk.annotations.Filter;
+import backend.academy.bot.telegram.sdk.fsm.FSMContext;
 import com.pengrad.telegrambot.model.Message;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
@@ -29,8 +29,8 @@ public class FilterRegister {
     public MessageFilter getMessageFilterInstance(Class<? extends AbstractFilter> filterClass) {
         var instance = filterMap.get(filterClass);
         if (instance == null) {
-            throw new RuntimeException("Filter " + filterClass.getSimpleName() + " not found. " +
-                "All filters should implement AbstractFilter interface");
+            throw new RuntimeException("Filter " + filterClass.getSimpleName() + " not found. "
+                    + "All filters should implement AbstractFilter interface");
         }
         return instance;
     }
@@ -92,10 +92,10 @@ public class FilterRegister {
             return message -> {
                 String text = message.text();
                 return notEmpty(text)
-                    && text.matches("(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]"
-                    + "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|"
-                    + "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-"
-                    + "Z0-9]+\\.[^\\s]{2,})");
+                        && text.matches("(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]"
+                                + "\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|"
+                                + "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-"
+                                + "Z0-9]+\\.[^\\s]{2,})");
             };
         }
     }

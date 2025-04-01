@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -22,30 +23,29 @@ public class StackOverflowClient {
 
         if (credentials.tokenDisabled()) {
             return builder.uri(uriBuilder -> {
-                    var uri = uriBuilder
-                        .path("/questions/{questionId}/answers")
-                        .queryParam("sort", "activity")
-                        .queryParam("site", "stackoverflow")
-                        .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-                        .queryParam("order", "desc")
-                        .build(questionId);
-                    log.info("uri {}", uri);
-                    return uri;
-                })
-                .retrieve()
-                .bodyToMono(StackResponseDto.class);
+                        UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
+                        basicQueries(building, fromDate);
+                        return building.build(questionId);
+                    })
+                    .retrieve()
+                    .bodyToMono(StackResponseDto.class);
         } else {
-            return builder.uri(uriBuilder -> uriBuilder
-                    .path("/questions/{questionId}/answers")
-                    .queryParam("sort", "activity")
-                    .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-                    .queryParam("order", "desc")
-                    .queryParam("site", "stackoverflow")
-                    .queryParam("key", credentials.key())
-                    .queryParam("access_token", credentials.accessToken())
-                    .build(questionId))
-                .retrieve()
-                .bodyToMono(StackResponseDto.class);
+            return builder.uri(uriBuilder -> {
+                        UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
+                        basicQueries(building, fromDate);
+                        return building.queryParam("key", credentials.key())
+                                .queryParam("access_token", credentials.accessToken())
+                                .build(questionId);
+                    })
+                    .retrieve()
+                    .bodyToMono(StackResponseDto.class);
         }
+    }
+
+    private void basicQueries(UriBuilder builder, Instant fromDate) {
+        builder.queryParam("sort", "activity")
+                .queryParam("site", "stackoverflow")
+                .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
+                .queryParam("order", "desc");
     }
 }

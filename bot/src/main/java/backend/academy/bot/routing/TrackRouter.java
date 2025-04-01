@@ -2,18 +2,18 @@ package backend.academy.bot.routing;
 
 import static backend.academy.bot.BotKeyboards.SKIP_TEXT;
 import static backend.academy.bot.BotKeyboards.getSkipButton;
-import static backend.academy.bot.telegram.utils.filters.FilterParameter.COMMANDS;
+import static backend.academy.bot.telegram.sdk.filters.FilterParameter.COMMANDS;
 
 import backend.academy.bot.SubscriptionBotState;
 import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.repository.UserDataCacheRepository;
-import backend.academy.bot.telegram.utils.TelegramAPI;
-import backend.academy.bot.telegram.utils.annotations.FilterParam;
-import backend.academy.bot.telegram.utils.annotations.MessageHandler;
-import backend.academy.bot.telegram.utils.annotations.Router;
-import backend.academy.bot.telegram.utils.filters.FilterParameter;
-import backend.academy.bot.telegram.utils.filters.FilterRegister;
-import backend.academy.bot.telegram.utils.fsm.FSMContext;
+import backend.academy.bot.telegram.sdk.annotations.FilterParam;
+import backend.academy.bot.telegram.sdk.annotations.MessageHandler;
+import backend.academy.bot.telegram.sdk.annotations.Router;
+import backend.academy.bot.telegram.sdk.filters.FilterParameter;
+import backend.academy.bot.telegram.sdk.filters.FilterRegister;
+import backend.academy.bot.telegram.sdk.fsm.FSMContext;
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.AddLinkRequest;
 import com.pengrad.telegrambot.model.Message;
 import java.util.stream.Stream;

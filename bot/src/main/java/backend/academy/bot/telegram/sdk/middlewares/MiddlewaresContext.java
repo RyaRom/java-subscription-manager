@@ -1,4 +1,4 @@
-package backend.academy.bot.telegram.utils.middlewares;
+package backend.academy.bot.telegram.sdk.middlewares;
 
 import com.pengrad.telegrambot.model.Update;
 import java.util.List;
@@ -13,21 +13,20 @@ import reactor.core.publisher.Mono;
 public class MiddlewaresContext {
     private final List<AbstractMiddleware> middlewares;
 
-    public Mono<Update> applyMiddlewares(
-        Mono<Update> request,
-        Mono<Update> process
-    ) {
+    public Mono<Update> applyMiddlewares(Mono<Update> request, Mono<Update> process) {
         var pipeline = request;
         for (var middleware : middlewares) {
-            pipeline = middleware.preHandle(pipeline)
-                .doOnSuccess(it -> log.info("Before request {}. In middleware {}", it, middleware.getClass()));
+            pipeline = middleware
+                    .preHandle(pipeline)
+                    .doOnSuccess(it -> log.info("Before request {}. In middleware {}", it, middleware.getClass()));
         }
 
         pipeline = pipeline.then(process);
 
         for (var middleware : middlewares) {
-            pipeline = middleware.postHandle(pipeline)
-                .doOnSuccess(it -> log.info("After request {}. In middleware {}", it, middleware.getClass()));
+            pipeline = middleware
+                    .postHandle(pipeline)
+                    .doOnSuccess(it -> log.info("After request {}. In middleware {}", it, middleware.getClass()));
         }
 
         return pipeline;

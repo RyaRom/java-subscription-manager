@@ -1,4 +1,4 @@
-package backend.academy.bot.telegram.utils.annotations;
+package backend.academy.bot.telegram.sdk.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

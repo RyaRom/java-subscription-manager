@@ -1,12 +1,10 @@
-package backend.academy.bot.telegram.utils;
+package backend.academy.bot.telegram.sdk.utils;
 
 import com.pengrad.telegrambot.model.Update;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Wrapper for all exceptions after receiving update for storing telegram context
- */
+/** Wrapper for all exceptions after receiving update for storing telegram context */
 @Getter
 @RequiredArgsConstructor
 public class TelegramException extends RuntimeException {

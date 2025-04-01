@@ -1,4 +1,4 @@
-package backend.academy.bot.telegram.utils.fsm;
+package backend.academy.bot.telegram.sdk.fsm;
 
 import backend.academy.bot.repository.UserCache;
 import backend.academy.bot.repository.UserDataCacheRepository;

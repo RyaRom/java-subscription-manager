@@ -1,8 +1,8 @@
 package backend.academy.bot.config;
 
+import backend.academy.configuration.AppConfig;
 import java.util.List;
 import java.util.stream.Collectors;
-import backend.academy.configuration.AppConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +25,7 @@ public record BotConfig(BotCommands settings) {
         return settings;
     }
 
-    public record BotCommands(List<BotCommand> commands) {
-    }
+    public record BotCommands(List<BotCommand> commands) {}
 
     public record BotCommand(String command, String description) {
         @Override

@@ -13,9 +13,9 @@ public class GithubClient {
 
     public Flux<GithubActivity> getRepoActivities(String owner, String repo) {
         return githubHttpClient
-            .get()
-            .uri("/repos/{owner}/{repo}/activity", owner, repo)
-            .retrieve()
-            .bodyToFlux(GithubActivity.class);
+                .get()
+                .uri("/repos/{owner}/{repo}/activity", owner, repo)
+                .retrieve()
+                .bodyToFlux(GithubActivity.class);
     }
 }

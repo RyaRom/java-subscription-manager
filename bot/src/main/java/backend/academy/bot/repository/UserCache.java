@@ -1,7 +1,7 @@
 package backend.academy.bot.repository;
 
-import backend.academy.bot.telegram.utils.fsm.BotState;
-import backend.academy.bot.telegram.utils.fsm.DefaultStates;
+import backend.academy.bot.telegram.sdk.fsm.BotState;
+import backend.academy.bot.telegram.sdk.fsm.DefaultStates;
 import lombok.Builder;
 import lombok.Data;
 

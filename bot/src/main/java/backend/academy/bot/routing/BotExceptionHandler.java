@@ -1,8 +1,8 @@
 package backend.academy.bot.routing;
 
-import backend.academy.bot.telegram.utils.TelegramAPI;
-import backend.academy.bot.telegram.utils.annotations.BotRouterAdvice;
-import backend.academy.bot.telegram.utils.annotations.ExceptionHandler;
+import backend.academy.bot.telegram.sdk.annotations.BotRouterAdvice;
+import backend.academy.bot.telegram.sdk.annotations.ExceptionHandler;
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.exception.BadLinkException;
 import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class BotExceptionHandler {
     @ExceptionHandler(BadLinkException.class)
     public Mono<Void> badLink(BadLinkException e, Update update) {
         log.error("In badLink {}. update = {}", e, update);
-        return telegramAPI.sendMessageAsync(update.message(), "Link is not supported incorrect or duplicated. Your links: /list");
+        return telegramAPI.sendMessageAsync(
+                update.message(), "Link is not supported incorrect or duplicated. Your links: /list");
     }
 }

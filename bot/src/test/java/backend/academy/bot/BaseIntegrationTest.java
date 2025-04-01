@@ -1,8 +1,13 @@
 package backend.academy.bot;
 
-import backend.academy.bot.clients.ScrapperClient;
-import backend.academy.bot.telegram.utils.BotContext;
-import backend.academy.bot.telegram.utils.TelegramAPI;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import backend.academy.bot.telegram.sdk.BotContext;
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
@@ -12,11 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -32,7 +32,7 @@ public class BaseIntegrationTest {
         when(telegramAPI.sendMessageAsync(any(Message.class), anyString())).thenCallRealMethod();
         when(telegramAPI.sendMessagesAsync(any(), any())).thenCallRealMethod();
         when(telegramAPI.sendMessageAsync(any(Message.class), anyString(), any(Keyboard.class)))
-            .thenCallRealMethod();
+                .thenCallRealMethod();
         when(telegramAPI.sendMessageAsync(anyLong(), anyString())).thenCallRealMethod();
     }
 

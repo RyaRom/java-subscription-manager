@@ -3,8 +3,8 @@ package backend.academy.scrapper.service;
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
-import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.exception.BadLinkException;
+import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
 import backend.academy.scrapper.service.parsers.LinkContext;
@@ -34,7 +34,7 @@ public class LinksService {
         var savedLink = linkRepository
                 .findByUrl(request.getLink())
                 .map(link -> {
-                    if (link.getChatIds().contains(chatId)){
+                    if (link.getChatIds().contains(chatId)) {
                         throw new BadLinkException("Link already exists");
                     }
                     link.getChatIds().add(chatId);
@@ -52,7 +52,8 @@ public class LinksService {
 
     public Mono<LinkResponse> removeLink(String link) {
         log.info("Remove link {}", link);
-        var deletedLink = linkRepository.deleteByUrl(link).orElseThrow(() -> new ResourceNotFoundException("not found" + link));
+        var deletedLink =
+                linkRepository.deleteByUrl(link).orElseThrow(() -> new ResourceNotFoundException("not found" + link));
         return Mono.just(deletedLink.toLinkResponse());
     }
 }

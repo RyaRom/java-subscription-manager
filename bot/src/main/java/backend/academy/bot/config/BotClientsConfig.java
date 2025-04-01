@@ -16,16 +16,16 @@ public record BotClientsConfig(@NotEmpty String scrapperUrl) {
     @Bean
     public WebClient scrapperHttpClient() {
         return WebClient.builder()
-            .baseUrl(scrapperUrl)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .baseUrl(scrapperUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     public WebClient botHttpClient(String telegramToken) {
         return WebClient.builder()
-            .baseUrl("https://api.telegram.org/bot" + telegramToken)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .baseUrl("https://api.telegram.org/bot" + telegramToken)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 }

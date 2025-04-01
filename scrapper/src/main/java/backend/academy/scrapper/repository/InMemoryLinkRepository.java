@@ -62,7 +62,7 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public void dropForTest() {
-        if (envType != EnvType.TEST){
+        if (envType != EnvType.TEST) {
             return;
         }
         storage.clear();

@@ -1,6 +1,6 @@
 package backend.academy.bot.config;
 
-import backend.academy.bot.telegram.utils.BotContext;
+import backend.academy.bot.telegram.sdk.BotContext;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import jakarta.validation.constraints.NotEmpty;
@@ -23,12 +23,11 @@ public record TelegramConfig(@NotEmpty String telegramToken) {
     public TelegramBot telegramBot(BotContext botContext) {
         var telegramBot = new TelegramBot(telegramToken);
         telegramBot.setUpdatesListener(
-            updates -> {
-                updates.forEach(botContext::consumeUpdate);
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            },
-            e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
+                updates -> {
+                    updates.forEach(botContext::consumeUpdate);
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                },
+                e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
         return telegramBot;
     }
-
 }

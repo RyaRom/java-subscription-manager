@@ -1,5 +1,14 @@
 package backend.academy.bot.routing;
 
+import static backend.academy.bot.rest.BotController.getUpdateInfo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.BaseIntegrationTest;
 import backend.academy.bot.BotKeyboards;
 import backend.academy.bot.clients.ScrapperClient;
@@ -13,14 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Mono;
-import static backend.academy.bot.rest.BotController.getUpdateInfo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class BotRouterTest extends BaseIntegrationTest {
     @Autowired
@@ -34,33 +35,33 @@ class BotRouterTest extends BaseIntegrationTest {
 
     private static ListLinkResponse getTestLinksData() {
         return new ListLinkResponse(
-            List.of(
-                new LinkResponse(
-                    1L,
-                    "https://google.com",
-                    List.of("tag1, tag2"),
-                    List.of("filter1:value1", "filter2:value2")),
-                new LinkResponse(
-                    2L,
-                    "https://github.com",
-                    List.of("tag1, tag2"),
-                    List.of("filter1:value1", "filter2:value2")),
-                new LinkResponse(
-                    3L,
-                    "https://stackoverflow.com",
-                    List.of("tag1, tag2"),
-                    List.of("filter1:value1", "filter2:value2")),
-                new LinkResponse(
-                    4L,
-                    "https://stackoverflow.com",
-                    List.of("tag1, tag2"),
-                    List.of("filter1:value1", "filter2:value2")),
-                new LinkResponse(
-                    5L,
-                    "https://stackoverflow.com",
-                    List.of("tag1, tag2"),
-                    List.of("filter1:value1", "filter2:value2"))),
-            5);
+                List.of(
+                        new LinkResponse(
+                                1L,
+                                "https://google.com",
+                                List.of("tag1, tag2"),
+                                List.of("filter1:value1", "filter2:value2")),
+                        new LinkResponse(
+                                2L,
+                                "https://github.com",
+                                List.of("tag1, tag2"),
+                                List.of("filter1:value1", "filter2:value2")),
+                        new LinkResponse(
+                                3L,
+                                "https://stackoverflow.com",
+                                List.of("tag1, tag2"),
+                                List.of("filter1:value1", "filter2:value2")),
+                        new LinkResponse(
+                                4L,
+                                "https://stackoverflow.com",
+                                List.of("tag1, tag2"),
+                                List.of("filter1:value1", "filter2:value2")),
+                        new LinkResponse(
+                                5L,
+                                "https://stackoverflow.com",
+                                List.of("tag1, tag2"),
+                                List.of("filter1:value1", "filter2:value2"))),
+                5);
     }
 
     @BeforeEach
@@ -107,7 +108,6 @@ class BotRouterTest extends BaseIntegrationTest {
         verify(scrapperClient, times(1)).getLinks(1L);
         verify(scrapperClient, times(1)).addLink(eq(1L), any());
     }
-
 
     @Test
     void sendUpdate() {

@@ -5,6 +5,7 @@ import backend.academy.scrapper.repository.dto.GithubActivity;
 import backend.academy.scrapper.repository.dto.Link;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,19 +13,21 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
+@Log4j2
+@SuppressWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class BotClient {
     private final WebClient botHttpClient;
 
     public static String getGithubUpdate(GithubActivity githubActivity) {
         return String.format(
-                "Update in github repo:%n type: %s; timestamp: %s; author: %s",
+                "Update in github repo:\n type: %s; timestamp: %s; author: %s",
                 githubActivity.activityType().toString(),
                 githubActivity.timestamp().toString(),
                 githubActivity.actor().login());
     }
 
     public static String getStackAnswerUpdate(StackAnswersResponseDto stackAnswersResponseDto) {
-        return String.format("New answer in so question:%n%s", stackAnswersResponseDto.getLink());
+        return String.format("New answer in so question:\n%s", stackAnswersResponseDto.getLink());
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
@@ -38,6 +41,9 @@ public class BotClient {
     }
 
     public Mono<Void> sendUpdate(GithubActivity githubActivity, Link link) {
+        if (githubActivity.activityType() == GithubActivity.ActivityType.UNKNOWN) {
+            log.warn("Unknown type in update {}", githubActivity);
+        }
         LinkUpdate linkUpdate = LinkUpdate.builder()
                 .linkId(link.getLinkId())
                 .url(link.getUrl())

@@ -1,4 +1,4 @@
-package backend.academy.bot.telegram.utils.filters;
+package backend.academy.bot.telegram.sdk.filters;
 
 public enum FilterParameter {
     COMMANDS,

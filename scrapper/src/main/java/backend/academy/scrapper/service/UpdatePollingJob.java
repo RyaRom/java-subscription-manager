@@ -21,15 +21,15 @@ public class UpdatePollingJob {
     public void update() {
         log.info("Polling all links");
         Flux.fromIterable(linkRepository.findAll())
-            .flatMap(link -> {
-                log.info("polling link {}", link.getUrl());
-                return linkContext.updateLink(link, lastUpdated);
-            })
-            .then()
-            .doFinally(signal -> {
-                log.info("Polling finished");
-                lastUpdated = Instant.now();
-            })
-            .subscribe();
+                .flatMap(link -> {
+                    log.info("polling link {}", link.getUrl());
+                    return linkContext.updateLink(link, lastUpdated);
+                })
+                .then()
+                .doFinally(signal -> {
+                    log.info("Polling finished");
+                    lastUpdated = Instant.now();
+                })
+                .subscribe();
     }
 }

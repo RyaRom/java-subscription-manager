@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public record GithubActivity(
         Long id,
         @JsonProperty("node_id") String nodeId,
@@ -20,7 +22,8 @@ public record GithubActivity(
         BRANCH_DELETION("branch_deletion"),
         BRANCH_CREATION("branch_creation"),
         PR_MERGE("pr_merge"),
-        MERGE_QUEUE_MERGE("merge_queue_merge");
+        MERGE_QUEUE_MERGE("merge_queue_merge"),
+        UNKNOWN("unknown");
 
         private final String value;
 
@@ -35,7 +38,8 @@ public record GithubActivity(
                     return type;
                 }
             }
-            throw new IllegalArgumentException("Unknown activity type: " + value);
+            log.warn("Unknown activity type: {}", value);
+            return UNKNOWN;
         }
 
         @Override

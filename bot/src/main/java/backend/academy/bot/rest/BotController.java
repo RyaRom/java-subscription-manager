@@ -1,6 +1,6 @@
 package backend.academy.bot.rest;
 
-import backend.academy.bot.telegram.utils.TelegramAPI;
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/bot/api")
 @RequiredArgsConstructor
+@SuppressWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class BotController {
     private final TelegramAPI telegramAPI;
 
@@ -26,6 +27,6 @@ public class BotController {
     }
 
     public static @NotNull String getUpdateInfo(LinkUpdate linkUpdate) {
-        return "Update in %s%n%n%s".formatted(linkUpdate.url(), linkUpdate.description());
+        return "Update in %s\n\n%s".formatted(linkUpdate.url(), linkUpdate.description());
     }
 }

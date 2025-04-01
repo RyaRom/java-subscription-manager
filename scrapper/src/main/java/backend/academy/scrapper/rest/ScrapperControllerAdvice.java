@@ -1,9 +1,9 @@
 package backend.academy.scrapper.rest;
 
 import backend.academy.dto.ApiErrorResponse;
+import backend.academy.exception.BadLinkException;
 import backend.academy.exception.ResourceNotFoundException;
 import java.util.stream.Stream;
-import backend.academy.exception.BadLinkException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

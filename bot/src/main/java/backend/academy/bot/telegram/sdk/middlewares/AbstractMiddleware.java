@@ -1,4 +1,4 @@
-package backend.academy.bot.telegram.utils.middlewares;
+package backend.academy.bot.telegram.sdk.middlewares;
 
 import com.pengrad.telegrambot.model.Update;
 import reactor.core.publisher.Mono;
