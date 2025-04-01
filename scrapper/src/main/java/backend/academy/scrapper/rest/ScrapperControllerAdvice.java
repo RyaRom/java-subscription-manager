@@ -23,7 +23,7 @@ public class ScrapperControllerAdvice {
         BadLinkException.class
     })
     public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequestExceptions(Exception e) {
-        log.error("Bad request error: {}", e.getMessage());
+        log.debug("Bad request error: {}", e.getMessage());
         return Mono.just(ResponseEntity.badRequest()
                 .body(ApiErrorResponse.builder()
                         .code("400")
@@ -34,7 +34,7 @@ public class ScrapperControllerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public Mono<ResponseEntity<ApiErrorResponse>> notFoundLinkException(ResourceNotFoundException e) {
-        log.error(e.getMessage());
+        log.debug(e.getMessage());
         return Mono.just(ResponseEntity.status(404)
                 .body(ApiErrorResponse.builder()
                         .code("404")
