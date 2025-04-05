@@ -41,9 +41,7 @@ public class Link {
         STACK_OVERFLOW
     }
 
-    public record StackOverflowInfo(Long questionId) {
-    }
+    public record StackOverflowInfo(Long questionId) {}
 
-    public record GithubInfo(String owner, String repo) {
-    }
+    public record GithubInfo(String owner, String repo) {}
 }

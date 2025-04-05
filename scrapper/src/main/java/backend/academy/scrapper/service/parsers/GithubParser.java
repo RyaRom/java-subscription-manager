@@ -39,19 +39,19 @@ public class GithubParser implements AbstractParser {
             throw new IllegalStateException("Parser doesn't work correctly");
         }
         return githubClient
-            .getRepoActivities(
-                link.getGithubInfo().owner(), link.getGithubInfo().repo())
-            .doOnNext(activity -> {
-                log.info("activity {}", activity);
-                log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
-                log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
-            })
-            .filter(activity -> activity.timestamp()
-                .toInstant()
-                .atOffset(ZoneOffset.UTC)
-                .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-            .flatMap(activity -> botClient.sendUpdate(activity, link))
-            .then(Mono.just(true));
+                .getRepoActivities(
+                        link.getGithubInfo().owner(), link.getGithubInfo().repo())
+                .doOnNext(activity -> {
+                    log.info("activity {}", activity);
+                    log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
+                    log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
+                })
+                .filter(activity -> activity.timestamp()
+                        .toInstant()
+                        .atOffset(ZoneOffset.UTC)
+                        .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                .flatMap(activity -> botClient.sendUpdate(activity, link))
+                .then(Mono.just(true));
     }
 
     @Override

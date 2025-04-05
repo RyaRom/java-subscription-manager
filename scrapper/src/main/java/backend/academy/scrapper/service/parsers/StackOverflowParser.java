@@ -39,11 +39,11 @@ public class StackOverflowParser implements AbstractParser {
             throw new IllegalStateException("Parser doesn't work correctly");
         }
         return stackOverflowClient
-            .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
-            .flatMapMany(res -> Flux.fromIterable(res.items()))
-            .doOnNext(activity -> log.info("so update {}", activity))
-            .flatMap(answer -> botClient.sendUpdate(answer, link))
-            .then(Mono.just(true));
+                .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
+                .flatMapMany(res -> Flux.fromIterable(res.items()))
+                .doOnNext(activity -> log.info("so update {}", activity))
+                .flatMap(answer -> botClient.sendUpdate(answer, link))
+                .then(Mono.just(true));
     }
 
     @Override

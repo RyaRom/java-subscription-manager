@@ -44,7 +44,7 @@ public class PollingTest extends BaseIntegrationTest {
 
     private final Link githubLink = Link.builder()
             .url("https://github.com/academy-frontend/academy-frontend")
-            .githubInfo(new Link.GithubInfo("academy-frontend","academy-frontend"))
+            .githubInfo(new Link.GithubInfo("academy-frontend", "academy-frontend"))
             .linkType(Link.Type.GITHUB)
             .chatIds(Set.of(1L, 2L))
             .build();
