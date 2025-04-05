@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Component
 @Log4j2
-public class LinkContext {
+public class LinkParsesContext {
     private final List<AbstractParser> parserChain;
 
     public Link generateLink(String url, Long chatId) {
@@ -25,7 +25,7 @@ public class LinkContext {
         builder.chatIds(new HashSet<>(List.of(chatId)));
         List<String> tokens = List.of(url.split("/"));
         for (var parser : parserChain) {
-            if (parser.parse(builder, tokens, url)) {
+            if (parser.parse(builder, tokens)) {
                 return builder.build();
             }
         }

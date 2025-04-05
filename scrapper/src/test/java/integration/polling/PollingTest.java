@@ -42,14 +42,16 @@ public class PollingTest extends BaseIntegrationTest {
     @MockitoBean
     private BotClient botClient;
 
-    private Link githubLink = Link.builder()
+    private final Link githubLink = Link.builder()
             .url("https://github.com/academy-frontend/academy-frontend")
+            .githubInfo(new Link.GithubInfo("academy-frontend","academy-frontend"))
             .linkType(Link.Type.GITHUB)
             .chatIds(Set.of(1L, 2L))
             .build();
 
-    private Link soLink = Link.builder()
+    private final Link soLink = Link.builder()
             .url("https://stackoverflow.com/questions/1732348/text")
+            .stackOverflowInfo(new Link.StackOverflowInfo(1732348L))
             .chatIds(Set.of(1L, 2L))
             .linkType(Link.Type.STACK_OVERFLOW)
             .build();

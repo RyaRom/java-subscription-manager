@@ -7,7 +7,7 @@ import backend.academy.exception.BadLinkException;
 import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.Link;
-import backend.academy.scrapper.service.parsers.LinkContext;
+import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class LinksService {
     private final LinkRepository linkRepository;
-    private final LinkContext linkContext;
+    private final LinkParsesContext linkParsesContext;
 
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
@@ -42,7 +42,7 @@ public class LinksService {
                     return link;
                 })
                 .orElseGet(() -> {
-                    Link link = linkContext.generateLink(request.getLink(), chatId);
+                    Link link = linkParsesContext.generateLink(request.getLink(), chatId);
                     linkRepository.save(link);
                     return link;
                 });

@@ -42,26 +42,8 @@ public class Link {
     }
 
     public record StackOverflowInfo(Long questionId) {
-        public static StackOverflowInfo parseStackOverflowInfo(String url) {
-            var tokens = List.of(url.split("/"));
-            if (tokens.contains("stackoverflow.com")) {
-                int site = tokens.indexOf("stackoverflow.com");
-                return new StackOverflowInfo(Long.parseLong(tokens.get(site + 2)));
-            } else {
-                throw new IllegalArgumentException("Not a stackoverflow link");
-            }
-        }
     }
 
     public record GithubInfo(String owner, String repo) {
-        public static GithubInfo parseGithubInfo(String url) {
-            var tokens = List.of(url.split("/"));
-            if (tokens.contains("github.com")) {
-                int site = tokens.indexOf("github.com");
-                return new GithubInfo(tokens.get(site + 1), tokens.get(site + 2));
-            } else {
-                throw new IllegalArgumentException("Not a github link");
-            }
-        }
     }
 }

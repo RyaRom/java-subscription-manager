@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.service.parsers.LinkContext;
+import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class UpdatePollingJob {
     private final LinkRepository linkRepository;
-    private final LinkContext linkContext;
+    private final LinkParsesContext linkParsesContext;
     private Instant lastUpdated = Instant.now();
 
     @Scheduled(cron = "#{@updateCron}")
@@ -23,7 +23,7 @@ public class UpdatePollingJob {
         Flux.fromIterable(linkRepository.findAll())
                 .flatMap(link -> {
                     log.info("polling link {}", link.getUrl());
-                    return linkContext.updateLink(link, lastUpdated);
+                    return linkParsesContext.updateLink(link, lastUpdated);
                 })
                 .then()
                 .doFinally(signal -> {

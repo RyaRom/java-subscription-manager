@@ -1,7 +1,5 @@
 package backend.academy.scrapper.service.parsers;
 
-import static backend.academy.scrapper.repository.dto.Link.StackOverflowInfo.parseStackOverflowInfo;
-
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
 import backend.academy.scrapper.repository.dto.Link;
@@ -21,10 +19,12 @@ public class StackOverflowParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(Link.LinkBuilder link, List<String> tokens, String url) {
+    public boolean parse(Link.LinkBuilder link, List<String> tokens) {
         if (tokens.contains("stackoverflow.com")) {
             link.linkType(Link.Type.STACK_OVERFLOW);
-            link.stackOverflowInfo(parseStackOverflowInfo(url));
+            int siteIndex = tokens.indexOf("stackoverflow.com");
+            var info = new Link.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
+            link.stackOverflowInfo(info);
             return true;
         }
         return false;
@@ -36,14 +36,14 @@ public class StackOverflowParser implements AbstractParser {
             return Mono.just(false);
         }
         if (link.getStackOverflowInfo() == null) {
-            link.setStackOverflowInfo(parseStackOverflowInfo(link.getUrl()));
+            throw new IllegalStateException("Parser doesn't work correctly");
         }
         return stackOverflowClient
-                .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
-                .flatMapMany(res -> Flux.fromIterable(res.items()))
-                .doOnNext(activity -> log.info("so update {}", activity))
-                .flatMap(answer -> botClient.sendUpdate(answer, link))
-                .then(Mono.just(true));
+            .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
+            .flatMapMany(res -> Flux.fromIterable(res.items()))
+            .doOnNext(activity -> log.info("so update {}", activity))
+            .flatMap(answer -> botClient.sendUpdate(answer, link))
+            .then(Mono.just(true));
     }
 
     @Override

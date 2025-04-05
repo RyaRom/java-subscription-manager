@@ -1,7 +1,5 @@
 package backend.academy.scrapper.service.parsers;
 
-import static backend.academy.scrapper.repository.dto.Link.GithubInfo.parseGithubInfo;
-
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.repository.dto.Link;
@@ -21,10 +19,12 @@ public class GithubParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(Link.LinkBuilder link, List<String> tokens, String url) {
+    public boolean parse(Link.LinkBuilder link, List<String> tokens) {
         if (tokens.contains("github.com")) {
             link.linkType(Link.Type.GITHUB);
-            link.githubInfo(parseGithubInfo(url));
+            int siteIndex = tokens.indexOf("github.com");
+            var info = new Link.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
+            link.githubInfo(info);
             return true;
         }
         return false;
@@ -36,22 +36,22 @@ public class GithubParser implements AbstractParser {
             return Mono.just(false);
         }
         if (link.getGithubInfo() == null) {
-            link.setGithubInfo(Link.GithubInfo.parseGithubInfo(link.getUrl()));
+            throw new IllegalStateException("Parser doesn't work correctly");
         }
         return githubClient
-                .getRepoActivities(
-                        link.getGithubInfo().owner(), link.getGithubInfo().repo())
-                .doOnNext(activity -> {
-                    log.info("activity {}", activity);
-                    log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
-                    log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
-                })
-                .filter(activity -> activity.timestamp()
-                        .toInstant()
-                        .atOffset(ZoneOffset.UTC)
-                        .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-                .flatMap(activity -> botClient.sendUpdate(activity, link))
-                .then(Mono.just(true));
+            .getRepoActivities(
+                link.getGithubInfo().owner(), link.getGithubInfo().repo())
+            .doOnNext(activity -> {
+                log.info("activity {}", activity);
+                log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
+                log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
+            })
+            .filter(activity -> activity.timestamp()
+                .toInstant()
+                .atOffset(ZoneOffset.UTC)
+                .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+            .flatMap(activity -> botClient.sendUpdate(activity, link))
+            .then(Mono.just(true));
     }
 
     @Override
