@@ -73,7 +73,7 @@ class BotRouterTest extends BaseIntegrationTest {
     }
 
     @Test
-    void normalBotPipeline() {
+    void normalBotPipeline() throws InterruptedException {
         var start = mockMessageUpdate("/start", 1L);
         var help = mockMessageUpdate("/help", 1L);
         var list = mockMessageUpdate("/list", 1L);
@@ -96,6 +96,8 @@ class BotRouterTest extends BaseIntegrationTest {
         botContext.consumeUpdate(untrack);
         botContext.consumeUpdate(link);
         botContext.consumeUpdate(defaultHandler);
+
+        Thread.sleep(2000);
 
         verify(telegramAPI, times(1)).sendMessage(1L, "Hello! Use /track command to start");
         verify(telegramAPI, times(1)).sendMessage(1L, helpMessage);
