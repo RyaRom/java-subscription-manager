@@ -8,7 +8,7 @@ import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkType;
 import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -74,7 +74,7 @@ public class AddLinksTest extends BaseIntegrationTest {
             assertThat(link.getGithubInfo().owner()).isEqualTo("RyaRom");
             assertThat(link.getGithubInfo().repo()).isEqualTo("HackChangeHackathon2024");
             assertThat(link.getChatIds()).contains(1L);
-            assertThat(link.getLinkType()).isEqualTo(Link.Type.GITHUB);
+            assertThat(link.getLinkType()).isEqualTo(LinkType.GITHUB);
             assertThat(link.getStackOverflowInfo()).isNull();
         });
     }
@@ -99,7 +99,7 @@ public class AddLinksTest extends BaseIntegrationTest {
             assertThat(link.getStackOverflowInfo()).isNotNull();
             assertThat(link.getStackOverflowInfo().questionId()).isEqualTo(1732348);
             assertThat(link.getChatIds()).contains(1L);
-            assertThat(link.getLinkType()).isEqualTo(Link.Type.STACK_OVERFLOW);
+            assertThat(link.getLinkType()).isEqualTo(LinkType.STACK_OVERFLOW);
         });
     }
 

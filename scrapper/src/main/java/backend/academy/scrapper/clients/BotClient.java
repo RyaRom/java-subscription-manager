@@ -2,7 +2,7 @@ package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
 import backend.academy.scrapper.repository.dto.GithubActivity;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -40,7 +40,7 @@ public class BotClient {
                 .then();
     }
 
-    public Mono<Void> sendUpdate(GithubActivity githubActivity, Link link) {
+    public Mono<Void> sendUpdate(GithubActivity githubActivity, LinkDto link) {
         if (githubActivity.activityType() == GithubActivity.ActivityType.UNKNOWN) {
             log.warn("Unknown type in update {}", githubActivity);
         }
@@ -53,7 +53,7 @@ public class BotClient {
         return sendUpdate(linkUpdate);
     }
 
-    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, Link link) {
+    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, LinkDto link) {
         LinkUpdate linkUpdate = LinkUpdate.builder()
                 .linkId(link.getLinkId())
                 .url(link.getUrl())

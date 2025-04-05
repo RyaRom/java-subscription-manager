@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service.parsers;
 
 import backend.academy.exception.BadLinkException;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
 import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Comparator;
@@ -19,8 +19,8 @@ import reactor.core.publisher.Mono;
 public class LinkParsesContext {
     private final List<AbstractParser> parserChain;
 
-    public Link generateLink(String url, Long chatId) {
-        var builder = Link.builder();
+    public LinkDto generateLink(String url, Long chatId) {
+        var builder = LinkDto.builder();
         builder.url(url);
         builder.chatIds(new HashSet<>(List.of(chatId)));
         List<String> tokens = List.of(url.split("/"));
@@ -32,7 +32,7 @@ public class LinkParsesContext {
         throw new BadLinkException("Not a valid link");
     }
 
-    public Mono<Void> updateLink(Link link, Instant lastUpdated) {
+    public Mono<Void> updateLink(LinkDto link, Instant lastUpdated) {
         log.info("polling link {}", link.getUrl());
         Mono<Boolean> wasUpdated = Flux.fromIterable(parserChain)
                 .concatMap(it -> it.update(link, lastUpdated))

@@ -16,7 +16,8 @@ spring:
   application:
     name: Scrapper
   liquibase:
-    enabled: false
+    enabled: true
+    change-log: classpath:/liquibase/master.yaml
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,6 +26,11 @@ spring:
     import: optional:file:.env[.properties]
   profiles:
     active: dev
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
 server:
   port: 8081

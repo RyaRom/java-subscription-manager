@@ -2,9 +2,10 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
 import java.time.Instant;
 import java.util.List;
+import backend.academy.scrapper.repository.dto.LinkType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,11 @@ public class StackOverflowParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(Link.LinkBuilder link, List<String> tokens) {
+    public boolean parse(LinkDto.LinkDtoBuilder link, List<String> tokens) {
         if (tokens.contains("stackoverflow.com")) {
-            link.linkType(Link.Type.STACK_OVERFLOW);
+            link.linkType(LinkType.STACK_OVERFLOW);
             int siteIndex = tokens.indexOf("stackoverflow.com");
-            var info = new Link.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
+            var info = new LinkDto.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
             link.stackOverflowInfo(info);
             return true;
         }
@@ -31,8 +32,8 @@ public class StackOverflowParser implements AbstractParser {
     }
 
     @Override
-    public Mono<Boolean> update(Link link, Instant lastUpdated) {
-        if (link.getLinkType() != Link.Type.STACK_OVERFLOW) {
+    public Mono<Boolean> update(LinkDto link, Instant lastUpdated) {
+        if (link.getLinkType() != LinkType.STACK_OVERFLOW) {
             return Mono.just(false);
         }
         if (link.getStackOverflowInfo() == null) {

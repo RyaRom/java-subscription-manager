@@ -11,7 +11,8 @@ import backend.academy.scrapper.clients.GithubClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.GithubActivity;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.dto.LinkType;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
 import backend.academy.scrapper.repository.dto.StackResponseDto;
 import backend.academy.scrapper.service.UpdatePollingJob;
@@ -42,18 +43,18 @@ public class PollingTest extends BaseIntegrationTest {
     @MockitoBean
     private BotClient botClient;
 
-    private final Link githubLink = Link.builder()
+    private final LinkDto githubLink = LinkDto.builder()
             .url("https://github.com/academy-frontend/academy-frontend")
-            .githubInfo(new Link.GithubInfo("academy-frontend", "academy-frontend"))
-            .linkType(Link.Type.GITHUB)
+            .linkType(LinkType.GITHUB)
+            .githubInfo(new LinkDto.GithubInfo("academy-frontend","academy-frontend"))
             .chatIds(Set.of(1L, 2L))
             .build();
 
-    private final Link soLink = Link.builder()
+    private final LinkDto soLink = LinkDto.builder()
             .url("https://stackoverflow.com/questions/1732348/text")
-            .stackOverflowInfo(new Link.StackOverflowInfo(1732348L))
+            .stackOverflowInfo(new LinkDto.StackOverflowInfo(1732348L))
             .chatIds(Set.of(1L, 2L))
-            .linkType(Link.Type.STACK_OVERFLOW)
+            .linkType(LinkType.STACK_OVERFLOW)
             .build();
 
     @BeforeEach

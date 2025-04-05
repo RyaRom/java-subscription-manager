@@ -1,6 +1,6 @@
 package backend.academy.scrapper.repository;
 
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -8,20 +8,20 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LinkRepository {
-    Optional<Link> findById(Long linkId);
+    Optional<LinkDto> findById(Long linkId);
 
-    Optional<Link> findByUrl(String url);
+    Optional<LinkDto> findByUrl(String url);
 
-    List<Link> findAll();
+    List<LinkDto> findAll();
 
     @Nullable
-    Link save(Link link);
+    LinkDto save(LinkDto link);
 
-    List<Link> saveAll(List<Link> links);
+    List<LinkDto> saveAll(List<LinkDto> links);
 
-    Optional<Link> deleteById(Long linkId);
+    Optional<LinkDto> deleteById(Long linkId);
 
-    Optional<Link> deleteByUrl(String url);
+    Optional<LinkDto> deleteByUrl(String url);
 
     void dropForTest();
 }

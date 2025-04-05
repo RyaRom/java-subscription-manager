@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.repository.dto.Link;
+import backend.academy.scrapper.repository.dto.LinkDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,25 +13,25 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class InMemoryLinkRepository implements LinkRepository {
     private final EnvType envType;
-    private final Map<Long, Link> storage = new HashMap<>();
+    private final Map<Long, LinkDto> storage = new HashMap<>();
 
     @Override
-    public Optional<Link> findById(Long linkId) {
+    public Optional<LinkDto> findById(Long linkId) {
         return Optional.ofNullable(storage.get(linkId));
     }
 
     @Override
-    public Optional<Link> findByUrl(String url) {
+    public Optional<LinkDto> findByUrl(String url) {
         return storage.values().stream().filter(l -> l.getUrl().equals(url)).findFirst();
     }
 
     @Override
-    public List<Link> findAll() {
+    public List<LinkDto> findAll() {
         return storage.values().stream().toList();
     }
 
     @Override
-    public Link save(Link link) {
+    public LinkDto save(LinkDto link) {
         if (findByUrl(link.getUrl()).isEmpty()) {
             return storage.put(link.getLinkId(), link);
         }
@@ -39,18 +39,18 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
-    public List<Link> saveAll(List<Link> links) {
+    public List<LinkDto> saveAll(List<LinkDto> links) {
         links.forEach(this::save);
         return links;
     }
 
     @Override
-    public Optional<Link> deleteById(Long linkId) {
+    public Optional<LinkDto> deleteById(Long linkId) {
         return Optional.ofNullable(storage.remove(linkId));
     }
 
     @Override
-    public Optional<Link> deleteByUrl(String url) {
+    public Optional<LinkDto> deleteByUrl(String url) {
         return findAll().stream()
                 .filter(l -> l.getUrl().equals(url))
                 .findFirst()
