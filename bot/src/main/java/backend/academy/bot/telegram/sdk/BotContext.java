@@ -29,6 +29,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -105,7 +106,8 @@ public class BotContext {
             handler.handler
                 .apply(update.message())
                 .thenReturn(update)
-                .onErrorMap(e -> new TelegramException(update, e)));
+                .onErrorMap(e -> new TelegramException(update, e)))
+            .contextWrite(Context.of("chatId", update.message().chat().id()));
     }
 
     @PostConstruct
