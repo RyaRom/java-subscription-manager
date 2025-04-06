@@ -13,15 +13,24 @@ import jakarta.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +40,7 @@ public class BotContext {
     private final ApplicationContext applicationContext;
     private final List<MessageHandler> messageHandlers = new ArrayList<>();
     private final MiddlewaresContext middlewaresContext;
+    private final Sinks.Many<Update> sink = Sinks.many().multicast().onBackpressureBuffer();
 
     public static <T> Mono<T> handleAsyncOrNotFunction(Object bean, Method method, Class<T> returnType, Object... args)
             throws IllegalAccessException, InvocationTargetException {
@@ -69,26 +79,33 @@ public class BotContext {
         return methods;
     }
 
-    public void consumeUpdate(Update update) {
-        if (update.message() == null) {
-            // Possible logic for other update types
-            return;
-        }
-        Message message = update.message();
-        for (var handler : messageHandlers) {
-            if (handler.filter.test(message)) {
-                Mono<Update> pipeline = middlewaresContext.applyMiddlewares(
-                        Mono.just(update),
-                        handler.handler
-                                .apply(message)
-                                .thenReturn(update)
-                                .onErrorMap(throwable -> new TelegramException(update, throwable)));
-                pipeline.subscribe();
-                if (handler.isFinal) {
-                    return;
-                }
-            }
-        }
+    public void emmitUpdate(Update update) {
+        log.info("Update emitted {}", update);
+        sink.tryEmitNext(update);
+    }
+
+    public Flux<Update> consumeUpdate(Update update) {
+        return Mono.just(update)
+                .filter(u -> u.message() != null)
+                .doOnSuccess(u -> log.info(
+                        "In queue for {}: {}",
+                        u.message().chat().id(),
+                        u.message().text()))
+                .flatMapMany(validUpdate -> Flux.fromIterable(messageHandlers)
+                        .filter(handler -> handler.filter.test(validUpdate.message()))
+                        .concatMap(handler ->
+                                processWithHandler(validUpdate, handler).map(it -> Tuples.of(it, handler.isFinal)))
+                        .takeUntil(Tuple2::getT2)
+                        .map(Tuple2::getT1));
+    }
+
+    private Mono<Update> processWithHandler(Update update, MessageHandler handler) {
+        return middlewaresContext.applyMiddlewares(
+                Mono.just(update),
+                handler.handler
+                        .apply(update.message())
+                        .thenReturn(update)
+                        .onErrorMap(e -> new TelegramException(update, e)));
     }
 
     @PostConstruct
@@ -102,6 +119,14 @@ public class BotContext {
             }
         }
         messageHandlers.sort(Comparator.comparingInt(MessageHandler::priority));
+    }
+
+    @PostConstruct
+    public void startListening() {
+        sink.asFlux()
+                .groupBy(update -> update.message().chat().id())
+                .flatMap(grouped -> grouped.concatMap(this::consumeUpdate))
+                .subscribe();
     }
 
     private void registerHandler(Object bean, Method method) {

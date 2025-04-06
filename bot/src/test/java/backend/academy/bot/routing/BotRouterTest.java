@@ -85,17 +85,17 @@ class BotRouterTest extends BaseIntegrationTest {
         var untrack = mockMessageUpdate("/untrack", 1L);
         var defaultHandler = mockMessageUpdate("some text", 1L);
 
-        botContext.consumeUpdate(start);
-        botContext.consumeUpdate(help);
-        botContext.consumeUpdate(list);
-        botContext.consumeUpdate(track);
-        botContext.consumeUpdate(incorrectLink);
-        botContext.consumeUpdate(link);
-        botContext.consumeUpdate(tags);
-        botContext.consumeUpdate(filters);
-        botContext.consumeUpdate(untrack);
-        botContext.consumeUpdate(link);
-        botContext.consumeUpdate(defaultHandler);
+        botContext.emmitUpdate(start);
+        botContext.emmitUpdate(help);
+        botContext.emmitUpdate(list);
+        botContext.emmitUpdate(track);
+        botContext.emmitUpdate(incorrectLink);
+        botContext.emmitUpdate(link);
+        botContext.emmitUpdate(tags);
+        botContext.emmitUpdate(filters);
+        botContext.emmitUpdate(untrack);
+        botContext.emmitUpdate(link);
+        botContext.emmitUpdate(defaultHandler);
 
         Thread.sleep(2000);
 

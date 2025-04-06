@@ -32,8 +32,8 @@ public class BotMiddlewareTest extends BaseIntegrationTest {
         var messageTest = mockMessageUpdate("/start", 1L);
         var messageTest2 = mockMessageUpdate("/list", 1L);
 
-        botContext.consumeUpdate(messageTest);
-        botContext.consumeUpdate(messageTest2);
+        botContext.emmitUpdate(messageTest);
+        botContext.emmitUpdate(messageTest2);
 
         Thread.sleep(2000L);
 

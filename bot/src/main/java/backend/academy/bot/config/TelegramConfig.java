@@ -24,7 +24,7 @@ public record TelegramConfig(@NotEmpty String telegramToken) {
         var telegramBot = new TelegramBot(telegramToken);
         telegramBot.setUpdatesListener(
                 updates -> {
-                    updates.forEach(botContext::consumeUpdate);
+                    updates.forEach(botContext::emmitUpdate);
                     return UpdatesListener.CONFIRMED_UPDATES_ALL;
                 },
                 e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
