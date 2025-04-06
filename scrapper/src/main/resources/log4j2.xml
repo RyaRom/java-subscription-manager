@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.yourpackage">
+    <Appenders>
+        <Console name="ECSConsole" target="SYSTEM_OUT">
+            <EcsLayout serviceName="bot">
+                <KeyValuePair key="timestamp" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}"/>
+                <KeyValuePair key="log.level" value="%level"/>
+                <KeyValuePair key="message" value="%message"/>
+                <KeyValuePair key="process.thread.name" value="%t"/>
+                <KeyValuePair key="log.logger" value="%logger{1.}"/>
+                <KeyValuePair key="event.timezone" value="UTC+3"/>
+            </EcsLayout>
+        </Console>
+        <Console name="PlainConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] %c{1.} - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!--        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">-->
+        <!--            <AppenderRef ref="ECSConsole"/>-->
+        <!--        </Logger>-->
+        <Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <AppenderRef ref="PlainConsole"/>
+        </Logger>
+
+<!--                <Root level="INFO">-->
+<!--                    <AppenderRef ref="ECSConsole"/>-->
+<!--                </Root>-->
+        <Root level="INFO">
+            <AppenderRef ref="PlainConsole"/>
+        </Root>
+    </Loggers>
+</Configuration>

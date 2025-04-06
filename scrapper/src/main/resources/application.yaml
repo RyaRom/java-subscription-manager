@@ -39,8 +39,7 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
-#
-#logging:
-#  structured:
-#    format:
-#      console: ecs
+
+logging:
+  config:
+    classpath:log4j2.xml

@@ -43,37 +43,37 @@ public class BotContext {
     private final Sinks.Many<Update> sink = Sinks.many().multicast().onBackpressureBuffer();
 
     public static <T> Mono<T> handleAsyncOrNotFunction(Object bean, Method method, Class<T> returnType, Object... args)
-            throws IllegalAccessException, InvocationTargetException {
+        throws IllegalAccessException, InvocationTargetException {
         Object result = method.invoke(bean, args);
         if (result instanceof Mono) {
             return (Mono<T>) result;
         } else {
             log.warn("Blocking call in {}", method.getName());
             return Mono.fromCallable(() -> {
-                        var uncasted = method.invoke(bean, args);
-                        if (returnType.isInstance(uncasted)) {
-                            return (T) returnType;
-                        }
-                        throw new RuntimeException(
-                                "Method " + method.getName() + " must return " + returnType.getName());
-                    })
-                    .subscribeOn(Schedulers.boundedElastic());
+                    var uncasted = method.invoke(bean, args);
+                    if (returnType.isInstance(uncasted)) {
+                        return (T) returnType;
+                    }
+                    throw new RuntimeException(
+                        "Method " + method.getName() + " must return " + returnType.getName());
+                })
+                .subscribeOn(Schedulers.boundedElastic());
         }
     }
 
     public static Map<Object, List<Method>> getAnnotatedMethods(
-            ApplicationContext applicationContext,
-            Class<? extends Annotation> targetAnnotation,
-            Class<? extends Annotation> methodAnnotation) {
+        ApplicationContext applicationContext,
+        Class<? extends Annotation> targetAnnotation,
+        Class<? extends Annotation> methodAnnotation) {
         Map<Object, List<Method>> methods = new HashMap<>();
         String[] beanNames = applicationContext.getBeanNamesForAnnotation(targetAnnotation);
         for (String beanName : beanNames) {
             Object bean = applicationContext.getBean(beanName);
             List<Method> beanMethods = new ArrayList<>(
-                            Arrays.asList(bean.getClass().getMethods()))
-                    .stream()
-                            .filter(method -> method.isAnnotationPresent(methodAnnotation))
-                            .toList();
+                Arrays.asList(bean.getClass().getMethods()))
+                .stream()
+                .filter(method -> method.isAnnotationPresent(methodAnnotation))
+                .toList();
             methods.put(bean, beanMethods);
         }
         return methods;
@@ -86,32 +86,32 @@ public class BotContext {
 
     public Flux<Update> consumeUpdate(Update update) {
         return Mono.just(update)
-                .filter(u -> u.message() != null)
-                .doOnSuccess(u -> log.info(
-                        "In queue for {}: {}",
-                        u.message().chat().id(),
-                        u.message().text()))
-                .flatMapMany(validUpdate -> Flux.fromIterable(messageHandlers)
-                        .filter(handler -> handler.filter.test(validUpdate.message()))
-                        .concatMap(handler ->
-                                processWithHandler(validUpdate, handler).map(it -> Tuples.of(it, handler.isFinal)))
-                        .takeUntil(Tuple2::getT2)
-                        .map(Tuple2::getT1));
+            .filter(u -> u.message() != null)
+            .doOnSuccess(u -> log.info(
+                "In queue for {}: {}",
+                u.message().chat().id(),
+                u.message().text()))
+            .flatMapMany(validUpdate -> Flux.fromIterable(messageHandlers)
+                .filter(handler -> handler.filter.test(validUpdate.message()))
+                .concatMap(handler ->
+                    processWithHandler(validUpdate, handler).map(it -> Tuples.of(it, handler.isFinal)))
+                .takeUntil(Tuple2::getT2)
+                .map(Tuple2::getT1));
     }
 
     private Mono<Update> processWithHandler(Update update, MessageHandler handler) {
         return middlewaresContext.applyMiddlewares(
-                Mono.just(update),
-                handler.handler
-                        .apply(update.message())
-                        .thenReturn(update)
-                        .onErrorMap(e -> new TelegramException(update, e)));
+            Mono.just(update),
+            handler.handler
+                .apply(update.message())
+                .thenReturn(update)
+                .onErrorMap(e -> new TelegramException(update, e)));
     }
 
     @PostConstruct
     public void init() {
         Map<Object, List<Method>> methods = getAnnotatedMethods(
-                applicationContext, Router.class, backend.academy.bot.telegram.sdk.annotations.MessageHandler.class);
+            applicationContext, Router.class, backend.academy.bot.telegram.sdk.annotations.MessageHandler.class);
 
         for (var entry : methods.entrySet()) {
             for (Method method : entry.getValue()) {
@@ -124,9 +124,13 @@ public class BotContext {
     @PostConstruct
     public void startListening() {
         sink.asFlux()
-                .groupBy(update -> update.message().chat().id())
-                .flatMap(grouped -> grouped.concatMap(this::consumeUpdate))
-                .subscribe();
+            .groupBy(update -> update.message().chat().id())
+            .map(it -> {
+                log.info("Grouped in {}", it.key());
+                return it;
+            })
+            .flatMap(grouped -> grouped.concatMap(this::consumeUpdate))
+            .subscribe();
     }
 
     private void registerHandler(Object bean, Method method) {
@@ -142,19 +146,20 @@ public class BotContext {
             filters.add(filterGenerator.filter(params));
         }
         messageHandlers.add(new MessageHandler(
-                message -> filters.stream().allMatch(filter -> filter.test(message)),
-                message -> {
-                    try {
-                        return handleAsyncOrNotFunction(bean, method, Void.TYPE, message);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        log.error("Unable to invoke message handler {}", method.getName(), e);
-                        throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
-                    }
-                },
-                messageHandler.priority(),
-                messageHandler.isFinal()));
+            message -> filters.stream().allMatch(filter -> filter.test(message)),
+            message -> {
+                try {
+                    return handleAsyncOrNotFunction(bean, method, Void.TYPE, message);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    log.error("Unable to invoke message handler {}", method.getName(), e);
+                    throw new RuntimeException("Unable to invoke message handler " + method.getName(), e);
+                }
+            },
+            messageHandler.priority(),
+            messageHandler.isFinal()));
     }
 
     public record MessageHandler(
-            Predicate<Message> filter, Function<Message, Mono<Void>> handler, int priority, boolean isFinal) {}
+        Predicate<Message> filter, Function<Message, Mono<Void>> handler, int priority, boolean isFinal) {
+    }
 }

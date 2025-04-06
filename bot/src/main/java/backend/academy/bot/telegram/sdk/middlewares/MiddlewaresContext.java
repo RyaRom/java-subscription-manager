@@ -18,7 +18,7 @@ public class MiddlewaresContext {
         for (var middleware : middlewares) {
             pipeline = middleware
                     .preHandle(pipeline)
-                    .doOnSuccess(it -> log.info("Before request {}. In middleware {}", it, middleware.getClass()));
+                    .doOnSuccess(it -> log.info("In middleware {}; Before request {}", it, middleware.getClass()));
         }
 
         pipeline = pipeline.then(process);
@@ -26,7 +26,7 @@ public class MiddlewaresContext {
         for (var middleware : middlewares) {
             pipeline = middleware
                     .postHandle(pipeline)
-                    .doOnSuccess(it -> log.info("After request {}. In middleware {}", it, middleware.getClass()));
+                    .doOnSuccess(it -> log.info("In middleware {}. After request {}.", it, middleware.getClass()));
         }
 
         return pipeline;

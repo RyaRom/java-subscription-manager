@@ -4,13 +4,14 @@ import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.dto.StackResponseDto;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
-@Slf4j
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class StackOverflowClient {
