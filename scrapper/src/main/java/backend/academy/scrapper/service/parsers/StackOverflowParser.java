@@ -3,9 +3,9 @@ package backend.academy.scrapper.service.parsers;
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
 import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.dto.LinkType;
 import java.time.Instant;
 import java.util.List;
-import backend.academy.scrapper.repository.dto.LinkType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class StackOverflowParser implements AbstractParser {
             link.linkType(LinkType.STACK_OVERFLOW);
             int siteIndex = tokens.indexOf("stackoverflow.com");
             var info = new LinkDto.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
-            link.stackOverflowInfo(info);
+            link.linkInfo(info);
             return true;
         }
         return false;
@@ -36,15 +36,16 @@ public class StackOverflowParser implements AbstractParser {
         if (link.getLinkType() != LinkType.STACK_OVERFLOW) {
             return Mono.just(false);
         }
-        if (link.getStackOverflowInfo() == null) {
-            throw new IllegalStateException("Parser doesn't work correctly");
-        }
-        return stackOverflowClient
-                .getStackOverflowNewAnswers(link.getStackOverflowInfo().questionId(), lastUpdated)
+        if (link.getLinkInfo() instanceof LinkDto.StackOverflowInfo stackOverflowInfo) {
+            return stackOverflowClient
+                .getStackOverflowNewAnswers(stackOverflowInfo.questionId(), lastUpdated)
                 .flatMapMany(res -> Flux.fromIterable(res.items()))
                 .doOnNext(activity -> log.info("so update {}", activity))
                 .flatMap(answer -> botClient.sendUpdate(answer, link))
                 .then(Mono.just(true));
+
+        }
+        throw new IllegalStateException("Parser doesn't work correctly");
     }
 
     @Override

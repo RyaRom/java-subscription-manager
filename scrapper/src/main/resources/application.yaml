@@ -10,6 +10,8 @@ app:
     github-token: ${GITHUB_TOKEN}
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
+  data:
+    type: orm
 
 
 spring:

@@ -24,7 +24,7 @@ public class LinksService {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findAll().stream()
                 .filter(link -> link.getChatIds().contains(chatId))
-                    .map(LinkDto::toLinkResponse)
+                .map(LinkDto::toLinkResponse)
                 .toList();
             return new ListLinkResponse(links, links.size());
         });
@@ -37,12 +37,11 @@ public class LinksService {
                 if (link.getChatIds().contains(chatId)) {
                     throw new BadLinkException("Link already exists");
                 }
-                link.getChatIds().add(chatId);
-                linkRepository.save(link);
+                linkRepository.addChatId(link.getLinkId(), chatId);
                 return link;
             })
             .orElseGet(() -> {
-                    LinkDto link = linkContext.generateLink(request.getLink(), chatId);
+                LinkDto link = linkContext.generateLink(request.getLink(), chatId);
                 linkRepository.save(link);
                 return link;
             });

@@ -17,6 +17,8 @@ public interface LinkRepository {
     @Nullable
     LinkDto save(LinkDto link);
 
+    void addChatId(Long linkId, Long chatId);
+
     List<LinkDto> saveAll(List<LinkDto> links);
 
     Optional<LinkDto> deleteById(Long linkId);

@@ -39,6 +39,11 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
+    public void addChatId(Long linkId, Long chatId) {
+        findById(linkId).ifPresent(link -> link.getChatIds().add(chatId));
+    }
+
+    @Override
     public List<LinkDto> saveAll(List<LinkDto> links) {
         links.forEach(this::save);
         return links;
@@ -52,12 +57,12 @@ public class InMemoryLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkDto> deleteByUrl(String url) {
         return findAll().stream()
-                .filter(l -> l.getUrl().equals(url))
-                .findFirst()
-                .map(it -> {
-                    storage.remove(it.getLinkId());
-                    return it;
-                });
+            .filter(l -> l.getUrl().equals(url))
+            .findFirst()
+            .map(it -> {
+                storage.remove(it.getLinkId());
+                return it;
+            });
     }
 
     @Override

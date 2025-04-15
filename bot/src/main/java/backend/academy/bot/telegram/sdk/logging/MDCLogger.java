@@ -23,4 +23,21 @@ public class MDCLogger {
                 () -> logStatement.accept(signal.get()));
         };
     }
+
+    public static <T> Consumer<Signal<T>> logOnError(Consumer<T> logStatement) {
+        return signal -> {
+            if (!signal.isOnError()){
+                return;
+            }
+            Optional<Long> chatId = signal.getContextView().getOrEmpty("chatId");
+
+            chatId.ifPresentOrElse(tpim -> {
+                    try (MDC.MDCCloseable cMdc = MDC.putCloseable("chatId", String.valueOf(tpim))) {
+                        logStatement.accept(signal.get());
+                    }
+                },
+                () -> logStatement.accept(signal.get()));
+        };
+    }
+
 }

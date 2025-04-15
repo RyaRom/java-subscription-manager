@@ -20,9 +20,18 @@
             </column>
 
             <column name="link_info" type="JSONB"/>
+        </createTable>
+    </changeSet>
 
-            <column name="chat_ids" type="BIGINT[]" defaultValue="{}">
-                <constraints nullable="false"/>
+    <changeSet id="create-chat-table" author="riabirom">
+        <createTable tableName="chat">
+            <column name = "link_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="links_chats_pkey"
+                foreignKeyName="fk_link_chats" referencedTableName="link"
+                referencedColumnNames="link_id"/>
+            </column>
+            <column name = "chat_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="chats_pkey" nullable="false"/>
             </column>
         </createTable>
     </changeSet>

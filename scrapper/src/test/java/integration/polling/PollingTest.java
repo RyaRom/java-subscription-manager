@@ -46,13 +46,13 @@ public class PollingTest extends BaseIntegrationTest {
     private final LinkDto githubLink = LinkDto.builder()
             .url("https://github.com/academy-frontend/academy-frontend")
             .linkType(LinkType.GITHUB)
-            .githubInfo(new LinkDto.GithubInfo("academy-frontend","academy-frontend"))
+            .linkInfo(new LinkDto.GithubInfo("academy-frontend","academy-frontend"))
             .chatIds(Set.of(1L, 2L))
             .build();
 
     private final LinkDto soLink = LinkDto.builder()
             .url("https://stackoverflow.com/questions/1732348/text")
-            .stackOverflowInfo(new LinkDto.StackOverflowInfo(1732348L))
+            .linkInfo(new LinkDto.StackOverflowInfo(1732348L))
             .chatIds(Set.of(1L, 2L))
             .linkType(LinkType.STACK_OVERFLOW)
             .build();
@@ -75,8 +75,10 @@ public class PollingTest extends BaseIntegrationTest {
         linkRepository.saveAll(List.of(githubLink, soLink));
         updatePollingJob.update();
 
-        verify(githubClient, times(1)).getRepoActivities("academy-frontend", "academy-frontend");
-        verify(stackOverflowClient, times(1)).getStackOverflowNewAnswers(eq(1732348L), any());
+        verify(githubClient, times(1))
+            .getRepoActivities("academy-frontend", "academy-frontend");
+        verify(stackOverflowClient, times(1))
+            .getStackOverflowNewAnswers(eq(1732348L), any());
     }
 
     @Test
@@ -87,6 +89,7 @@ public class PollingTest extends BaseIntegrationTest {
         linkRepository.save(soLink);
         updatePollingJob.update();
 
-        verify(botClient, times(1)).sendUpdate(response.items().getFirst(), soLink);
+        verify(botClient, times(1))
+            .sendUpdate(response.items().getFirst(), soLink);
     }
 }

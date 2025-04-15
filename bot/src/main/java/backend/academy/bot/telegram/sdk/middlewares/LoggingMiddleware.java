@@ -14,8 +14,8 @@ import static backend.academy.bot.telegram.sdk.logging.MDCLogger.logOnNext;
 public class LoggingMiddleware implements AbstractMiddleware {
     @Override
     public Mono<Update> preHandle(Mono<Update> chain) {
-        return chain.doOnSuccess(update ->
-            log.info("Before update in chat {}", update.message().chat().id()));
+        return chain.doOnEach(logOnNext(update ->
+            log.info("Before update in chat {}", update.message().chat().id())));
     }
 
     @Override

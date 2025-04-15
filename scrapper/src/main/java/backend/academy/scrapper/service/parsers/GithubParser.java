@@ -25,7 +25,7 @@ public class GithubParser implements AbstractParser {
             link.linkType(LinkType.GITHUB);
             int siteIndex = tokens.indexOf("github.com");
             var info = new LinkDto.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
-            link.githubInfo(info);
+            link.linkInfo(info);
             return true;
         }
         return false;
@@ -36,23 +36,24 @@ public class GithubParser implements AbstractParser {
         if (link.getLinkType() != LinkType.GITHUB) {
             return Mono.just(false);
         }
-        if (link.getGithubInfo() == null) {
-            throw new IllegalStateException("Parser doesn't work correctly");
-        }
-        return githubClient
+        if (link.getLinkInfo() instanceof LinkDto.GithubInfo githubInfo) {
+            return githubClient
                 .getRepoActivities(
-                        link.getGithubInfo().owner(), link.getGithubInfo().repo())
+                    githubInfo.owner(), githubInfo.repo())
                 .doOnNext(activity -> {
                     log.info("activity {}", activity);
                     log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
                     log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
                 })
                 .filter(activity -> activity.timestamp()
-                        .toInstant()
-                        .atOffset(ZoneOffset.UTC)
-                        .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                    .toInstant()
+                    .atOffset(ZoneOffset.UTC)
+                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                 .flatMap(activity -> botClient.sendUpdate(activity, link))
                 .then(Mono.just(true));
+        }
+
+        throw new IllegalStateException("Parser doesn't work correctly");
     }
 
     @Override

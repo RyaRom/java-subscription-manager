@@ -1,6 +1,7 @@
 package backend.academy.scrapper.config;
 
 import backend.academy.configuration.AppConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,5 +24,6 @@ public record ScrapperConfig(@Nullable StackOverflowCredentials stackOverflow, @
     }
 
     public record StackOverflowCredentials(
-            @Nullable String key, @Nullable String accessToken, @NotEmpty Boolean tokenDisabled) {}
+        @Nullable String key, @Nullable String accessToken, @NotEmpty Boolean tokenDisabled) {
+    }
 }

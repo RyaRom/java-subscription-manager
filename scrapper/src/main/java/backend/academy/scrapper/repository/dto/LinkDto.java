@@ -3,7 +3,6 @@ package backend.academy.scrapper.repository.dto;
 import backend.academy.dto.LinkResponse;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import lombok.Builder;
 import lombok.Data;
 import org.jspecify.annotations.NonNull;
@@ -12,18 +11,14 @@ import org.jspecify.annotations.Nullable;
 @Data
 @Builder
 public class LinkDto {
-    private static final AtomicLong SIMULATE_COUNTER = new AtomicLong();
-    @Builder.Default
-    private Long linkId = SIMULATE_COUNTER.addAndGet(1L);
+    @Nullable
+    private Long linkId;
 
     @NonNull
     private String url;
 
-    @Nullable
-    private GithubInfo githubInfo;
-
-    @Nullable
-    private StackOverflowInfo stackOverflowInfo;
+    @NonNull
+    private LinkInfo linkInfo;
 
     @NonNull
     private LinkType linkType;
@@ -35,7 +30,9 @@ public class LinkDto {
         return new LinkResponse(linkId, url, List.of(), List.of());
     }
 
-    public record StackOverflowInfo(Long questionId) {}
+    public record GithubInfo(String owner, String repo) implements LinkInfo {
+    }
 
-    public record GithubInfo(String owner, String repo) {}
+    public record StackOverflowInfo(Long questionId) implements LinkInfo {
+    }
 }
