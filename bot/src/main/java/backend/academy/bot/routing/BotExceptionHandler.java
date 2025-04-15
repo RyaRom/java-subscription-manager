@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class BotExceptionHandler {
     private final TelegramAPI telegramAPI;
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(Throwable.class)
     public Mono<Void> unknownError(Exception e, Update update) {
         log.error("In unknown error {}. update = {}", e, update);
         return telegramAPI.sendMessageAsync(update.message(), "Unexpected error: " + e.getMessage());

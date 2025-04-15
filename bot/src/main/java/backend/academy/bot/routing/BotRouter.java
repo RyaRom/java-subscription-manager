@@ -68,7 +68,9 @@ public class BotRouter {
             .then(scrapperClient
                 .getLinks(message.chat().id()))
             .flatMapMany(res -> Flux.fromIterable(res.links()))
-            .flatMap(res -> telegramAPI.sendMessageAsync(message, getPrettyLinkInfo(res)))
+            .map(this::getPrettyLinkInfo)
+            .defaultIfEmpty("You haven't submitted any links yet")
+            .flatMap(it -> telegramAPI.sendMessageAsync(message, it))
             .then();
     }
 

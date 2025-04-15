@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface LinkRepository {
     Optional<LinkDto> findById(Long linkId);
 

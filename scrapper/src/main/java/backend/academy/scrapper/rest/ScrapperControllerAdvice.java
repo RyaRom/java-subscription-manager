@@ -46,6 +46,7 @@ public class ScrapperControllerAdvice {
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ApiErrorResponse>> unknownException(Exception e) {
         log.error(e.getMessage());
+        e.printStackTrace();
         return Mono.just(ResponseEntity.internalServerError()
                 .body(ApiErrorResponse.builder()
                         .code("500")

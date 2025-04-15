@@ -16,6 +16,7 @@ import backend.academy.bot.telegram.sdk.fsm.FSMContext;
 import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.AddLinkRequest;
 import com.pengrad.telegrambot.model.Message;
+import java.util.Locale;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -94,7 +95,7 @@ public class TrackRouter {
                 .flatMap(data -> scrapperClient.addLink(
                         message.chat().id(),
                         AddLinkRequest.builder()
-                                .link(data.getLink())
+                                .link(data.getLink().toLowerCase(Locale.ROOT))
                                 .filters(Stream.of(data.getFilters().split(" "))
                                         .filter(s -> !s.isEmpty())
                                         .toList())
