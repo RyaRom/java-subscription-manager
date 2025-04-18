@@ -1,0 +1,42 @@
+app:
+  main:
+    stackoverflow:
+      key: fake-so-key
+      access-token: fake-so-token
+      token-disabled: true
+    update-cron: "0 0 */12 * * ?"
+  clients:
+    bot-url: http://localhost:8080/bot/api
+    github-token: fake-gh-key
+    stack-overflow-url: stack
+    github-url: github
+  data:
+    type: orm
+
+spring:
+  application:
+    name: Scrapper
+  liquibase:
+    enabled: true
+    change-log: classpath:/liquibase/master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8008
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+
+logging:
+  config:
+    classpath:log4j2.xml
