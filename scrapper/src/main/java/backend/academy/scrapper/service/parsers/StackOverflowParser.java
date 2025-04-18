@@ -6,6 +6,7 @@ import backend.academy.scrapper.repository.entities.LinkEntity;
 import backend.academy.scrapper.repository.dto.LinkType;
 import java.time.Instant;
 import java.util.List;
+import backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class StackOverflowParser implements AbstractParser {
         if (tokens.contains("stackoverflow.com")) {
             link.setLinkType(LinkType.STACK_OVERFLOW);
             int siteIndex = tokens.indexOf("stackoverflow.com");
-            var info = new backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
+            var info = new StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
             link.setLinkInfo(info);
             return true;
         }
@@ -36,7 +37,7 @@ public class StackOverflowParser implements AbstractParser {
         if (link.getLinkType() != LinkType.STACK_OVERFLOW) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo stackOverflowInfo) {
+        if (link.getLinkInfo() instanceof StackOverflowInfo stackOverflowInfo) {
             return stackOverflowClient
                 .getStackOverflowNewAnswers(stackOverflowInfo.questionId(), lastUpdated)
                 .flatMapMany(res -> Flux.fromIterable(res.items()))

@@ -64,7 +64,7 @@ public class BotRouter {
     public Mono<Void> listLinks(Message message) {
         //TODO log everywhere like here
         return Mono.just(message)
-            .doOnEach(logOnNext(m -> log.info("In handler listLinks {}", message.chat().id())))
+            .doOnEach(logOnNext(m -> log.info("In handler listLinks")))
             .then(scrapperClient
                 .getLinks(message.chat().id()))
             .flatMapMany(res -> Flux.fromIterable(res.links()))

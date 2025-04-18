@@ -84,9 +84,7 @@ public class ORMLinkRepository implements LinkRepository {
                     Optional.ofNullable(session.get(backend.academy.scrapper.repository.entities.LinkEntity.class,
                         linkId));
                 link.ifPresent(it -> {
-                    var newChat = new ChatIdEntity()
-                        .setChatId(chatId)
-                        .setLink(it);
+                    var newChat = new ChatIdEntity(chatId, it);
                     session.persist(newChat);
                     session.getTransaction().commit();
                 });

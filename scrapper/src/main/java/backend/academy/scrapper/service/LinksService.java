@@ -4,6 +4,7 @@ import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.exception.BadLinkException;
+import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.entities.LinkEntity;
@@ -35,7 +36,7 @@ public class LinksService {
             .map(link -> {
                 if (link.getChatIds().stream()
                     .anyMatch(it -> it.getChatId().equals(chatId))) {
-                    throw new BadLinkException("Link already exists");
+                    throw new LinkDuplicatedException("Link already exists");
                 }
                 linkRepository.addChatId(link.getLinkId(), chatId);
                 return link;

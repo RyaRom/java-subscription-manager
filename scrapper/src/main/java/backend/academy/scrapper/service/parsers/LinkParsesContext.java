@@ -23,11 +23,17 @@ public class LinkParsesContext {
     public LinkEntity generateLink(String url, Long chatId) {
         var link = new LinkEntity();
         link.setUrl(url);
-        link.setChatIds(List.of(new ChatIdEntity().setChatId(chatId)));
+        link.setChatIds(List.of(new ChatIdEntity(chatId, link)));
         List<String> tokens = List.of(url.split("/"));
         for (var parser : parserChain) {
-            if (parser.parse(link, tokens)) {
-                return link;
+            try {
+                if (parser.parse(link, tokens)) {
+                    return link;
+                }
+            } catch (Exception e) {
+                log.warn("Error while parsing link {}", url, e);
+                e.printStackTrace();
+                throw new BadLinkException("Not a valid link");
             }
         }
         throw new BadLinkException("Not a valid link");

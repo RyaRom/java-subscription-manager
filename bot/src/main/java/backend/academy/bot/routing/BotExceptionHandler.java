@@ -4,6 +4,7 @@ import backend.academy.bot.telegram.sdk.annotations.BotRouterAdvice;
 import backend.academy.bot.telegram.sdk.annotations.ExceptionHandler;
 import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.exception.BadLinkException;
+import backend.academy.exception.LinkDuplicatedException;
 import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class BotExceptionHandler {
     private final TelegramAPI telegramAPI;
 
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler({Throwable.class, Exception.class})
     public Mono<Void> unknownError(Exception e, Update update) {
         log.error("In unknown error {}. update = {}", e, update);
         return telegramAPI.sendMessageAsync(update.message(), "Unexpected error: " + e.getMessage());
@@ -32,6 +33,13 @@ public class BotExceptionHandler {
     public Mono<Void> badLink(BadLinkException e, Update update) {
         log.error("In badLink {}. update = {}", e, update);
         return telegramAPI.sendMessageAsync(
-                update.message(), "Link is not supported incorrect or duplicated. Your links: /list");
+                update.message(), "Link is incorrect. Your links: /list");
+    }
+
+    @ExceptionHandler(LinkDuplicatedException.class)
+    public Mono<Void> duplicatedLink(LinkDuplicatedException e, Update update) {
+        log.error("In duplicatedLink {}. update = {}", e, update);
+        return telegramAPI.sendMessageAsync(
+                update.message(), "Link already exist. Your links: /list");
     }
 }

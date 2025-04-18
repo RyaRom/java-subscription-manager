@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import static backend.academy.bot.telegram.sdk.logging.MDCLogger.logOnNext;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +19,7 @@ public class MiddlewaresContext {
         for (var middleware : middlewares) {
             pipeline = middleware
                     .preHandle(pipeline)
-                    .doOnSuccess(it -> log.info("In middleware {}; Before request {}", it, middleware.getClass()));
+                .doOnEach(logOnNext(it -> log.info("In middleware {}. Before request", middleware.getClass())));
         }
 
         pipeline = pipeline.then(process);
@@ -26,7 +27,7 @@ public class MiddlewaresContext {
         for (var middleware : middlewares) {
             pipeline = middleware
                     .postHandle(pipeline)
-                    .doOnSuccess(it -> log.info("In middleware {}. After request {}.", it, middleware.getClass()));
+                .doOnEach(logOnNext(it -> log.info("In middleware {}. After request", middleware.getClass())));
         }
 
         return pipeline;
