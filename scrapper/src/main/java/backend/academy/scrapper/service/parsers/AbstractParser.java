@@ -1,14 +1,14 @@
 package backend.academy.scrapper.service.parsers;
 
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import java.time.Instant;
 import java.util.List;
 import reactor.core.publisher.Mono;
 
 public interface AbstractParser {
-    boolean parse(LinkDto.LinkDtoBuilder link, List<String> tokens);
+    boolean parse(LinkEntity link, List<String> tokens);
 
-    Mono<Boolean> update(LinkDto link, Instant lastUpdated);
+    Mono<Boolean> update(LinkEntity link, Instant lastUpdated);
 
     /**
      * if order in chain matters

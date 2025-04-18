@@ -6,7 +6,7 @@ import backend.academy.dto.ListLinkResponse;
 import backend.academy.exception.BadLinkException;
 import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,9 +22,8 @@ public class LinksService {
 
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
-            var links = linkRepository.findAll().stream()
-                .filter(link -> link.getChatIds().contains(chatId))
-                .map(LinkDto::toLinkResponse)
+            var links = linkRepository.findWithChatId(chatId).stream()
+                .map(LinkEntity::toLinkResponse)
                 .toList();
             return new ListLinkResponse(links, links.size());
         });
@@ -34,14 +33,15 @@ public class LinksService {
         var savedLink = linkRepository
             .findByUrl(request.getLink())
             .map(link -> {
-                if (link.getChatIds().contains(chatId)) {
+                if (link.getChatIds().stream()
+                    .anyMatch(it -> it.getChatId().equals(chatId))) {
                     throw new BadLinkException("Link already exists");
                 }
                 linkRepository.addChatId(link.getLinkId(), chatId);
                 return link;
             })
             .orElseGet(() -> {
-                LinkDto link = linkContext.generateLink(request.getLink(), chatId);
+                LinkEntity link = linkContext.generateLink(request.getLink(), chatId);
                 linkRepository.save(link);
                 return link;
             });

@@ -1,10 +1,8 @@
 package backend.academy.scrapper.repository;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.repository.dto.LinkDto;
 import backend.academy.scrapper.repository.entities.ChatIdEntity;
 import backend.academy.scrapper.repository.entities.LinkEntity;
-import backend.academy.scrapper.service.mappers.LinkMapper;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
@@ -27,50 +25,48 @@ public class ORMLinkRepository implements LinkRepository {
     }
 
     @Override
-    public Optional<LinkDto> findById(Long linkId) {
+    public Optional<LinkEntity> findById(Long linkId) {
         try (Session session = openSession()) {
-            return Optional.ofNullable(session.get(LinkEntity.class, linkId))
-                .map(LinkMapper::parseToDto);
+            return Optional.ofNullable(session.get(backend.academy.scrapper.repository.entities.LinkEntity.class,
+                linkId));
         } catch (NoResultException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public Optional<LinkDto> findByUrl(String url) {
+    public Optional<LinkEntity> findByUrl(String url) {
         try (Session session = openSession()) {
             return Optional.of(
-                    session.createQuery("from LinkEntity link where link.url = :url", LinkEntity.class)
-                        .setParameter("url", url)
-                        .getSingleResult())
-                .map(LinkMapper::parseToDto);
+                session.createQuery("from LinkEntity link where link.url = :url",
+                        LinkEntity.class)
+                    .setParameter("url", url)
+                    .getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public List<LinkDto> findAll() {
+    public List<LinkEntity> findAll() {
         try (Session session = openSession()) {
             return session.createQuery("from LinkEntity", LinkEntity.class)
                 .getResultList()
                 .stream()
-                .map(LinkMapper::parseToDto)
                 .toList();
         }
     }
 
     @Override
-    public @Nullable LinkDto save(LinkDto link) {
+    public @Nullable LinkEntity save(LinkEntity link) {
         try (Session session = openSession()) {
             try {
                 session.getTransaction().begin();
-                var entity = LinkMapper.parseToEntity(link);
-                if (session.contains(entity)) {
+                if (session.contains(link)) {
                     session.getTransaction().rollback();
                     return null;
                 }
-                session.persist(entity);
+                session.persist(link);
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
@@ -84,7 +80,9 @@ public class ORMLinkRepository implements LinkRepository {
         try (Session session = openSession()) {
             try {
                 session.getTransaction().begin();
-                var link = Optional.ofNullable(session.get(LinkEntity.class, linkId));
+                var link =
+                    Optional.ofNullable(session.get(backend.academy.scrapper.repository.entities.LinkEntity.class,
+                        linkId));
                 link.ifPresent(it -> {
                     var newChat = new ChatIdEntity()
                         .setChatId(chatId)
@@ -99,11 +97,11 @@ public class ORMLinkRepository implements LinkRepository {
     }
 
     @Override
-    public List<LinkDto> saveAll(List<LinkDto> links) {
+    public List<LinkEntity> saveAll(List<LinkEntity> links) {
         try (Session session = openSession()) {
             try {
                 session.getTransaction().begin();
-                links.forEach(it -> session.persist(LinkMapper.parseToEntity(it)));
+                links.forEach(session::persist);
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
@@ -113,24 +111,14 @@ public class ORMLinkRepository implements LinkRepository {
     }
 
     @Override
-    public Optional<LinkDto> deleteById(Long linkId) {
+    public Optional<LinkEntity> deleteByUrl(String url) {
         try (Session session = openSession()) {
-            var deleted = session.getReference(LinkEntity.class, linkId);
-            session.remove(deleted);
-            return Optional.of(LinkMapper.parseToDto(deleted));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<LinkDto> deleteByUrl(String url) {
-        try (Session session = openSession()) {
-            var deleted = session.createQuery("from LinkEntity where url = :url", LinkEntity.class)
+            var deleted = session.createQuery("from LinkEntity where url = :url",
+                    LinkEntity.class)
                 .setParameter("url", url)
                 .getSingleResult();
             session.remove(deleted);
-            return Optional.of(LinkMapper.parseToDto(deleted));
+            return Optional.of(deleted);
         } catch (NoResultException e) {
             return Optional.empty();
         }
@@ -142,7 +130,20 @@ public class ORMLinkRepository implements LinkRepository {
             if (envType != EnvType.TEST) {
                 return;
             }
-            session.createQuery("delete from LinkEntity", LinkEntity.class).executeUpdate();
+            session.createQuery("delete from LinkEntity",
+                LinkEntity.class).executeUpdate();
+        }
+    }
+
+    @Override
+    public List<LinkEntity> findWithChatId(Long chatId) {
+        try (Session session = openSession()) {
+            return session.createQuery(
+                    "SELECT DISTINCT l FROM LinkEntity l JOIN l.chatIds c WHERE c.chatId = :chatId",
+                    LinkEntity.class
+                )
+                .setParameter("chatId", chatId)
+                .getResultList();
         }
     }
 }

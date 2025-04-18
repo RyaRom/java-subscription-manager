@@ -2,7 +2,7 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -20,23 +20,23 @@ public class GithubParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(LinkDto.LinkDtoBuilder link, List<String> tokens) {
+    public boolean parse(LinkEntity link, List<String> tokens) {
         if (tokens.contains("github.com")) {
-            link.linkType(LinkType.GITHUB);
+            link.setLinkType(LinkType.GITHUB);
             int siteIndex = tokens.indexOf("github.com");
-            var info = new LinkDto.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
-            link.linkInfo(info);
+            var info = new backend.academy.scrapper.repository.entities.LinkEntity.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
+            link.setLinkInfo(info);
             return true;
         }
         return false;
     }
 
     @Override
-    public Mono<Boolean> update(LinkDto link, Instant lastUpdated) {
+    public Mono<Boolean> update(LinkEntity link, Instant lastUpdated) {
         if (link.getLinkType() != LinkType.GITHUB) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof LinkDto.GithubInfo githubInfo) {
+        if (link.getLinkInfo() instanceof backend.academy.scrapper.repository.entities.LinkEntity.GithubInfo githubInfo) {
             return githubClient
                 .getRepoActivities(
                     githubInfo.owner(), githubInfo.repo())

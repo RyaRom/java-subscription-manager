@@ -5,8 +5,8 @@ import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.dto.LinkDto;
 import backend.academy.scrapper.repository.dto.LinkType;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -72,11 +72,11 @@ public class AddLinksTest extends BaseIntegrationTest {
             assertThat(link.getUrl()).isEqualTo("https://github.com/RyaRom/HackChangeHackathon2024");
             assertThat(link.getLinkType()).isEqualTo(LinkType.GITHUB);
             assertThat(link.getLinkInfo()).isNotNull();
-            assertThat(link.getLinkInfo()).isInstanceOf(LinkDto.GithubInfo.class);
-            var githubInfo = (LinkDto.GithubInfo) link.getLinkInfo();
+            assertThat(link.getLinkInfo()).isInstanceOf(LinkEntity.GithubInfo.class);
+            var githubInfo = (LinkEntity.GithubInfo) link.getLinkInfo();
             assertThat(githubInfo.owner()).isEqualTo("RyaRom");
             assertThat(githubInfo.repo()).isEqualTo("HackChangeHackathon2024");
-            assertThat(link.getChatIds()).contains(1L);
+            assertThat(link.getChatIdList()).contains(1L);
         });
     }
 
@@ -99,10 +99,10 @@ public class AddLinksTest extends BaseIntegrationTest {
                         "-tags");
             assertThat(link.getLinkType()).isEqualTo(LinkType.STACK_OVERFLOW);
             assertThat(link.getLinkInfo()).isNotNull();
-            assertThat(link.getLinkInfo()).isInstanceOf(LinkDto.StackOverflowInfo.class);
-            var stackOverflowInfo = (LinkDto.StackOverflowInfo) link.getLinkInfo();
+            assertThat(link.getLinkInfo()).isInstanceOf(LinkEntity.StackOverflowInfo.class);
+            var stackOverflowInfo = (LinkEntity.StackOverflowInfo) link.getLinkInfo();
             assertThat(stackOverflowInfo.questionId()).isEqualTo(1732348);
-            assertThat(link.getChatIds()).contains(1L);
+            assertThat(link.getChatIdList()).contains(1L);
         });
     }
 
@@ -145,7 +145,7 @@ public class AddLinksTest extends BaseIntegrationTest {
         assertThat(linkRepository.findAll())
             .hasSize(2)
             .allMatch(link ->
-                link.getChatIds().size() == 1 && link.getChatIds().contains(1L));
+                link.getChatIdList().size() == 1 && link.getChatIdList().contains(1L));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class AddLinksTest extends BaseIntegrationTest {
         assertThat(linkRepository.findAll())
             .hasSize(1)
             .allMatch(link ->
-                link.getChatIds().size() == 1 && link.getChatIds().contains(1L));
+                link.getChatIdList().size() == 1 && link.getChatIdList().contains(1L));
     }
 
     @Test
@@ -209,7 +209,7 @@ public class AddLinksTest extends BaseIntegrationTest {
             .isOk();
 
         assertThat(linkRepository.findAll()).singleElement().satisfies(link -> {
-            assertThat(link.getChatIds()).hasSize(2).containsExactlyInAnyOrder(1L, 2L);
+            assertThat(link.getChatIdList()).hasSize(2).containsExactlyInAnyOrder(1L, 2L);
             assertThat(link.getUrl()).isEqualTo(stackOverflowLink.getLink());
         });
     }

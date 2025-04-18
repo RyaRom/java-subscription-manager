@@ -1,28 +1,27 @@
 package backend.academy.scrapper.repository;
 
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Repository;
 
 public interface LinkRepository {
-    Optional<LinkDto> findById(Long linkId);
+    Optional<LinkEntity> findById(Long linkId);
 
-    Optional<LinkDto> findByUrl(String url);
+    Optional<LinkEntity> findByUrl(String url);
 
-    List<LinkDto> findAll();
+    List<LinkEntity> findAll();
 
     @Nullable
-    LinkDto save(LinkDto link);
+    LinkEntity save(LinkEntity link);
 
     void addChatId(Long linkId, Long chatId);
 
-    List<LinkDto> saveAll(List<LinkDto> links);
+    List<LinkEntity> saveAll(List<LinkEntity> links);
 
-    Optional<LinkDto> deleteById(Long linkId);
-
-    Optional<LinkDto> deleteByUrl(String url);
+    Optional<LinkEntity> deleteByUrl(String url);
 
     void dropForTest();
+
+    List<LinkEntity> findWithChatId(Long chatId);
 }

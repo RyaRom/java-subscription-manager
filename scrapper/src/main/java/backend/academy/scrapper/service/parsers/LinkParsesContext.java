@@ -1,13 +1,13 @@
 package backend.academy.scrapper.service.parsers;
 
 import backend.academy.exception.BadLinkException;
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.ChatIdEntity;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -20,20 +20,20 @@ import reactor.core.publisher.Mono;
 public class LinkParsesContext {
     private final List<AbstractParser> parserChain;
 
-    public LinkDto generateLink(String url, Long chatId) {
-        var builder = LinkDto.builder();
-        builder.url(url);
-        builder.chatIds(new HashSet<>(List.of(chatId)));
+    public LinkEntity generateLink(String url, Long chatId) {
+        var link = new LinkEntity();
+        link.setUrl(url);
+        link.setChatIds(List.of(new ChatIdEntity().setChatId(chatId)));
         List<String> tokens = List.of(url.split("/"));
         for (var parser : parserChain) {
-            if (parser.parse(builder, tokens)) {
-                return builder.build();
+            if (parser.parse(link, tokens)) {
+                return link;
             }
         }
         throw new BadLinkException("Not a valid link");
     }
 
-    public Mono<Void> updateLink(LinkDto link, Instant lastUpdated) {
+    public Mono<Void> updateLink(LinkEntity link, Instant lastUpdated) {
         log.info("polling link {}", link.getUrl());
         Mono<Boolean> wasUpdated = Flux.fromIterable(parserChain)
             .concatMap(it -> it.update(link, lastUpdated))

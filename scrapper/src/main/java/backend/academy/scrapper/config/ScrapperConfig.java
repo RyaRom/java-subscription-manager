@@ -1,7 +1,6 @@
 package backend.academy.scrapper.config;
 
 import backend.academy.configuration.AppConfig;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,6 +21,14 @@ public record ScrapperConfig(@Nullable StackOverflowCredentials stackOverflow, @
     public String updateCron() {
         return updateCron;
     }
+
+//    @Bean
+//    public Module jacksonModule() {
+//        SimpleModule module = new SimpleModule();
+//        module.addAbstractTypeMapping(LinkInfo.class, LinkDto.GithubInfo.class);
+//        module.addAbstractTypeMapping(LinkInfo.class, LinkDto.StackOverflowInfo.class);
+//        return module;
+//    }
 
     public record StackOverflowCredentials(
         @Nullable String key, @Nullable String accessToken, @NotEmpty Boolean tokenDisabled) {

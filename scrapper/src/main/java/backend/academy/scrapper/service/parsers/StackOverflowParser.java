@@ -2,7 +2,7 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
-import backend.academy.scrapper.repository.dto.LinkDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import backend.academy.scrapper.repository.dto.LinkType;
 import java.time.Instant;
 import java.util.List;
@@ -20,23 +20,23 @@ public class StackOverflowParser implements AbstractParser {
     private final BotClient botClient;
 
     @Override
-    public boolean parse(LinkDto.LinkDtoBuilder link, List<String> tokens) {
+    public boolean parse(LinkEntity link, List<String> tokens) {
         if (tokens.contains("stackoverflow.com")) {
-            link.linkType(LinkType.STACK_OVERFLOW);
+            link.setLinkType(LinkType.STACK_OVERFLOW);
             int siteIndex = tokens.indexOf("stackoverflow.com");
-            var info = new LinkDto.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
-            link.linkInfo(info);
+            var info = new backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
+            link.setLinkInfo(info);
             return true;
         }
         return false;
     }
 
     @Override
-    public Mono<Boolean> update(LinkDto link, Instant lastUpdated) {
+    public Mono<Boolean> update(LinkEntity link, Instant lastUpdated) {
         if (link.getLinkType() != LinkType.STACK_OVERFLOW) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof LinkDto.StackOverflowInfo stackOverflowInfo) {
+        if (link.getLinkInfo() instanceof backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo stackOverflowInfo) {
             return stackOverflowClient
                 .getStackOverflowNewAnswers(stackOverflowInfo.questionId(), lastUpdated)
                 .flatMapMany(res -> Flux.fromIterable(res.items()))

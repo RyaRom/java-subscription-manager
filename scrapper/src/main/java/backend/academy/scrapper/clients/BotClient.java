@@ -2,8 +2,8 @@ package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
 import backend.academy.scrapper.repository.dto.GithubActivity;
-import backend.academy.scrapper.repository.dto.LinkDto;
 import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
+import backend.academy.scrapper.repository.entities.LinkEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -20,10 +20,10 @@ public class BotClient {
 
     public static String getGithubUpdate(GithubActivity githubActivity) {
         return String.format(
-                "Update in github repo:\n type: %s; timestamp: %s; author: %s",
-                githubActivity.activityType().toString(),
-                githubActivity.timestamp().toString(),
-                githubActivity.actor().login());
+            "Update in github repo:\n type: %s; timestamp: %s; author: %s",
+            githubActivity.activityType().toString(),
+            githubActivity.timestamp().toString(),
+            githubActivity.actor().login());
     }
 
     public static String getStackAnswerUpdate(StackAnswersResponseDto stackAnswersResponseDto) {
@@ -32,34 +32,34 @@ public class BotClient {
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return botHttpClient
-                .post()
-                .uri("/updates")
-                .body(BodyInserters.fromValue(linkUpdate))
-                .retrieve()
-                .toBodilessEntity()
-                .then();
+            .post()
+            .uri("/updates")
+            .body(BodyInserters.fromValue(linkUpdate))
+            .retrieve()
+            .toBodilessEntity()
+            .then();
     }
 
-    public Mono<Void> sendUpdate(GithubActivity githubActivity, LinkDto link) {
+    public Mono<Void> sendUpdate(GithubActivity githubActivity, LinkEntity link) {
         if (githubActivity.activityType() == GithubActivity.ActivityType.UNKNOWN) {
             log.warn("Unknown type in update {}", githubActivity);
         }
         LinkUpdate linkUpdate = LinkUpdate.builder()
-                .linkId(link.getLinkId())
-                .url(link.getUrl())
-                .tgChatIds(link.getChatIds().stream().toList())
-                .description(getGithubUpdate(githubActivity))
-                .build();
+            .linkId(link.getLinkId())
+            .url(link.getUrl())
+            .tgChatIds(link.getChatIdList())
+            .description(getGithubUpdate(githubActivity))
+            .build();
         return sendUpdate(linkUpdate);
     }
 
-    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, LinkDto link) {
+    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, LinkEntity link) {
         LinkUpdate linkUpdate = LinkUpdate.builder()
-                .linkId(link.getLinkId())
-                .url(link.getUrl())
-                .tgChatIds(link.getChatIds().stream().toList())
-                .description(getStackAnswerUpdate(answer))
-                .build();
+            .linkId(link.getLinkId())
+            .url(link.getUrl())
+            .tgChatIds(link.getChatIdList())
+            .description(getStackAnswerUpdate(answer))
+            .build();
         return sendUpdate(linkUpdate);
     }
 }
