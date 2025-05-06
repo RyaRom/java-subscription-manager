@@ -12,6 +12,7 @@ import backend.academy.scrapper.repository.entities.ChatIdEntity;
 import backend.academy.scrapper.repository.entities.LinkEntity;
 import backend.academy.scrapper.service.UpdatePollingJob;
 import integration.BaseIntegrationTest;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +77,10 @@ public class PollingTest extends BaseIntegrationTest {
 
     @Test
     void botUpdateTest() {
-        var response = new StackResponseDto(List.of(new StackAnswersResponseDto(1L)), false);
+        var response = new StackResponseDto(List.of(new StackAnswersResponseDto(1L,
+            Instant.ofEpochMilli(123),
+            new StackAnswersResponseDto.Owner("Name"),
+            "body")), false);
         when(stackOverflowClient.getStackOverflowNewAnswers(eq(1732348L), any()))
             .thenReturn(Mono.just(response));
         linkRepository.save(soLink);

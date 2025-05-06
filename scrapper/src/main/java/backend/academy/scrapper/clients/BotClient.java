@@ -27,7 +27,12 @@ public class BotClient {
     }
 
     public static String getStackAnswerUpdate(StackAnswersResponseDto stackAnswersResponseDto) {
-        return String.format("New answer in so question:\n%s", stackAnswersResponseDto.getLink());
+        return String.format("""
+                New Stack overflow update in %s:
+                Question: %s
+                User: %s
+                Text: %s""",
+            stackAnswersResponseDto.getLink());
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {

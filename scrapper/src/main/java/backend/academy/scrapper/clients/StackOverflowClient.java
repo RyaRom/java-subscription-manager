@@ -47,6 +47,7 @@ public class StackOverflowClient {
         builder.queryParam("sort", "activity")
                 .queryParam("site", "stackoverflow")
                 .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-                .queryParam("order", "desc");
+                .queryParam("order", "desc")
+            .queryParam("filter", "!6WPIompiwYPmM");
     }
 }

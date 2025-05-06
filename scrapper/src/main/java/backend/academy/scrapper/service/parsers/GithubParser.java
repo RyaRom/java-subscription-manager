@@ -24,7 +24,7 @@ public class GithubParser implements AbstractParser {
         if (tokens.contains("github.com")) {
             link.setLinkType(LinkType.GITHUB);
             int siteIndex = tokens.indexOf("github.com");
-            var info = new backend.academy.scrapper.repository.entities.LinkEntity.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
+            var info = new LinkEntity.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
             link.setLinkInfo(info);
             return true;
         }
@@ -36,10 +36,10 @@ public class GithubParser implements AbstractParser {
         if (link.getLinkType() != LinkType.GITHUB) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof backend.academy.scrapper.repository.entities.LinkEntity.GithubInfo githubInfo) {
+        if (link.getLinkInfo() instanceof LinkEntity.GithubInfo(String owner, String repo)) {
             return githubClient
                 .getRepoActivities(
-                    githubInfo.owner(), githubInfo.repo())
+                    owner, repo)
                 .doOnNext(activity -> {
                     log.info("activity {}", activity);
                     log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
