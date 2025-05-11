@@ -27,7 +27,7 @@ public class ORMLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> findById(Long linkId) {
         try (Session session = openSession()) {
-            return Optional.ofNullable(session.get(backend.academy.scrapper.repository.entities.LinkEntity.class,
+            return Optional.ofNullable(session.get(LinkEntity.class,
                 linkId));
         } catch (NoResultException e) {
             return Optional.empty();
@@ -81,7 +81,7 @@ public class ORMLinkRepository implements LinkRepository {
             try {
                 session.getTransaction().begin();
                 var link =
-                    Optional.ofNullable(session.get(backend.academy.scrapper.repository.entities.LinkEntity.class,
+                    Optional.ofNullable(session.get(LinkEntity.class,
                         linkId));
                 link.ifPresent(it -> {
                     var newChat = new ChatIdEntity(chatId, it);
@@ -111,25 +111,38 @@ public class ORMLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> deleteByUrl(String url) {
         try (Session session = openSession()) {
-            var deleted = session.createQuery("from LinkEntity where url = :url",
-                    LinkEntity.class)
-                .setParameter("url", url)
-                .getSingleResult();
-            session.remove(deleted);
-            return Optional.of(deleted);
+            try {
+                session.beginTransaction();
+                var deleted = session.createQuery("from LinkEntity where url = :url",
+                        LinkEntity.class)
+                    .setParameter("url", url)
+                    .getSingleResult();
+                session.remove(deleted);
+                session.getTransaction().commit();
+                return Optional.of(deleted);
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
         } catch (NoResultException e) {
             return Optional.empty();
         }
+        return Optional.empty();
     }
 
     @Override
     public void dropForTest() {
         try (Session session = openSession()) {
-            if (envType != EnvType.TEST) {
-                return;
+            try {
+                if (envType != EnvType.TEST) {
+                    return;
+                }
+                session.beginTransaction();
+                session.createNativeQuery("TRUNCATE TABLE link CASCADE")
+                    .executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
             }
-            session.createQuery("delete from LinkEntity",
-                LinkEntity.class).executeUpdate();
         }
     }
 

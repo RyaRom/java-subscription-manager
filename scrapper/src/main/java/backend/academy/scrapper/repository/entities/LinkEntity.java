@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,7 +47,7 @@ public class LinkEntity {
     private LinkType linkType;
 
     @NonNull
-    @OneToMany(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ChatIdEntity> chatIds;
 
     public LinkResponse toLinkResponse() {

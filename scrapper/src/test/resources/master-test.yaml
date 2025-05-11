@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/changelog/v1.0-links-schema.xml
+      relativeToChangelogFile: false
+  - include:
+      file: liquibase/changelog/v1.1-indexes.xml
+      relativeToChangelogFile: false
