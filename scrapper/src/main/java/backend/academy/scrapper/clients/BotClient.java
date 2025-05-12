@@ -1,8 +1,8 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
-import backend.academy.scrapper.repository.dto.GithubActivity;
-import backend.academy.scrapper.repository.dto.StackAnswersResponseDto;
+import backend.academy.scrapper.repository.dto.github.GithubFullInfo;
+import backend.academy.scrapper.repository.dto.stackOverflow.StackOverflowFullInfo;
 import backend.academy.scrapper.repository.entities.LinkEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,22 +18,29 @@ import reactor.core.publisher.Mono;
 public class BotClient {
     private final WebClient botHttpClient;
 
-    public static String getGithubUpdate(GithubActivity githubActivity) {
-        return String.format(
-            "Update in github repo:\n type: %s; timestamp: %s; author: %s",
-            githubActivity.activityType().toString(),
-            githubActivity.timestamp().toString(),
-            githubActivity.actor().login());
+    public static String getGithubUpdate(GithubFullInfo info) {
+        return String.format("""
+                New Github update (%s): %s
+                User: %s
+                Text: %s""",
+            info.type(),
+            info.title(),
+            info.username(),
+            info.body()
+        );
     }
 
-    public static String getStackAnswerUpdate(StackAnswersResponseDto stackAnswersResponseDto) {
-//        return String.format("""
-//                New Stack overflow update in %s:
-//                Question: %s
-//                User: %s
-//                Text: %s""",
-//            stackAnswersResponseDto.getLink());
-        return "";
+    public static String getStackAnswerUpdate(StackOverflowFullInfo info) {
+        return String.format("""
+                New Stack overflow %s
+                Question: %s
+                User: %s
+                Text: %s""",
+            info.type(),
+            info.questionTitle(),
+            info.username(),
+            info.body()
+        );
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
@@ -46,9 +53,9 @@ public class BotClient {
             .then();
     }
 
-    public Mono<Void> sendUpdate(GithubActivity githubActivity, LinkEntity link) {
-        if (githubActivity.activityType() == GithubActivity.ActivityType.UNKNOWN) {
-            log.warn("Unknown type in update {}", githubActivity);
+    public Mono<Void> sendUpdate(GithubFullInfo githubActivity, LinkEntity link) {
+        if (githubActivity.type().isEmpty()) {
+            log.warn("Unknown type in github update {}", githubActivity);
         }
         LinkUpdate linkUpdate = LinkUpdate.builder()
             .linkId(link.getLinkId())
@@ -59,7 +66,10 @@ public class BotClient {
         return sendUpdate(linkUpdate);
     }
 
-    public Mono<Void> sendUpdate(StackAnswersResponseDto answer, LinkEntity link) {
+    public Mono<Void> sendUpdate(StackOverflowFullInfo answer, LinkEntity link) {
+        if (answer.type().isEmpty()) {
+            log.warn("Unknown type in stack update {}", answer);
+        }
         LinkUpdate linkUpdate = LinkUpdate.builder()
             .linkId(link.getLinkId())
             .url(link.getUrl())

@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="create-links-table" author="riabirom">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="link"/>
+            </not>
+        </preConditions>
+        <createTable tableName="link">
+            <column name="link_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="links_pkey"/>
+            </column>
+
+            <column name="url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="link_type" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="link_info" type="SMALLINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-link-info-table" author="riabirom">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="link_info"/>
+            </not>
+        </preConditions>
+        <createTable tableName="link_info">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"
+                             foreignKeyName="fk_link_info_link"
+                             referencedTableName="link"
+                             referencedColumnNames="link_id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-stack_overflow_info" author="riabirom">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="stack_overflow_info"/>
+            </not>
+        </preConditions>
+        <createTable tableName="stack_overflow_info">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="fk_so_link_info"
+                             referencedTableName="link_info"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="question_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-githubinfo-table" author="riabirom">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="create-githubinfo-table"/>
+            </not>
+        </preConditions>
+        <createTable tableName="github_info">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="fk_gh_link_info"
+                             referencedTableName="link_info"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="owner" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repo" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-chat-table" author="riabirom">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="chat"/>
+            </not>
+        </preConditions>
+        <createTable tableName="chat">
+            <column name="link_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="links_chats_pkey"
+                             foreignKeyName="fk_link_chats" referencedTableName="link"
+                             referencedColumnNames="link_id"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="chats_pkey" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

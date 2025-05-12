@@ -2,11 +2,13 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
+import backend.academy.scrapper.repository.dto.LinkType;
+import backend.academy.scrapper.repository.dto.github.GithubFullInfo;
+import backend.academy.scrapper.repository.entities.GithubInfoEntity;
 import backend.academy.scrapper.repository.entities.LinkEntity;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
-import backend.academy.scrapper.repository.dto.LinkType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,8 @@ public class GithubParser implements AbstractParser {
         if (tokens.contains("github.com")) {
             link.setLinkType(LinkType.GITHUB);
             int siteIndex = tokens.indexOf("github.com");
-            var info = new LinkEntity.GithubInfo(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
+            var info = new GithubInfoEntity(tokens.get(siteIndex + 1), tokens.get(siteIndex + 2));
+            info.setLink(link);
             link.setLinkInfo(info);
             return true;
         }
@@ -36,10 +39,10 @@ public class GithubParser implements AbstractParser {
         if (link.getLinkType() != LinkType.GITHUB) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof LinkEntity.GithubInfo(String owner, String repo)) {
+        if (link.getLinkInfo() instanceof GithubInfoEntity githubInfo) {
             return githubClient
                 .getRepoActivities(
-                    owner, repo)
+                    githubInfo.getOwner(), githubInfo.getRepo())
                 .doOnNext(activity -> {
                     log.info("activity {}", activity);
                     log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
@@ -49,7 +52,8 @@ public class GithubParser implements AbstractParser {
                     .toInstant()
                     .atOffset(ZoneOffset.UTC)
                     .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-                .flatMap(activity -> botClient.sendUpdate(activity, link))
+                .flatMap(activity ->
+                    botClient.sendUpdate(GithubFullInfo.fromResponse(activity), link))
                 .then(Mono.just(true));
         }
 

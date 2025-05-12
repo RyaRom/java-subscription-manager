@@ -6,7 +6,8 @@ import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.repository.dto.LinkType;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.entities.GithubInfoEntity;
+import backend.academy.scrapper.repository.entities.StackOverflowInfoEntity;
 import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -72,10 +73,10 @@ public class AddLinksTest extends BaseIntegrationTest {
             assertThat(link.getUrl()).isEqualTo("https://github.com/RyaRom/HackChangeHackathon2024");
             assertThat(link.getLinkType()).isEqualTo(LinkType.GITHUB);
             assertThat(link.getLinkInfo()).isNotNull();
-            assertThat(link.getLinkInfo()).isInstanceOf(LinkEntity.GithubInfo.class);
-            var githubInfo = (LinkEntity.GithubInfo) link.getLinkInfo();
-            assertThat(githubInfo.owner()).isEqualTo("RyaRom");
-            assertThat(githubInfo.repo()).isEqualTo("HackChangeHackathon2024");
+            assertThat(link.getLinkInfo()).isInstanceOf(GithubInfoEntity.class);
+            var githubInfo = (GithubInfoEntity) link.getLinkInfo();
+            assertThat(githubInfo.getOwner()).isEqualTo("RyaRom");
+            assertThat(githubInfo.getRepo()).isEqualTo("HackChangeHackathon2024");
             assertThat(link.getChatIdList()).contains(1L);
         });
     }
@@ -99,9 +100,9 @@ public class AddLinksTest extends BaseIntegrationTest {
                         "-tags");
             assertThat(link.getLinkType()).isEqualTo(LinkType.STACK_OVERFLOW);
             assertThat(link.getLinkInfo()).isNotNull();
-            assertThat(link.getLinkInfo()).isInstanceOf(LinkEntity.StackOverflowInfo.class);
-            var stackOverflowInfo = (LinkEntity.StackOverflowInfo) link.getLinkInfo();
-            assertThat(stackOverflowInfo.questionId()).isEqualTo(1732348);
+            assertThat(link.getLinkInfo()).isInstanceOf(StackOverflowInfoEntity.class);
+            var stackOverflowInfo = (StackOverflowInfoEntity) link.getLinkInfo();
+            assertThat(stackOverflowInfo.getQuestionId()).isEqualTo(1732348);
             assertThat(link.getChatIdList()).contains(1L);
         });
     }

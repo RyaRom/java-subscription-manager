@@ -7,9 +7,11 @@ import jakarta.validation.constraints.NotEmpty;
 import org.apache.logging.log4j.core.config.ConfigurationException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
+@Profile("dev")
 @ConfigurationProperties(prefix = "app.data", ignoreUnknownFields = false)
 public record RepositoryConfig(@NotEmpty String type) {
     @Bean

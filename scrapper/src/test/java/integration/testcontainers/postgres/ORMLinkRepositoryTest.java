@@ -2,9 +2,11 @@ package integration.testcontainers.postgres;
 
 import backend.academy.configuration.EnvType;
 import backend.academy.scrapper.repository.ORMLinkRepository;
-import backend.academy.scrapper.repository.dto.LinkInfo;
+import backend.academy.scrapper.repository.entities.GithubInfoEntity;
+import backend.academy.scrapper.repository.entities.LinkInfoEntity;
 import backend.academy.scrapper.repository.dto.LinkType;
 import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.entities.StackOverflowInfoEntity;
 import integration.BaseTestcontainersTest;
 import java.util.List;
 import java.util.Optional;
@@ -144,13 +146,14 @@ public class ORMLinkRepositoryTest extends BaseTestcontainersTest {
     }
 
     private LinkEntity createTestLink(String url, LinkType type) {
-        LinkInfo info;
+        LinkInfoEntity info;
         if (type == LinkType.GITHUB) {
-            info = new LinkEntity.GithubInfo("own", "rp");
+            info = new GithubInfoEntity("own", "rp");
         } else {
-            info = new LinkEntity.StackOverflowInfo(5L);
+            info = new StackOverflowInfoEntity(5L);
         }
         LinkEntity link = new LinkEntity();
+        info.setLink(link);
         link.setUrl(url);
         link.setLinkType(type);
         link.setLinkInfo(info);

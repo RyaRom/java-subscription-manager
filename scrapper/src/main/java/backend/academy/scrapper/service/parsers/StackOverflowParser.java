@@ -2,11 +2,12 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
-import backend.academy.scrapper.repository.entities.LinkEntity;
 import backend.academy.scrapper.repository.dto.LinkType;
+import backend.academy.scrapper.repository.dto.stackOverflow.StackOverflowFullInfo;
+import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.entities.StackOverflowInfoEntity;
 import java.time.Instant;
 import java.util.List;
-import backend.academy.scrapper.repository.entities.LinkEntity.StackOverflowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,8 @@ public class StackOverflowParser implements AbstractParser {
         if (tokens.contains("stackoverflow.com")) {
             link.setLinkType(LinkType.STACK_OVERFLOW);
             int siteIndex = tokens.indexOf("stackoverflow.com");
-            var info = new StackOverflowInfo(Long.parseLong(tokens.get(siteIndex + 2)));
+            var info = new StackOverflowInfoEntity(Long.parseLong(tokens.get(siteIndex + 2)));
+            info.setLink(link);
             link.setLinkInfo(info);
             return true;
         }
@@ -37,14 +39,25 @@ public class StackOverflowParser implements AbstractParser {
         if (link.getLinkType() != LinkType.STACK_OVERFLOW) {
             return Mono.just(false);
         }
-        if (link.getLinkInfo() instanceof StackOverflowInfo stackOverflowInfo) {
+        if (link.getLinkInfo() instanceof StackOverflowInfoEntity stackOverflowInfo) {
             return stackOverflowClient
-                .getStackOverflowNewAnswers(stackOverflowInfo.questionId(), lastUpdated)
+                .getStackOverflowNewAnswers(stackOverflowInfo.getQuestionId(), lastUpdated)
                 .flatMapMany(res -> Flux.fromIterable(res.items()))
-                .doOnNext(activity -> log.info("so update {}", activity))
+                .doOnNext(activity -> log.info("so answer update in {}", link.getLinkId()))
+                .zipWith(stackOverflowClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                    (answersResponseDto, title) ->
+                        StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Answer"))
                 .flatMap(answer -> botClient.sendUpdate(answer, link))
+                .zipWith(
+                    stackOverflowClient.getStackOverflowNewComments(stackOverflowInfo.getQuestionId(), lastUpdated)
+                        .flatMapMany(res -> Flux.fromIterable(res.items()))
+                        .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
+                        .zipWith(stackOverflowClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                            (answersResponseDto, title) ->
+                                StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Comment"))
+                        .flatMap(answer -> botClient.sendUpdate(answer, link))
+                )
                 .then(Mono.just(true));
-
         }
         throw new IllegalStateException("Parser doesn't work correctly");
     }

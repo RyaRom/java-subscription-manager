@@ -3,6 +3,7 @@ package backend.academy.scrapper.service;
 import backend.academy.scrapper.repository.LinkRepository;
 import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,17 +20,21 @@ public class UpdatePollingJob {
 
     @Scheduled(cron = "#{@updateCron}")
     public void update() {
+        //TODO: DELETE
+        lastUpdated = Instant.now().minus(10000, ChronoUnit.DAYS);
+
+
         log.info("Polling all links");
         Flux.fromIterable(linkRepository.findAll())
-                .flatMap(link -> {
-                    log.info("polling link {}", link.getUrl());
-                    return linkParsesContext.updateLink(link, lastUpdated);
-                })
-                .then()
-                .doFinally(signal -> {
-                    log.info("Polling finished");
-                    lastUpdated = Instant.now();
-                })
-                .subscribe();
+            .flatMap(link -> {
+                log.info("polling link {}", link.getUrl());
+                return linkParsesContext.updateLink(link, lastUpdated);
+            })
+            .then()
+            .doFinally(signal -> {
+                log.info("Polling finished");
+                lastUpdated = Instant.now();
+            })
+            .subscribe();
     }
 }

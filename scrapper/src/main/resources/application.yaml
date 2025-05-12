@@ -19,7 +19,7 @@ spring:
     name: Scrapper
   liquibase:
     enabled: true
-    change-log: classpath:/liquibase/master.yaml
+    change-log: classpath:/migrations/master.yaml
   jpa:
     hibernate:
       ddl-auto: validate

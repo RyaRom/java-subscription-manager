@@ -1,12 +1,8 @@
 package backend.academy.scrapper.repository.entities;
 
-import java.util.List;
-
 import backend.academy.dto.LinkResponse;
-import backend.academy.scrapper.repository.dto.LinkInfo;
 import backend.academy.scrapper.repository.dto.LinkType;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,14 +11,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @NoArgsConstructor
 @Getter
@@ -38,9 +35,9 @@ public class LinkEntity {
     @NonNull
     private String url;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private LinkInfo linkInfo;
+    @Nullable
+    @OneToOne(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LinkInfoEntity linkInfo;
 
     @NonNull
     @Enumerated(EnumType.ORDINAL)
@@ -56,13 +53,7 @@ public class LinkEntity {
 
     public List<Long> getChatIdList() {
         return chatIds.stream()
-                .map(ChatIdEntity::getChatId)
-                .toList();
-    }
-
-    public record GithubInfo(String owner, String repo) implements LinkInfo {
-    }
-
-    public record StackOverflowInfo(Long questionId) implements LinkInfo {
+            .map(ChatIdEntity::getChatId)
+            .toList();
     }
 }

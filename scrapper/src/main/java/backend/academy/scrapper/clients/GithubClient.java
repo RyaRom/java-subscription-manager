@@ -1,6 +1,6 @@
 package backend.academy.scrapper.clients;
 
-import backend.academy.scrapper.repository.dto.GithubActivity;
+import backend.academy.scrapper.repository.dto.github.GithubActivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
