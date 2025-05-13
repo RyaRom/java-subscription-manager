@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Log4j2
 public class InMemoryLinkRepository implements LinkRepository {
     private final EnvType envType;
     private final Map<Long, LinkEntity> storage = new HashMap<>();
@@ -33,8 +35,10 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public LinkEntity save(LinkEntity link) {
+        log.info("saving link {}", link.toString());
+        log.info("storage {}", storage);
         if (findByUrl(link.getUrl()).isEmpty()) {
-            return storage.put(link.getLinkId(), link);
+            return storage.put((long) link.getUrl().hashCode(), link);
         }
         return null;
     }
@@ -71,6 +75,7 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public List<LinkEntity> findWithChatId(Long chatId) {
+        log.info("getting links for chat {}, storage {}", chatId, storage);
         return findAll().stream()
             .filter(l -> l.getChatIds()
                 .stream()

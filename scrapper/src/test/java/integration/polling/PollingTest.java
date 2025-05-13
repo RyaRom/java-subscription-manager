@@ -20,7 +20,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,15 +30,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class PollingTest extends BaseIntegrationTest {
+    public static final GithubInfoEntity GITHUB_INFO_ENTITY = new GithubInfoEntity("academy-frontend",
+        "academy-frontend");
+    public static final StackOverflowInfoEntity STACK_OVERFLOW_INFO_ENTITY = new StackOverflowInfoEntity(1732348L);
     private final LinkEntity githubLink = new LinkEntity()
         .setUrl("https://github.com/academy-frontend/academy-frontend")
         .setLinkType(LinkType.GITHUB)
-        .setLinkInfo(new GithubInfoEntity("academy-frontend",
-            "academy-frontend"))
+        .setLinkInfo(GITHUB_INFO_ENTITY)
         .setChatIds(List.of(new ChatIdEntity().setChatId(1L), new ChatIdEntity().setChatId(2L)));
     private final LinkEntity soLink = new LinkEntity()
         .setUrl("https://stackoverflow.com/questions/1732348/text")
-        .setLinkInfo(new StackOverflowInfoEntity(1732348L))
+        .setLinkInfo(STACK_OVERFLOW_INFO_ENTITY)
         .setChatIds(List.of(new ChatIdEntity().setChatId(1L), new ChatIdEntity().setChatId(2L)))
         .setLinkType(LinkType.STACK_OVERFLOW);
 
@@ -60,6 +61,9 @@ public class PollingTest extends BaseIntegrationTest {
         when(stackOverflowClient.getStackOverflowNewAnswers(any(), any())).thenReturn(Mono.empty());
         when(botClient.sendUpdate(any(GithubFullInfo.class), any())).thenReturn(Mono.empty());
         when(botClient.sendUpdate(any(StackOverflowFullInfo.class), any())).thenReturn(Mono.empty());
+
+        GITHUB_INFO_ENTITY.setLink(githubLink);
+        STACK_OVERFLOW_INFO_ENTITY.setLink(soLink);
     }
 
     @AfterEach
@@ -83,13 +87,13 @@ public class PollingTest extends BaseIntegrationTest {
         var response = new StackResponseForUpdatesDto(List.of(new StackResponseForUpdatesDto.StackAnswersResponseDto(
             Instant.ofEpochMilli(123),
             new StackResponseForUpdatesDto.StackAnswersResponseDto.Owner("Name"),
-            "body", "link")));
+            "body")));
         when(stackOverflowClient.getStackOverflowNewAnswers(eq(1732348L), any()))
             .thenReturn(Mono.just(response));
         linkRepository.save(soLink);
         updatePollingJob.update();
 
         verify(botClient, times(1))
-            .sendUpdate(any(StackOverflowFullInfo.class), soLink);
+            .sendUpdate(any(StackOverflowFullInfo.class), eq(soLink));
     }
 }

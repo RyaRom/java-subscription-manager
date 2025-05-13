@@ -1,31 +1,23 @@
 package integration;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.ScrapperApplication;
-import backend.academy.scrapper.repository.InMemoryLinkRepository;
 import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.ORMLinkRepository;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 @EnableAutoConfiguration
-@SpringBootTest(classes = ScrapperApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 @ContextConfiguration(classes = BaseIntegrationTest.TestConfig.class)
-public class BaseIntegrationTest {
+public class BaseIntegrationTest extends BaseTestcontainersTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     protected WebTestClient webTestClient;
-
-    @LocalServerPort
-    protected int port;
 
     protected String apiUrl;
 
@@ -46,8 +38,8 @@ public class BaseIntegrationTest {
     @TestConfiguration
     static class TestConfig {
         @Bean
-        public LinkRepository linkRepository() {
-            return new InMemoryLinkRepository(EnvType.TEST);
+        public LinkRepository linkRepository(SessionFactory sessionFactory) {
+            return new ORMLinkRepository(EnvType.TEST, sessionFactory);
         }
     }
 }

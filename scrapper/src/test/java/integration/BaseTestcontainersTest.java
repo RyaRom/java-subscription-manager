@@ -12,6 +12,7 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,10 +22,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-@SpringBootTest(classes = ScrapperApplication.class)
+@SpringBootTest(classes = ScrapperApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("testing")
 public class BaseTestcontainersTest {
-
     @Container
     protected static PostgreSQLContainer<?> postgresContainer =
         new PostgreSQLContainer<>("postgres:17-alpine")
@@ -34,6 +34,8 @@ public class BaseTestcontainersTest {
             .withUsername("postgres")
             .withPassword("test")
             .withReuse(true);
+    @LocalServerPort
+    protected int port;
 
     @DynamicPropertySource
     static void registerDynamicProperties(DynamicPropertyRegistry registry) {

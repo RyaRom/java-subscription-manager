@@ -39,6 +39,6 @@ public class BotMiddlewareTest extends BaseIntegrationTest {
 
         verify(telegramAPI, times(1)).sendMessage(1L, "Can't connect to internal server");
         verify(telegramAPI, times(1))
-                .sendMessage(1L, "Link is not supported incorrect or duplicated. Your links: /list");
+                .sendMessage(1L, "Link is incorrect. Your links: /list");
     }
 }

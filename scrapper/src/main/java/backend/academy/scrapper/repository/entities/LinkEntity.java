@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 @Setter
 @EqualsAndHashCode(exclude = "linkId")
 @Table(name = "link")
+@ToString
 @Entity
 public class LinkEntity {
     @Id
