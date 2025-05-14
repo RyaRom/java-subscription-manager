@@ -9,12 +9,14 @@ public record StackResponseForUpdatesDto(
 ) {
     public record StackAnswersResponseDto(
         @JsonProperty("creation_date") Instant creationDate,
-        @JsonProperty("owner") Owner owner,
-        @JsonProperty("body_markdown") String bodyMarkdown
+        @JsonProperty("body_markdown") String bodyMarkdown,
+        @JsonProperty("owner") Owner owner
     ) {
-        public record Owner(
-            @JsonProperty("display_name") String displayName
-        ) {
-        }
+    }
+
+    public record Owner(
+        @JsonProperty("display_name")
+        String displayName
+    ) {
     }
 }

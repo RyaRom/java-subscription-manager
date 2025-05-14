@@ -11,7 +11,24 @@ public record GithubFullInfo(
         GithubActivity activity
     ) {
         return new GithubFullInfo(
-            "", "", "", "", ""
+            "Activity",
+            activity.actor().login(),
+            activity.timestamp().toString(),
+            "git update",
+            activity.activityType().toString()
+        );
+    }
+
+    public static GithubFullInfo fromUpdate(
+        GithubIssueOrPrResponse githubIssueOrPrResponse,
+        String type
+    ) {
+        return new GithubFullInfo(
+            githubIssueOrPrResponse.title(),
+            githubIssueOrPrResponse.user().login(),
+            githubIssueOrPrResponse.updatedAt(),
+            githubIssueOrPrResponse.body(),
+            type
         );
     }
 }

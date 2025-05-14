@@ -6,6 +6,8 @@ import backend.academy.scrapper.repository.dto.LinkType;
 import backend.academy.scrapper.repository.dto.github.GithubFullInfo;
 import backend.academy.scrapper.repository.entities.GithubInfoEntity;
 import backend.academy.scrapper.repository.entities.LinkEntity;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -18,6 +20,8 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @RequiredArgsConstructor
 public class GithubParser implements AbstractParser {
+    private static final SimpleDateFormat DATE_FORMAT =
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
     private final GithubClient githubClient;
     private final BotClient botClient;
 
@@ -54,6 +58,37 @@ public class GithubParser implements AbstractParser {
                     .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                 .flatMap(activity ->
                     botClient.sendUpdate(GithubFullInfo.fromResponse(activity), link))
+                .mergeWith(
+                    githubClient.getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
+                        .filter(activity ->
+                        {
+                            try {
+                                return DATE_FORMAT.parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .flatMap(activity ->
+                            botClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link))
+                ).mergeWith(
+                    githubClient.getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
+                        .filter(activity ->
+                        {
+                            try {
+                                return DATE_FORMAT.parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .flatMap(activity ->
+                            botClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link))
+                )
                 .then(Mono.just(true));
         }
 

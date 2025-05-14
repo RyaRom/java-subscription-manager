@@ -86,8 +86,8 @@ public class PollingTest extends BaseIntegrationTest {
     void botUpdateTest() {
         var response = new StackResponseForUpdatesDto(List.of(new StackResponseForUpdatesDto.StackAnswersResponseDto(
             Instant.ofEpochMilli(123),
-            new StackResponseForUpdatesDto.StackAnswersResponseDto.Owner("Name"),
-            "body")));
+            "body",
+            new StackResponseForUpdatesDto.Owner("Name"))));
         when(stackOverflowClient.getStackOverflowNewAnswers(eq(1732348L), any()))
             .thenReturn(Mono.just(response));
         linkRepository.save(soLink);
