@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.entities;
+package backend.academy.scrapper.repository.links.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,10 +11,11 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stack_overflow_info")
-public class StackOverflowInfoEntity extends LinkInfoEntity {
-    private Long questionId;
+@EqualsAndHashCode(callSuper = false)
+@Table(name = "github_info")
+public class GithubInfoEntity extends LinkInfoEntity {
+    private String owner;
+    private String repo;
 }

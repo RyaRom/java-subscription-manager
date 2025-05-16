@@ -2,7 +2,7 @@ package integration.testcontainers.postgres;
 
 import backend.academy.configuration.EnvType;
 import backend.academy.scrapper.repository.links.LinkRepository;
-import backend.academy.scrapper.repository.links.ORMLinkRepository;
+import backend.academy.scrapper.repository.links.SQLLinkRepository;
 import backend.academy.scrapper.repository.links.dto.LinkType;
 import backend.academy.scrapper.repository.links.entities.GithubInfoEntity;
 import backend.academy.scrapper.repository.links.entities.LinkEntity;
@@ -11,7 +11,6 @@ import backend.academy.scrapper.repository.links.entities.StackOverflowInfoEntit
 import integration.BaseTestcontainersTest;
 import java.util.List;
 import java.util.Optional;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ContextConfiguration(classes = ORMLinkRepositoryTest.ConfigOrmRepo.class)
-public class ORMLinkRepositoryTest extends BaseTestcontainersTest {
+@ContextConfiguration(classes = SQLLinkRepositoryTest.ConfigSqlRepo.class)
+public class SQLLinkRepositoryTest extends BaseTestcontainersTest {
     @Autowired
-    private ORMLinkRepository linkRepository;
+    private SQLLinkRepository linkRepository;
 
     @BeforeEach
     void setUp() {
@@ -163,10 +162,11 @@ public class ORMLinkRepositoryTest extends BaseTestcontainersTest {
     }
 
     @Configuration
-    static class ConfigOrmRepo {
+    static class ConfigSqlRepo {
         @Bean
-        public LinkRepository linkRepository(SessionFactory sessionFactory) {
-            return new ORMLinkRepository(EnvType.TEST, sessionFactory);
+        public LinkRepository linkRepository() {
+            return new SQLLinkRepository(EnvType.TEST, postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(), postgresContainer.getPassword());
         }
     }
 }

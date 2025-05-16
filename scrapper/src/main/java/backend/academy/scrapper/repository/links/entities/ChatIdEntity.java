@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.entities;
+package backend.academy.scrapper.repository.links.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

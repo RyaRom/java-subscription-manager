@@ -1,12 +1,11 @@
 package backend.academy.scrapper.service.parsers;
 
 import backend.academy.exception.BadLinkException;
-import backend.academy.scrapper.repository.entities.ChatIdEntity;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.ChatIdEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

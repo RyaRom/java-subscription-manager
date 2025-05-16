@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.dto.stackOverflow;
+package backend.academy.scrapper.repository.links.dto.stackOverflow;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

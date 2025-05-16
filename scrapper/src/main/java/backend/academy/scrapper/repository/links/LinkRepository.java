@@ -1,6 +1,6 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.links;
 
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;

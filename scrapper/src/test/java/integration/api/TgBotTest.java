@@ -1,6 +1,6 @@
 package integration.api;
 
-import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.links.LinkRepository;
 import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

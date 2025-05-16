@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.dto.github;
+package backend.academy.scrapper.repository.links.dto.github;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

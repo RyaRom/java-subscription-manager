@@ -1,8 +1,8 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.links;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.repository.entities.ChatIdEntity;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.ChatIdEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +13,6 @@ import org.hibernate.SessionFactory;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
-@Repository
 @Log4j2
 @RequiredArgsConstructor
 public class ORMLinkRepository implements LinkRepository {

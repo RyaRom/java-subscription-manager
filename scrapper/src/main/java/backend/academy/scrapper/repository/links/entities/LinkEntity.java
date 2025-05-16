@@ -1,7 +1,7 @@
-package backend.academy.scrapper.repository.entities;
+package backend.academy.scrapper.repository.links.entities;
 
 import backend.academy.dto.LinkResponse;
-import backend.academy.scrapper.repository.dto.LinkType;
+import backend.academy.scrapper.repository.links.dto.LinkType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(exclude = "linkId")

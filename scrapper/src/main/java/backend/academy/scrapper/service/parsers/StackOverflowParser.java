@@ -2,10 +2,10 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.StackOverflowClient;
-import backend.academy.scrapper.repository.dto.LinkType;
-import backend.academy.scrapper.repository.dto.stackOverflow.StackOverflowFullInfo;
-import backend.academy.scrapper.repository.entities.LinkEntity;
-import backend.academy.scrapper.repository.entities.StackOverflowInfoEntity;
+import backend.academy.scrapper.repository.links.dto.LinkType;
+import backend.academy.scrapper.repository.links.dto.stackOverflow.StackOverflowFullInfo;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.StackOverflowInfoEntity;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

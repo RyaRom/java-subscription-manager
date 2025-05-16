@@ -1,12 +1,11 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.links.LinkRepository;
 import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;

@@ -11,14 +11,14 @@ app:
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
   data:
-    type: orm
+    type: sql
 
 
 spring:
   application:
     name: Scrapper
   liquibase:
-    enabled: true
+    enabled: false
     change-log: classpath:/migrations/master.yaml
   jpa:
     hibernate:

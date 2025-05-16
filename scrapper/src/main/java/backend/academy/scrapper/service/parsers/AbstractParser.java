@@ -1,6 +1,6 @@
 package backend.academy.scrapper.service.parsers;
 
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import java.time.Instant;
 import java.util.List;
 import reactor.core.publisher.Mono;

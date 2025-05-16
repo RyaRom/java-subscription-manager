@@ -1,8 +1,8 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.links;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.repository.entities.ChatIdEntity;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.entities.ChatIdEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 @Log4j2
 public class InMemoryLinkRepository implements LinkRepository {

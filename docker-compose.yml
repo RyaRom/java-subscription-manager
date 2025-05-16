@@ -27,10 +27,10 @@ services:
       postgres:
         condition: service_healthy
     command:
-      - --url=jdbc:postgresql://postgres_container:5430/scrapper
+      - --url=jdbc:postgresql://postgres_container:5432/web-scrapper
       - --username=${POSTGRES_USERNAME}
       - --password=${POSTGRES_PASSWORD}
-      - --changelog-file=master.xml
+      - --changelog-file=master.yaml
       - --classpath=/liquibase/changelog
       - --searchPath=/liquibase/changelog
       - update

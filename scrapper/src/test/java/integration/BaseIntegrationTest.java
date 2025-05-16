@@ -1,8 +1,8 @@
 package integration;
 
 import backend.academy.configuration.EnvType;
-import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.ORMLinkRepository;
+import backend.academy.scrapper.repository.links.LinkRepository;
+import backend.academy.scrapper.repository.links.ORMLinkRepository;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

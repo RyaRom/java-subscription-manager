@@ -2,10 +2,10 @@ package backend.academy.scrapper.service.parsers;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubClient;
-import backend.academy.scrapper.repository.dto.LinkType;
-import backend.academy.scrapper.repository.dto.github.GithubFullInfo;
-import backend.academy.scrapper.repository.entities.GithubInfoEntity;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.dto.LinkType;
+import backend.academy.scrapper.repository.links.dto.github.GithubFullInfo;
+import backend.academy.scrapper.repository.links.entities.GithubInfoEntity;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;

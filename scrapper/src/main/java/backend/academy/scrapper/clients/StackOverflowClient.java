@@ -1,8 +1,8 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
-import backend.academy.scrapper.repository.dto.stackOverflow.StackResponseForQuestionInfoDto;
-import backend.academy.scrapper.repository.dto.stackOverflow.StackResponseForUpdatesDto;
+import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
+import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

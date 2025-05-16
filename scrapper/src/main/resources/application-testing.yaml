@@ -11,7 +11,7 @@ app:
     stack-overflow-url: stack
     github-url: github
   data:
-    type: orm
+    type: sql
 
 spring:
   application:
@@ -24,9 +24,6 @@ spring:
       ddl-auto: validate
     open-in-view: false
   datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
 server:

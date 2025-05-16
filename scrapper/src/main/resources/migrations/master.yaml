@@ -1,7 +1,7 @@
 databaseChangeLog:
   - include:
-      file: classpath:migrations/changelog/v1.0-links-schema.xml
+      file: changelog/v1.0-links-schema.xml
       relativeToChangelogFile: false
   - include:
-      file: classpath:migrations/changelog/v1.1-indexes.xml
+      file: changelog/v1.1-indexes.xml
       relativeToChangelogFile: false

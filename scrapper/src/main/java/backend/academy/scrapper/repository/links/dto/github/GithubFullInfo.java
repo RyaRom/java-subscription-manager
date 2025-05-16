@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.dto.github;
+package backend.academy.scrapper.repository.links.dto.github;
 
 public record GithubFullInfo(
     String title,

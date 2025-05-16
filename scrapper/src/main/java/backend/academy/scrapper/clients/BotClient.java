@@ -1,9 +1,9 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
-import backend.academy.scrapper.repository.dto.github.GithubFullInfo;
-import backend.academy.scrapper.repository.dto.stackOverflow.StackOverflowFullInfo;
-import backend.academy.scrapper.repository.entities.LinkEntity;
+import backend.academy.scrapper.repository.links.dto.github.GithubFullInfo;
+import backend.academy.scrapper.repository.links.dto.stackOverflow.StackOverflowFullInfo;
+import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
