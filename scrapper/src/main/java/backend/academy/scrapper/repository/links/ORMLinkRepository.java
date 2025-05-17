@@ -11,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Repository;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -53,6 +52,19 @@ public class ORMLinkRepository implements LinkRepository {
                 .getResultList()
                 .stream()
                 .toList();
+        }
+    }
+
+    @Override
+    public List<LinkEntity> findAllPaginated(long lastId, int limit) {
+        try (Session session = openSession()) {
+            return session.createQuery(
+                    "SELECT l FROM LinkEntity l " +
+                        "WHERE l.linkId > :lastId " +
+                        "ORDER BY l.linkId ASC", LinkEntity.class)
+                .setParameter("lastId", lastId)
+                .setMaxResults(limit)
+                .getResultList();
         }
     }
 

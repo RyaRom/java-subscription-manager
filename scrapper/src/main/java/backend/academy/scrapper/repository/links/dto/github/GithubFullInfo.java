@@ -8,7 +8,7 @@ public record GithubFullInfo(
     String type
 ) {
     public static GithubFullInfo fromResponse(
-        GithubActivity activity
+        GithubActivityResponse activity
     ) {
         return new GithubFullInfo(
             "Activity",

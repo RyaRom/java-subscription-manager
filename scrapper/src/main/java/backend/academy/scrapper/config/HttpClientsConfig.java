@@ -19,7 +19,7 @@ public record HttpClientsConfig(
         @NotEmpty String githubUrl) {
 
     @Bean
-    public WebClient githubHttpClient() {
+    public WebClient githubWebClient() {
         var builder = WebClient.builder()
                 .baseUrl(githubUrl)
                 .defaultHeader(GITHUB_API_VERSION, "2022-11-28")
@@ -31,13 +31,13 @@ public record HttpClientsConfig(
     }
 
     @Bean
-    public WebClient stackOverflowHttpClient() {
+    public WebClient stackOverflowWebClient() {
         var builder = WebClient.builder().baseUrl(stackOverflowUrl);
         return builder.build();
     }
 
     @Bean
-    public WebClient botHttpClient() {
+    public WebClient botWebClient() {
         return WebClient.builder()
                 .baseUrl(botUrl)
                 .defaultHeader("Content-Type", "application/json")

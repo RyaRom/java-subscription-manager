@@ -1,7 +1,7 @@
 package backend.academy.scrapper;
 
-import backend.academy.scrapper.config.HttpClientsConfig;
 import backend.academy.scrapper.config.DatabaseConfig;
+import backend.academy.scrapper.config.HttpClientsConfig;
 import backend.academy.scrapper.config.ScrapperConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

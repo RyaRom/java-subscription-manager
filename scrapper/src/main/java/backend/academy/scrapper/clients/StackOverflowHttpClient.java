@@ -14,13 +14,13 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class StackOverflowClient {
-    private final WebClient stackOverflowHttpClient;
+public class StackOverflowHttpClient {
+    private final WebClient stackOverflowWebClient;
 
     private final StackOverflowCredentials credentials;
 
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
-        var builder = stackOverflowHttpClient.get();
+        var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
                 UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
                 basicQueriesFromDate(building, fromDate, true);
@@ -32,7 +32,7 @@ public class StackOverflowClient {
     }
 
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
-        var builder = stackOverflowHttpClient.get();
+        var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
                 UriBuilder building = uriBuilder.path("/questions/{questionId}/comments");
                 basicQueriesFromDate(building, fromDate, false);
@@ -44,7 +44,7 @@ public class StackOverflowClient {
     }
 
     public Mono<String> getQuestionTitle(Long questionId) {
-        var builder = stackOverflowHttpClient.get();
+        var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
                 UriBuilder building = uriBuilder.path("/questions/{questionId}");
                 basicQueries(building);

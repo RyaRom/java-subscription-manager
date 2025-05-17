@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service.parsers;
 
-import backend.academy.scrapper.clients.BotClient;
-import backend.academy.scrapper.clients.GithubClient;
+import backend.academy.scrapper.clients.BotHttpClient;
+import backend.academy.scrapper.clients.GithubHttpClient;
 import backend.academy.scrapper.repository.links.dto.LinkType;
 import backend.academy.scrapper.repository.links.dto.github.GithubFullInfo;
 import backend.academy.scrapper.repository.links.entities.GithubInfoEntity;
@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -22,8 +23,8 @@ import reactor.core.publisher.Mono;
 public class GithubParser implements AbstractParser {
     private static final SimpleDateFormat DATE_FORMAT =
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
-    private final GithubClient githubClient;
-    private final BotClient botClient;
+    private final GithubHttpClient githubHttpClient;
+    private final BotHttpClient botHttpClient;
 
     @Override
     public boolean parse(LinkEntity link, List<String> tokens) {
@@ -44,7 +45,7 @@ public class GithubParser implements AbstractParser {
             return Mono.just(false);
         }
         if (link.getLinkInfo() instanceof GithubInfoEntity githubInfo) {
-            return githubClient
+            var activities = githubHttpClient
                 .getRepoActivities(
                     githubInfo.getOwner(), githubInfo.getRepo())
                 .doOnNext(activity -> {
@@ -57,38 +58,37 @@ public class GithubParser implements AbstractParser {
                     .atOffset(ZoneOffset.UTC)
                     .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
                 .flatMap(activity ->
-                    botClient.sendUpdate(GithubFullInfo.fromResponse(activity), link))
-                .mergeWith(
-                    githubClient.getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
-                        .filter(activity ->
-                        {
-                            try {
-                                return DATE_FORMAT.parse(activity.updatedAt())
-                                    .toInstant()
-                                    .atOffset(ZoneOffset.UTC)
-                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .flatMap(activity ->
-                            botClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link))
-                ).mergeWith(
-                    githubClient.getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
-                        .filter(activity ->
-                        {
-                            try {
-                                return DATE_FORMAT.parse(activity.updatedAt())
-                                    .toInstant()
-                                    .atOffset(ZoneOffset.UTC)
-                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .flatMap(activity ->
-                            botClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link))
-                )
+                    botHttpClient.sendUpdate(GithubFullInfo.fromResponse(activity), link));
+            var issues = githubHttpClient.getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
+                .filter(activity ->
+                {
+                    try {
+                        return DATE_FORMAT.parse(activity.updatedAt())
+                            .toInstant()
+                            .atOffset(ZoneOffset.UTC)
+                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .flatMap(activity ->
+                    botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
+            var pulls = githubHttpClient.getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
+                .filter(activity ->
+                {
+                    try {
+                        return DATE_FORMAT.parse(activity.updatedAt())
+                            .toInstant()
+                            .atOffset(ZoneOffset.UTC)
+                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .flatMap(activity ->
+                    botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link));
+
+            return Flux.merge(activities, issues, pulls)
                 .then(Mono.just(true));
         }
 

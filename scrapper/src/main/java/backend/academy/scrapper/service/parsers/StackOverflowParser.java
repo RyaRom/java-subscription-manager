@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service.parsers;
 
-import backend.academy.scrapper.clients.BotClient;
-import backend.academy.scrapper.clients.StackOverflowClient;
+import backend.academy.scrapper.clients.BotHttpClient;
+import backend.academy.scrapper.clients.StackOverflowHttpClient;
 import backend.academy.scrapper.repository.links.dto.LinkType;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackOverflowFullInfo;
 import backend.academy.scrapper.repository.links.entities.LinkEntity;
@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @RequiredArgsConstructor
 public class StackOverflowParser implements AbstractParser {
-    private final StackOverflowClient stackOverflowClient;
-    private final BotClient botClient;
+    private final StackOverflowHttpClient stackOverflowHttpClient;
+    private final BotHttpClient botHttpClient;
 
     @Override
     public boolean parse(LinkEntity link, List<String> tokens) {
@@ -40,23 +40,25 @@ public class StackOverflowParser implements AbstractParser {
             return Mono.just(false);
         }
         if (link.getLinkInfo() instanceof StackOverflowInfoEntity stackOverflowInfo) {
-            return stackOverflowClient
+            var answers = stackOverflowHttpClient
                 .getStackOverflowNewAnswers(stackOverflowInfo.getQuestionId(), lastUpdated)
                 .flatMapMany(res -> Flux.fromIterable(res.items()))
                 .doOnNext(activity -> log.info("so answer update in {}", link.getLinkId()))
-                .zipWith(stackOverflowClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                .zipWith(stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
                     (answersResponseDto, title) ->
                         StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Answer"))
-                .flatMap(answer -> botClient.sendUpdate(answer, link))
-                .zipWith(
-                    stackOverflowClient.getStackOverflowNewComments(stackOverflowInfo.getQuestionId(), lastUpdated)
-                        .flatMapMany(res -> Flux.fromIterable(res.items()))
-                        .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
-                        .zipWith(stackOverflowClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
-                            (answersResponseDto, title) ->
-                                StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Comment"))
-                        .flatMap(answer -> botClient.sendUpdate(answer, link))
-                )
+                .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
+
+            var comments = stackOverflowHttpClient.getStackOverflowNewComments(stackOverflowInfo.getQuestionId(),
+                    lastUpdated)
+                .flatMapMany(res -> Flux.fromIterable(res.items()))
+                .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
+                .zipWith(stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                    (answersResponseDto, title) ->
+                        StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Comment"))
+                .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
+
+            return Flux.merge(answers, comments)
                 .then(Mono.just(true));
         }
         throw new IllegalStateException("Parser doesn't work correctly");

@@ -33,6 +33,11 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
+    public List<LinkEntity> findAllPaginated(long lastId, int limit) {
+        return List.of();
+    }
+
+    @Override
     public LinkEntity save(LinkEntity link) {
         log.info("saving link {}", link.toString());
         log.info("storage {}", storage);

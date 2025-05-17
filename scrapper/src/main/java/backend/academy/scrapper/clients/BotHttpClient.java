@@ -15,8 +15,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Log4j2
 @SuppressWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-public class BotClient {
-    private final WebClient botHttpClient;
+public class BotHttpClient {
+    private final WebClient botWebClient;
 
     public static String getGithubUpdate(GithubFullInfo info) {
         return String.format("""
@@ -44,7 +44,7 @@ public class BotClient {
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
-        return botHttpClient
+        return botWebClient
             .post()
             .uri("/updates")
             .body(BodyInserters.fromValue(linkUpdate))

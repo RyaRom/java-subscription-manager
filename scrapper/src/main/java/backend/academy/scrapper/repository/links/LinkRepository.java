@@ -12,6 +12,8 @@ public interface LinkRepository {
 
     List<LinkEntity> findAll();
 
+    List<LinkEntity> findAllPaginated(long lastId, int limit);
+
     @Nullable
     LinkEntity save(LinkEntity link);
 

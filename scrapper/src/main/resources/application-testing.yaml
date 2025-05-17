@@ -12,6 +12,7 @@ app:
     github-url: github
   data:
     type: sql
+  links-pagesize: 1
 
 spring:
   application:

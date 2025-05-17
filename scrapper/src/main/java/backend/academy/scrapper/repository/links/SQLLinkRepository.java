@@ -144,6 +144,31 @@ public class SQLLinkRepository implements LinkRepository {
     }
 
     @Override
+    public List<LinkEntity> findAllPaginated(long lastId, int limit) {
+        String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
+            + "FROM link l "
+            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
+            + "WHERE l.link_id > ? ORDER BY l.link_id ASC "
+            + "LIMIT ?";
+        List<LinkEntity> links = new ArrayList<>();
+        try (var connection = openConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setLong(1, lastId);
+                statement.setInt(2, limit);
+                ResultSet rs = statement.executeQuery();
+                while (rs.next()) {
+                    links.add(mapLinkEntity(rs));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error fetching all links", e);
+            return List.of();
+        }
+        return links;
+    }
+
+    @Override
     public @Nullable LinkEntity save(LinkEntity link) {
         String insertLink = "INSERT INTO link (url, link_type) VALUES (?, ?)";
         String insertChat = "INSERT INTO chat (link_id, chat_id) VALUES (?, ?)";
