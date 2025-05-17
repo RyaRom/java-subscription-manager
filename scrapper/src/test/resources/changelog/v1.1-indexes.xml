@@ -4,4 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="link-url-index" author="riabirom">
+        <sql>CREATE INDEX link_url_hash ON link USING HASH (url)</sql>
+        <rollback>
+            <sql>
+                DROP INDEX IF EXISTS link_url_hash;
+            </sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
