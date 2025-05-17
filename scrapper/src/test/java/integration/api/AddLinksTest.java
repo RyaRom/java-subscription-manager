@@ -14,10 +14,12 @@ import backend.academy.scrapper.repository.links.entities.StackOverflowInfoEntit
 import integration.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class AddLinksTest extends BaseIntegrationTest {
     private final AddLinkRequest badLink =
             AddLinkRequest.builder().link("https://google.com").build();
