@@ -21,8 +21,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @RequiredArgsConstructor
 public class GithubParser implements AbstractParser {
-    private static final SimpleDateFormat DATE_FORMAT =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
     private final GithubHttpClient githubHttpClient;
     private final BotHttpClient botHttpClient;
 
@@ -46,50 +45,47 @@ public class GithubParser implements AbstractParser {
         }
         if (link.getLinkInfo() instanceof GithubInfoEntity githubInfo) {
             var activities = githubHttpClient
-                .getRepoActivities(
-                    githubInfo.getOwner(), githubInfo.getRepo())
-                .doOnNext(activity -> {
-                    log.info("activity {}", activity);
-                    log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
-                    log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
-                })
-                .filter(activity -> activity.timestamp()
-                    .toInstant()
-                    .atOffset(ZoneOffset.UTC)
-                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-                .flatMap(activity ->
-                    botHttpClient.sendUpdate(GithubFullInfo.fromResponse(activity), link));
-            var issues = githubHttpClient.getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
-                .filter(activity ->
-                {
-                    try {
-                        return DATE_FORMAT.parse(activity.updatedAt())
+                    .getRepoActivities(githubInfo.getOwner(), githubInfo.getRepo())
+                    .doOnNext(activity -> {
+                        log.info("activity {}", activity);
+                        log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
+                        log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
+                    })
+                    .filter(activity -> activity.timestamp()
                             .toInstant()
                             .atOffset(ZoneOffset.UTC)
-                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .flatMap(activity ->
-                    botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
-            var pulls = githubHttpClient.getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
-                .filter(activity ->
-                {
-                    try {
-                        return DATE_FORMAT.parse(activity.updatedAt())
-                            .toInstant()
-                            .atOffset(ZoneOffset.UTC)
-                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .flatMap(activity ->
-                    botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link));
+                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                    .flatMap(activity -> botHttpClient.sendUpdate(GithubFullInfo.fromResponse(activity), link));
+            var issues = githubHttpClient
+                    .getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
+                    .filter(activity -> {
+                        try {
+                            return DATE_FORMAT
+                                    .parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .flatMap(activity -> botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
+            var pulls = githubHttpClient
+                    .getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
+                    .filter(activity -> {
+                        try {
+                            return DATE_FORMAT
+                                    .parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .flatMap(activity -> botHttpClient.sendUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link));
 
-            return Flux.merge(activities, issues, pulls)
-                .then(Mono.just(true));
+            return Flux.merge(activities, issues, pulls).then(Mono.just(true));
         }
 
         throw new IllegalStateException("Parser doesn't work correctly");

@@ -65,7 +65,7 @@
         <spotbugs-maven-plugin.version>4.8.6.6</spotbugs-maven-plugin.version>
         <findsecbugs.version>LATEST</findsecbugs.version>
         <spotbugs-slf4j.version>1.5.0</spotbugs-slf4j.version>
-        <ecs-logging-java.version>1.6.0 </ecs-logging-java.version>
+        <ecs-logging-java.version>1.6.0</ecs-logging-java.version>
     </properties>
 
     <dependencyManagement>

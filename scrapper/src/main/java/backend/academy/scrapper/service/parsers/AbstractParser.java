@@ -10,8 +10,6 @@ public interface AbstractParser {
 
     Mono<Boolean> update(LinkEntity link, Instant lastUpdated);
 
-    /**
-     * if order in chain matters
-     */
+    /** if order in chain matters */
     int getOrder();
 }

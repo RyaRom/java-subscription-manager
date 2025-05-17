@@ -18,21 +18,15 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Profile({"dev"})
 @ConfigurationProperties(prefix = "app.data", ignoreUnknownFields = false)
-@Import({
-    AdminController.class
-})
+@Import({AdminController.class})
 public record DatabaseConfig(@NotEmpty String type) {
     @Bean
     public LinkRepository linkRepository(
-        EnvType envType,
-        SessionFactory sessionFactory,
-        @Value("${spring.datasource.url}")
-        String url,
-        @Value("${spring.datasource.username}")
-        String username,
-        @Value("${spring.datasource.password}")
-        String password
-    ) {
+            EnvType envType,
+            SessionFactory sessionFactory,
+            @Value("${spring.datasource.url}") String url,
+            @Value("${spring.datasource.username}") String username,
+            @Value("${spring.datasource.password}") String password) {
         if (type.equalsIgnoreCase("orm")) {
             return new ORMLinkRepository(envType, sessionFactory);
         }

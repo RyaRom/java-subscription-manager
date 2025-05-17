@@ -26,14 +26,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("testing")
 public class BaseTestcontainersTest {
     @Container
-    protected static PostgreSQLContainer<?> postgresContainer =
-        new PostgreSQLContainer<>("postgres:17-alpine")
+    protected static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:17-alpine")
             .waitingFor(Wait.forListeningPort())
             .withExposedPorts(5432)
             .withDatabaseName("local")
             .withUsername("postgres")
             .withPassword("test")
             .withReuse(true);
+
     @LocalServerPort
     protected int port;
 
@@ -48,18 +48,11 @@ public class BaseTestcontainersTest {
     @BeforeAll
     static void liquibase() {
         try (Connection connection = DriverManager.getConnection(
-            postgresContainer.getJdbcUrl(),
-            postgresContainer.getUsername(),
-            postgresContainer.getPassword()
-        )) {
-            Database database = DatabaseFactory.getInstance()
-                .findCorrectDatabaseImplementation(new JdbcConnection(connection));
+                postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword())) {
+            Database database =
+                    DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
 
-            Liquibase liquibase = new Liquibase(
-                "master-test.yaml",
-                new ClassLoaderResourceAccessor(),
-                database
-            );
+            Liquibase liquibase = new Liquibase("master-test.yaml", new ClassLoaderResourceAccessor(), database);
 
             liquibase.update();
             connection.commit();
@@ -69,4 +62,3 @@ public class BaseTestcontainersTest {
         }
     }
 }
-

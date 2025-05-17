@@ -22,59 +22,58 @@ public class StackOverflowHttpClient {
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
-                UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
-                basicQueriesFromDate(building, fromDate, true);
-                addCredentials(building);
-                return building.build(questionId);
-            })
-            .retrieve()
-            .bodyToMono(StackResponseForUpdatesDto.class);
+                    UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
+                    basicQueriesFromDate(building, fromDate, true);
+                    addCredentials(building);
+                    return building.build(questionId);
+                })
+                .retrieve()
+                .bodyToMono(StackResponseForUpdatesDto.class);
     }
 
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
-                UriBuilder building = uriBuilder.path("/questions/{questionId}/comments");
-                basicQueriesFromDate(building, fromDate, false);
-                addCredentials(building);
-                return building.build(questionId);
-            })
-            .retrieve()
-            .bodyToMono(StackResponseForUpdatesDto.class);
+                    UriBuilder building = uriBuilder.path("/questions/{questionId}/comments");
+                    basicQueriesFromDate(building, fromDate, false);
+                    addCredentials(building);
+                    return building.build(questionId);
+                })
+                .retrieve()
+                .bodyToMono(StackResponseForUpdatesDto.class);
     }
 
     public Mono<String> getQuestionTitle(Long questionId) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
-                UriBuilder building = uriBuilder.path("/questions/{questionId}");
-                basicQueries(building);
-                addCredentials(building);
-                return building.build(questionId);
-            })
-            .retrieve()
-            .bodyToMono(StackResponseForQuestionInfoDto.class)
-            .map(it -> {
-                var items = it.items();
-                if (items.isEmpty()) {
-                    log.error("QuestionId {} doesn't have real question", questionId);
-                    throw new IllegalStateException("Question is broken: " + questionId);
-                }
-                return items.getFirst().title();
-            });
+                    UriBuilder building = uriBuilder.path("/questions/{questionId}");
+                    basicQueries(building);
+                    addCredentials(building);
+                    return building.build(questionId);
+                })
+                .retrieve()
+                .bodyToMono(StackResponseForQuestionInfoDto.class)
+                .map(it -> {
+                    var items = it.items();
+                    if (items.isEmpty()) {
+                        log.error("QuestionId {} doesn't have real question", questionId);
+                        throw new IllegalStateException("Question is broken: " + questionId);
+                    }
+                    return items.getFirst().title();
+                });
     }
 
     private void addCredentials(UriBuilder builder) {
         if (!credentials.tokenDisabled()) {
-            builder.queryParam("key", credentials.key())
-                .queryParam("access_token", credentials.accessToken());
+            builder.queryParam("key", credentials.key()).queryParam("access_token", credentials.accessToken());
         }
     }
 
     private void basicQueriesFromDate(UriBuilder builder, Instant fromDate, boolean withSort) {
         builder.queryParam("site", "stackoverflow")
-            .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
-            .queryParam("order", "desc")
-            .queryParam("filter", "!6WPIompfyuc1r");
+                .queryParam("fromdate", fromDate.toEpochMilli() / 1000)
+                .queryParam("order", "desc")
+                .queryParam("filter", "!6WPIompfyuc1r");
         if (withSort) {
             builder.queryParam("sort", "activity");
         }
@@ -82,8 +81,8 @@ public class StackOverflowHttpClient {
 
     private void basicQueries(UriBuilder builder) {
         builder.queryParam("sort", "activity")
-            .queryParam("site", "stackoverflow")
-            .queryParam("order", "desc")
-            .queryParam("filter", "!6WPIompfyuc1r");
+                .queryParam("site", "stackoverflow")
+                .queryParam("order", "desc")
+                .queryParam("filter", "!6WPIompfyuc1r");
     }
 }

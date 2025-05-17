@@ -23,28 +23,27 @@ public class LinksService {
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         return Mono.fromCallable(() -> {
             var links = linkRepository.findWithChatId(chatId).stream()
-                .map(LinkEntity::toLinkResponse)
-                .toList();
+                    .map(LinkEntity::toLinkResponse)
+                    .toList();
             return new ListLinkResponse(links, links.size());
         });
     }
 
     public Mono<LinkResponse> addLink(Long chatId, AddLinkRequest request) {
         var savedLink = linkRepository
-            .findByUrl(request.getLink())
-            .map(link -> {
-                if (link.getChatIds().stream()
-                    .anyMatch(it -> it.getChatId().equals(chatId))) {
-                    throw new LinkDuplicatedException("Link already exists");
-                }
-                linkRepository.addChatId(link.getLinkId(), chatId);
-                return link;
-            })
-            .orElseGet(() -> {
-                LinkEntity link = linkContext.generateLink(request.getLink(), chatId);
-                linkRepository.save(link);
-                return link;
-            });
+                .findByUrl(request.getLink())
+                .map(link -> {
+                    if (link.getChatIds().stream().anyMatch(it -> it.getChatId().equals(chatId))) {
+                        throw new LinkDuplicatedException("Link already exists");
+                    }
+                    linkRepository.addChatId(link.getLinkId(), chatId);
+                    return link;
+                })
+                .orElseGet(() -> {
+                    LinkEntity link = linkContext.generateLink(request.getLink(), chatId);
+                    linkRepository.save(link);
+                    return link;
+                });
 
         return Mono.just(savedLink.toLinkResponse());
     }
@@ -52,7 +51,7 @@ public class LinksService {
     public Mono<LinkResponse> removeLink(String link) {
         log.info("Remove link {}", link);
         var deletedLink =
-            linkRepository.deleteByUrl(link).orElseThrow(() -> new ResourceNotFoundException("not found" + link));
+                linkRepository.deleteByUrl(link).orElseThrow(() -> new ResourceNotFoundException("not found" + link));
         return Mono.just(deletedLink.toLinkResponse());
     }
 }

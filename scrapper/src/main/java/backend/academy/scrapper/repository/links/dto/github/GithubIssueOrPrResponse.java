@@ -3,14 +3,6 @@ package backend.academy.scrapper.repository.links.dto.github;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record GithubIssueOrPrResponse(
-    String title,
-    String body,
-    @JsonProperty("updated_at")
-    String updatedAt,
-    User user
-) {
-    public record User(
-        String login
-    ) {
-    }
+        String title, String body, @JsonProperty("updated_at") String updatedAt, User user) {
+    public record User(String login) {}
 }

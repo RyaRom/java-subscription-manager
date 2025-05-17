@@ -56,8 +56,6 @@ public class LinkEntity {
     }
 
     public List<Long> getChatIdList() {
-        return chatIds.stream()
-            .map(ChatIdEntity::getChatId)
-            .toList();
+        return chatIds.stream().map(ChatIdEntity::getChatId).toList();
     }
 }

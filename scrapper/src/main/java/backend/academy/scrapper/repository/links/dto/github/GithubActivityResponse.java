@@ -7,9 +7,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public record GithubActivityResponse(
-    OffsetDateTime timestamp,
-    @JsonProperty("activity_type") ActivityType activityType,
-    Actor actor) {
+        OffsetDateTime timestamp, @JsonProperty("activity_type") ActivityType activityType, Actor actor) {
     public enum ActivityType {
         PUSH("push"),
         FORCE_PUSH("force_push"),
@@ -42,8 +40,5 @@ public record GithubActivityResponse(
         }
     }
 
-    public record Actor(
-        String login
-    ) {
-    }
+    public record Actor(String login) {}
 }

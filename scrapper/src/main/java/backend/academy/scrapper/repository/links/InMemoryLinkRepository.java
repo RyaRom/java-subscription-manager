@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -61,12 +60,12 @@ public class InMemoryLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> deleteByUrl(String url) {
         return findAll().stream()
-            .filter(l -> l.getUrl().equals(url))
-            .findFirst()
-            .map(it -> {
-                storage.remove(it.getLinkId());
-                return it;
-            });
+                .filter(l -> l.getUrl().equals(url))
+                .findFirst()
+                .map(it -> {
+                    storage.remove(it.getLinkId());
+                    return it;
+                });
     }
 
     @Override
@@ -81,9 +80,7 @@ public class InMemoryLinkRepository implements LinkRepository {
     public List<LinkEntity> findWithChatId(Long chatId) {
         log.info("getting links for chat {}, storage {}", chatId, storage);
         return findAll().stream()
-            .filter(l -> l.getChatIds()
-                .stream()
-                .anyMatch(c -> c.getChatId().equals(chatId)))
-            .toList();
+                .filter(l -> l.getChatIds().stream().anyMatch(c -> c.getChatId().equals(chatId)))
+                .toList();
     }
 }

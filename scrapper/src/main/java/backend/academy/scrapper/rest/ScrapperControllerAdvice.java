@@ -27,24 +27,24 @@ public class ScrapperControllerAdvice {
     public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequestExceptions(Exception e) {
         log.debug("Bad request error: {}", e.getMessage());
         return Mono.just(ResponseEntity.badRequest()
-            .body(ApiErrorResponse.builder()
-                .code("400")
-                .description(e.getMessage())
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .build()));
+                .body(ApiErrorResponse.builder()
+                        .code("400")
+                        .description(e.getMessage())
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public Mono<ResponseEntity<ApiErrorResponse>> notFoundLinkException(ResourceNotFoundException e) {
         log.debug(e.getMessage());
         return Mono.just(ResponseEntity.status(404)
-            .body(ApiErrorResponse.builder()
-                .code("404")
-                .description(e.getMessage())
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .build()));
+                .body(ApiErrorResponse.builder()
+                        .code("404")
+                        .description(e.getMessage())
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -52,14 +52,14 @@ public class ScrapperControllerAdvice {
         log.error(e.getMessage());
         e.printStackTrace();
         return Mono.just(ResponseEntity.internalServerError()
-            .body(ApiErrorResponse.builder()
-                .code("500")
-                .description(e.getMessage())
-                .exceptionName(e.getClass().getName())
-                .stackTrace(Stream.of(e.getStackTrace())
-                    .map(StackTraceElement::toString)
-                    .toList())
-                .exceptionMessage(e.getMessage())
-                .build()));
+                .body(ApiErrorResponse.builder()
+                        .code("500")
+                        .description(e.getMessage())
+                        .exceptionName(e.getClass().getName())
+                        .stackTrace(Stream.of(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
     }
 }

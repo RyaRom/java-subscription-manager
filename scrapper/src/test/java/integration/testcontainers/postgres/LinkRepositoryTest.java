@@ -1,5 +1,10 @@
 package integration.testcontainers.postgres;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.repository.links.LinkRepository;
 import backend.academy.scrapper.repository.links.dto.LinkType;
 import backend.academy.scrapper.repository.links.entities.GithubInfoEntity;
@@ -12,14 +17,10 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
 
-    abstract protected LinkRepository getLinkRepository();
+    protected abstract LinkRepository getLinkRepository();
 
     @BeforeEach
     void setUp() {
@@ -121,8 +122,8 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
     @Test
     void saveAll_persistsMultipleLinksWithDifferentTypes() {
         LinkEntity githubLink = createTestLink("https://github.com/repo1", LinkType.GITHUB);
-        LinkEntity stackoverflowLink = createTestLink("https://stackoverflow.com/questions/123",
-            LinkType.STACK_OVERFLOW);
+        LinkEntity stackoverflowLink =
+                createTestLink("https://stackoverflow.com/questions/123", LinkType.STACK_OVERFLOW);
 
         getLinkRepository().saveAll(List.of(githubLink, stackoverflowLink));
 
@@ -135,32 +136,27 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
     @Test
     void findAllPaginated_returnsCorrectPagesInOrder() {
         List<LinkEntity> savedLinks = IntStream.rangeClosed(1, 5)
-            .mapToObj(i -> createTestLink("https://github.com/repo" + i))
-            .map(getLinkRepository()::save)
-            .toList();
+                .mapToObj(i -> createTestLink("https://github.com/repo" + i))
+                .map(getLinkRepository()::save)
+                .toList();
 
-        List<Long> expectedIds = savedLinks.stream()
-            .map(LinkEntity::getLinkId)
-            .sorted()
-            .toList();
+        List<Long> expectedIds =
+                savedLinks.stream().map(LinkEntity::getLinkId).sorted().toList();
 
         List<LinkEntity> page1 = getLinkRepository().findAllPaginated(0, 2);
         assertThat(page1)
-            .hasSize(2)
-            .extracting(LinkEntity::getLinkId)
-            .containsExactly(expectedIds.get(0), expectedIds.get(1));
+                .hasSize(2)
+                .extracting(LinkEntity::getLinkId)
+                .containsExactly(expectedIds.get(0), expectedIds.get(1));
 
         List<LinkEntity> page2 = getLinkRepository().findAllPaginated(expectedIds.get(1), 2);
         assertThat(page2)
-            .hasSize(2)
-            .extracting(LinkEntity::getLinkId)
-            .containsExactly(expectedIds.get(2), expectedIds.get(3));
+                .hasSize(2)
+                .extracting(LinkEntity::getLinkId)
+                .containsExactly(expectedIds.get(2), expectedIds.get(3));
 
         List<LinkEntity> page3 = getLinkRepository().findAllPaginated(expectedIds.get(3), 2);
-        assertThat(page3)
-            .hasSize(1)
-            .extracting(LinkEntity::getLinkId)
-            .containsExactly(expectedIds.get(4));
+        assertThat(page3).hasSize(1).extracting(LinkEntity::getLinkId).containsExactly(expectedIds.get(4));
 
         List<LinkEntity> page4 = getLinkRepository().findAllPaginated(expectedIds.get(4), 2);
         assertThat(page4).isEmpty();
@@ -178,10 +174,9 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         getLinkRepository().save(createTestLink("https://github.com/repo1"));
         getLinkRepository().save(createTestLink("https://github.com/repo2"));
 
-        List<Long> resultIds = getLinkRepository().findAllPaginated(0, 3)
-            .stream()
-            .map(LinkEntity::getLinkId)
-            .toList();
+        List<Long> resultIds = getLinkRepository().findAllPaginated(0, 3).stream()
+                .map(LinkEntity::getLinkId)
+                .toList();
 
         assertThat(resultIds).isSorted();
     }

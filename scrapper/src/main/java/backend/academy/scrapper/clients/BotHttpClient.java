@@ -19,38 +19,32 @@ public class BotHttpClient {
     private final WebClient botWebClient;
 
     public static String getGithubUpdate(GithubFullInfo info) {
-        return String.format("""
+        return String.format(
+                """
                 New Github update (%s): %s
                 User: %s
                 Text: %s""",
-            info.type(),
-            info.title(),
-            info.username(),
-            info.body()
-        );
+                info.type(), info.title(), info.username(), info.body());
     }
 
     public static String getStackAnswerUpdate(StackOverflowFullInfo info) {
-        return String.format("""
+        return String.format(
+                """
                 New Stack overflow %s
                 Question: %s
                 User: %s
                 Text: %s""",
-            info.type(),
-            info.questionTitle(),
-            info.username(),
-            info.body()
-        );
+                info.type(), info.questionTitle(), info.username(), info.body());
     }
 
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return botWebClient
-            .post()
-            .uri("/updates")
-            .body(BodyInserters.fromValue(linkUpdate))
-            .retrieve()
-            .toBodilessEntity()
-            .then();
+                .post()
+                .uri("/updates")
+                .body(BodyInserters.fromValue(linkUpdate))
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 
     public Mono<Void> sendUpdate(GithubFullInfo githubActivity, LinkEntity link) {
@@ -58,11 +52,11 @@ public class BotHttpClient {
             log.warn("Unknown type in github update {}", githubActivity);
         }
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.getLinkId())
-            .url(link.getUrl())
-            .tgChatIds(link.getChatIdList())
-            .description(getGithubUpdate(githubActivity))
-            .build();
+                .linkId(link.getLinkId())
+                .url(link.getUrl())
+                .tgChatIds(link.getChatIdList())
+                .description(getGithubUpdate(githubActivity))
+                .build();
         return sendUpdate(linkUpdate);
     }
 
@@ -71,11 +65,11 @@ public class BotHttpClient {
             log.warn("Unknown type in stack update {}", answer);
         }
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.getLinkId())
-            .url(link.getUrl())
-            .tgChatIds(link.getChatIdList())
-            .description(getStackAnswerUpdate(answer))
-            .build();
+                .linkId(link.getLinkId())
+                .url(link.getUrl())
+                .tgChatIds(link.getChatIdList())
+                .description(getStackAnswerUpdate(answer))
+                .build();
         return sendUpdate(linkUpdate);
     }
 }

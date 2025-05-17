@@ -22,8 +22,11 @@ public class SQLLinkRepositoryTest extends LinkRepositoryTest {
     static class ConfigSqlRepo {
         @Bean
         public LinkRepository linkRepository() {
-            return new SQLLinkRepository(EnvType.TEST, postgresContainer.getJdbcUrl(),
-                postgresContainer.getUsername(), postgresContainer.getPassword());
+            return new SQLLinkRepository(
+                    EnvType.TEST,
+                    postgresContainer.getJdbcUrl(),
+                    postgresContainer.getUsername(),
+                    postgresContainer.getPassword());
         }
     }
 }

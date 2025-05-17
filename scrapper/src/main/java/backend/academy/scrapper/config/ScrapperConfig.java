@@ -27,23 +27,19 @@ public record ScrapperConfig(@Nullable StackOverflowCredentials stackOverflow, @
         return updateCron;
     }
 
-
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .activateDefaultTyping(
-                BasicPolymorphicTypeValidator.builder()
-                    .allowIfSubType("com.yourpackage")
-                    .build(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-            )
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+                .registerModule(new JavaTimeModule())
+                .activateDefaultTyping(
+                        BasicPolymorphicTypeValidator.builder()
+                                .allowIfSubType("com.yourpackage")
+                                .build(),
+                        ObjectMapper.DefaultTyping.NON_FINAL,
+                        JsonTypeInfo.As.PROPERTY)
+                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
-
 
     public record StackOverflowCredentials(
-        @Nullable String key, @Nullable String accessToken, @NotEmpty Boolean tokenDisabled) {
-    }
+            @Nullable String key, @Nullable String accessToken, @NotEmpty Boolean tokenDisabled) {}
 }

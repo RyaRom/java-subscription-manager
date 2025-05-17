@@ -41,25 +41,26 @@ public class StackOverflowParser implements AbstractParser {
         }
         if (link.getLinkInfo() instanceof StackOverflowInfoEntity stackOverflowInfo) {
             var answers = stackOverflowHttpClient
-                .getStackOverflowNewAnswers(stackOverflowInfo.getQuestionId(), lastUpdated)
-                .flatMapMany(res -> Flux.fromIterable(res.items()))
-                .doOnNext(activity -> log.info("so answer update in {}", link.getLinkId()))
-                .zipWith(stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
-                    (answersResponseDto, title) ->
-                        StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Answer"))
-                .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
+                    .getStackOverflowNewAnswers(stackOverflowInfo.getQuestionId(), lastUpdated)
+                    .flatMapMany(res -> Flux.fromIterable(res.items()))
+                    .doOnNext(activity -> log.info("so answer update in {}", link.getLinkId()))
+                    .zipWith(
+                            stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                            (answersResponseDto, title) ->
+                                    StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Answer"))
+                    .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
 
-            var comments = stackOverflowHttpClient.getStackOverflowNewComments(stackOverflowInfo.getQuestionId(),
-                    lastUpdated)
-                .flatMapMany(res -> Flux.fromIterable(res.items()))
-                .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
-                .zipWith(stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
-                    (answersResponseDto, title) ->
-                        StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Comment"))
-                .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
+            var comments = stackOverflowHttpClient
+                    .getStackOverflowNewComments(stackOverflowInfo.getQuestionId(), lastUpdated)
+                    .flatMapMany(res -> Flux.fromIterable(res.items()))
+                    .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
+                    .zipWith(
+                            stackOverflowHttpClient.getQuestionTitle(stackOverflowInfo.getQuestionId()),
+                            (answersResponseDto, title) ->
+                                    StackOverflowFullInfo.fromResponse(answersResponseDto, title, "Comment"))
+                    .flatMap(answer -> botHttpClient.sendUpdate(answer, link));
 
-            return Flux.merge(answers, comments)
-                .then(Mono.just(true));
+            return Flux.merge(answers, comments).then(Mono.just(true));
         }
         throw new IllegalStateException("Parser doesn't work correctly");
     }

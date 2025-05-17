@@ -25,8 +25,7 @@ public class ORMLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> findById(Long linkId) {
         try (Session session = openSession()) {
-            return Optional.ofNullable(session.get(LinkEntity.class,
-                linkId));
+            return Optional.ofNullable(session.get(LinkEntity.class, linkId));
         } catch (NoResultException e) {
             return Optional.empty();
         }
@@ -35,9 +34,7 @@ public class ORMLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> findByUrl(String url) {
         try (Session session = openSession()) {
-            return Optional.of(
-                session.createQuery("from LinkEntity link where link.url = :url",
-                        LinkEntity.class)
+            return Optional.of(session.createQuery("from LinkEntity link where link.url = :url", LinkEntity.class)
                     .setParameter("url", url)
                     .getSingleResult());
         } catch (NoResultException e) {
@@ -48,10 +45,8 @@ public class ORMLinkRepository implements LinkRepository {
     @Override
     public List<LinkEntity> findAll() {
         try (Session session = openSession()) {
-            return session.createQuery("from LinkEntity", LinkEntity.class)
-                .getResultList()
-                .stream()
-                .toList();
+            return session.createQuery("from LinkEntity", LinkEntity.class).getResultList().stream()
+                    .toList();
         }
     }
 
@@ -59,12 +54,11 @@ public class ORMLinkRepository implements LinkRepository {
     public List<LinkEntity> findAllPaginated(long lastId, int limit) {
         try (Session session = openSession()) {
             return session.createQuery(
-                    "SELECT l FROM LinkEntity l " +
-                        "WHERE l.linkId > :lastId " +
-                        "ORDER BY l.linkId ASC", LinkEntity.class)
-                .setParameter("lastId", lastId)
-                .setMaxResults(limit)
-                .getResultList();
+                            "SELECT l FROM LinkEntity l " + "WHERE l.linkId > :lastId " + "ORDER BY l.linkId ASC",
+                            LinkEntity.class)
+                    .setParameter("lastId", lastId)
+                    .setMaxResults(limit)
+                    .getResultList();
         }
     }
 
@@ -91,9 +85,7 @@ public class ORMLinkRepository implements LinkRepository {
         try (Session session = openSession()) {
             try {
                 session.getTransaction().begin();
-                var link =
-                    Optional.ofNullable(session.get(LinkEntity.class,
-                        linkId));
+                var link = Optional.ofNullable(session.get(LinkEntity.class, linkId));
                 link.ifPresent(it -> {
                     var newChat = new ChatIdEntity(chatId, it);
                     session.persist(newChat);
@@ -124,10 +116,9 @@ public class ORMLinkRepository implements LinkRepository {
         try (Session session = openSession()) {
             try {
                 session.beginTransaction();
-                var deleted = session.createQuery("from LinkEntity where url = :url",
-                        LinkEntity.class)
-                    .setParameter("url", url)
-                    .getSingleResult();
+                var deleted = session.createQuery("from LinkEntity where url = :url", LinkEntity.class)
+                        .setParameter("url", url)
+                        .getSingleResult();
                 session.remove(deleted);
                 session.getTransaction().commit();
                 return Optional.of(deleted);
@@ -148,8 +139,7 @@ public class ORMLinkRepository implements LinkRepository {
                     return;
                 }
                 session.beginTransaction();
-                session.createNativeQuery("TRUNCATE TABLE link CASCADE")
-                    .executeUpdate();
+                session.createNativeQuery("TRUNCATE TABLE link CASCADE").executeUpdate();
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
@@ -161,11 +151,10 @@ public class ORMLinkRepository implements LinkRepository {
     public List<LinkEntity> findWithChatId(Long chatId) {
         try (Session session = openSession()) {
             return session.createQuery(
-                    "SELECT DISTINCT l FROM LinkEntity l JOIN l.chatIds c WHERE c.chatId = :chatId",
-                    LinkEntity.class
-                )
-                .setParameter("chatId", chatId)
-                .getResultList();
+                            "SELECT DISTINCT l FROM LinkEntity l JOIN l.chatIds c WHERE c.chatId = :chatId",
+                            LinkEntity.class)
+                    .setParameter("chatId", chatId)
+                    .getResultList();
         }
     }
 }

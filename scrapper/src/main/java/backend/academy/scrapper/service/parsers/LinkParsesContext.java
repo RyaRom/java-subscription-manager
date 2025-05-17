@@ -41,9 +41,9 @@ public class LinkParsesContext {
     public Mono<Void> updateLink(LinkEntity link, Instant lastUpdated) {
         log.info("polling link {}", link.getUrl());
         Mono<Boolean> wasUpdated = Flux.fromIterable(parserChain)
-            .concatMap(it -> it.update(link, lastUpdated))
-            .takeUntil(s -> s)
-            .last(false);
+                .concatMap(it -> it.update(link, lastUpdated))
+                .takeUntil(s -> s)
+                .last(false);
 
         return wasUpdated.handle((result, sink) -> {
             if (!result) {

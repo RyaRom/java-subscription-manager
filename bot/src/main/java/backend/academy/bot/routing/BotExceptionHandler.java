@@ -32,14 +32,12 @@ public class BotExceptionHandler {
     @ExceptionHandler(BadLinkException.class)
     public Mono<Void> badLink(BadLinkException e, Update update) {
         log.error("In badLink {}. update = {}", e, update);
-        return telegramAPI.sendMessageAsync(
-                update.message(), "Link is incorrect. Your links: /list");
+        return telegramAPI.sendMessageAsync(update.message(), "Link is incorrect. Your links: /list");
     }
 
     @ExceptionHandler(LinkDuplicatedException.class)
     public Mono<Void> duplicatedLink(LinkDuplicatedException e, Update update) {
         log.error("In duplicatedLink {}. update = {}", e, update);
-        return telegramAPI.sendMessageAsync(
-                update.message(), "Link already exist. Your links: /list");
+        return telegramAPI.sendMessageAsync(update.message(), "Link already exist. Your links: /list");
     }
 }
