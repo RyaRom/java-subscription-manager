@@ -4,7 +4,6 @@ import backend.academy.scrapper.repository.links.LinkRepository;
 import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
