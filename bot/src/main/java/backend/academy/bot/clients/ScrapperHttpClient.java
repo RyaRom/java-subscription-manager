@@ -23,16 +23,16 @@ import reactor.core.scheduler.Schedulers;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-public class ScrapperClient {
-    private final WebClient scrapperHttpClient;
+public class ScrapperHttpClient {
+    private final WebClient scrapperWebClient;
 
     public Mono<Void> registerChat(Long chatId) {
-        var result = scrapperHttpClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
+        var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
     public Mono<ListLinkResponse> getLinks(Long chatId) {
-        var result = scrapperHttpClient
+        var result = scrapperWebClient
                 .get()
                 .uri("/links")
                 .header(TG_CHAT_ID, chatId.toString())
@@ -41,7 +41,7 @@ public class ScrapperClient {
     }
 
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
-        var result = scrapperHttpClient
+        var result = scrapperWebClient
                 .post()
                 .uri("/links")
                 .header(TG_CHAT_ID, chatId.toString())
@@ -51,7 +51,7 @@ public class ScrapperClient {
     }
 
     public Mono<Void> removeLink(Long chatId, String link) {
-        var result = scrapperHttpClient
+        var result = scrapperWebClient
                 // body in delete is not allowed by default
                 .method(HttpMethod.DELETE)
                 .uri("/links")
@@ -70,7 +70,7 @@ public class ScrapperClient {
                         .flatMap(body -> Mono.error(new RuntimeException("Server error: " + body))))
                 .onStatus(
                         code -> code.equals(HttpStatusCode.valueOf(400)),
-                        response -> response.bodyToMono(ApiErrorResponse.class).flatMap(ScrapperClient::map400Error));
+                        response -> response.bodyToMono(ApiErrorResponse.class).flatMap(ScrapperHttpClient::map400Error));
     }
 
     private static @NotNull Mono<Throwable> map400Error(ApiErrorResponse body) {

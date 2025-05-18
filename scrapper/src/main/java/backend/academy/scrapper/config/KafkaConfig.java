@@ -25,6 +25,16 @@ public record KafkaConfig(
                 .build();
     }
 
+    @Bean
+    public NewTopic linkUpdatesDLTTopic() {
+        var topic = kafkaTopics.get("link-updates-DLT");
+        return TopicBuilder.name(topic.name)
+                .partitions(topic.partitions)
+                .replicas(topic.replicas)
+                .configs(topic.config)
+                .build();
+    }
+
     @lombok.Value
     public static class Topic {
         String name;

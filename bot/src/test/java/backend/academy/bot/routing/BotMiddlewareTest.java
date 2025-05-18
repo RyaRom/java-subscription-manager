@@ -3,7 +3,7 @@ package backend.academy.bot.routing;
 import static org.mockito.Mockito.*;
 
 import backend.academy.bot.BaseIntegrationTest;
-import backend.academy.bot.clients.ScrapperClient;
+import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.exception.BadLinkException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,14 +17,14 @@ import reactor.core.publisher.Mono;
 
 public class BotMiddlewareTest extends BaseIntegrationTest {
     @MockitoBean
-    private ScrapperClient scrapperClient;
+    private ScrapperHttpClient scrapperHttpClient;
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        when(scrapperClient.registerChat(anyLong()))
+        when(scrapperHttpClient.registerChat(anyLong()))
                 .thenReturn(Mono.error(new WebClientRequestException(
                         new Throwable(), HttpMethod.DELETE, new URI("127.0.0.1"), HttpHeaders.EMPTY)));
-        when(scrapperClient.getLinks(anyLong())).thenReturn(Mono.error(new BadLinkException("")));
+        when(scrapperHttpClient.getLinks(anyLong())).thenReturn(Mono.error(new BadLinkException("")));
     }
 
     @Test

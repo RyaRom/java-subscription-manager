@@ -22,7 +22,7 @@ public record BotClientsConfig(@NotEmpty String scrapperUrl) {
     }
 
     @Bean
-    public WebClient botHttpClient(String telegramToken) {
+    public WebClient scrapperWebClient(String telegramToken) {
         return WebClient.builder()
                 .baseUrl("https://api.telegram.org/bot" + telegramToken)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

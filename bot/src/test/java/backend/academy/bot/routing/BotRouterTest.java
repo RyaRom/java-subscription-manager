@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import backend.academy.bot.BaseIntegrationTest;
 import backend.academy.bot.BotKeyboards;
-import backend.academy.bot.clients.ScrapperClient;
+import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.rest.BotController;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.LinkUpdate;
@@ -28,7 +28,7 @@ class BotRouterTest extends BaseIntegrationTest {
     private String helpMessage;
 
     @MockitoBean
-    private ScrapperClient scrapperClient;
+    private ScrapperHttpClient scrapperHttpClient;
 
     @Autowired
     private BotController botController;
@@ -66,10 +66,10 @@ class BotRouterTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        when(scrapperClient.getLinks(any())).thenReturn(Mono.just(getTestLinksData()));
-        when(scrapperClient.addLink(anyLong(), any())).thenReturn(Mono.empty());
-        when(scrapperClient.registerChat(anyLong())).thenReturn(Mono.empty());
-        when(scrapperClient.removeLink(anyLong(), anyString())).thenReturn(Mono.empty());
+        when(scrapperHttpClient.getLinks(any())).thenReturn(Mono.just(getTestLinksData()));
+        when(scrapperHttpClient.addLink(anyLong(), any())).thenReturn(Mono.empty());
+        when(scrapperHttpClient.registerChat(anyLong())).thenReturn(Mono.empty());
+        when(scrapperHttpClient.removeLink(anyLong(), anyString())).thenReturn(Mono.empty());
     }
 
     @Test
@@ -105,10 +105,10 @@ class BotRouterTest extends BaseIntegrationTest {
         verify(telegramAPI, times(1)).sendMessage(1L, "Unsubscribed");
         verify(telegramAPI, times(1)).sendMessage(1L, "Incorrect url, try again");
         verify(telegramAPI, times(1)).sendMessage(1L, "Your input is not supported. Try /help");
-        verify(scrapperClient, times(1)).removeLink(1L, link.message().text());
-        verify(scrapperClient, times(1)).registerChat(1L);
-        verify(scrapperClient, times(1)).getLinks(1L);
-        verify(scrapperClient, times(1)).addLink(eq(1L), any());
+        verify(scrapperHttpClient, times(1)).removeLink(1L, link.message().text());
+        verify(scrapperHttpClient, times(1)).registerChat(1L);
+        verify(scrapperHttpClient, times(1)).getLinks(1L);
+        verify(scrapperHttpClient, times(1)).addLink(eq(1L), any());
     }
 
     @Test

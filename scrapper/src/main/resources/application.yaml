@@ -44,6 +44,9 @@ spring:
       link-updates:
         name: link-updates
         partitions: 1
+      link-updates-DLT:
+        name: link-updates-dlt
+        partitions: 1
 
 server:
   port: 8081
