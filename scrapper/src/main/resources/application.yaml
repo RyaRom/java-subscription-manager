@@ -10,6 +10,7 @@ app:
     github-token: ${GITHUB_TOKEN}
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
+    bot-client-type: kafka
   data:
     type: sql
   links-pagesize: 30
@@ -34,6 +35,15 @@ spring:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: localhost:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    kafka-topics:
+      link-updates:
+        name: link-updates
+        partitions: 1
 
 server:
   port: 8081

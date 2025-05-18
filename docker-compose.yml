@@ -22,7 +22,7 @@ services:
 
   liquibase-migrations:
     container_name: migrations
-    image: liquibase/liquibase:4.29
+    image: liquibase/liquibase:latest
     depends_on:
       postgres:
         condition: service_healthy
@@ -38,7 +38,12 @@ services:
       - ./scrapper/src/main/resources/migrations:/liquibase/changelog
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.4
+    image: confluentinc/cp-zookeeper:latest
+    healthcheck:
+      test: [ "CMD", "nc", "-vz", "localhost", "2181" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -49,11 +54,17 @@ services:
       - zookeeper-log:/var/lib/zookeeper/log
 
   kafka:
-    image: confluentinc/cp-kafka:7.4.4
+    image: confluentinc/cp-kafka:latest
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
       - 29092:29092
+    healthcheck:
+      test: [ "CMD", "nc", "-vz", "localhost", "29092" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -63,6 +74,22 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - kafka-data:/var/lib/kafka/data
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    container_name: kafka-ui
+    ports:
+      - 8090:8080
+    restart: always
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    links:
+      - kafka
+      - zookeeper
 
 
 volumes:

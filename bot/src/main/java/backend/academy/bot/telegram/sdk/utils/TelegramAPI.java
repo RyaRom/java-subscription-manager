@@ -1,5 +1,6 @@
 package backend.academy.bot.telegram.sdk.utils;
 
+import backend.academy.dto.LinkUpdate;
 import backend.academy.exception.TelegramServerError;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
@@ -8,6 +9,7 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.time.Duration;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -30,6 +32,10 @@ public class TelegramAPI {
 
     public Flux<Void> sendMessagesAsync(Flux<Long> chatIds, String text) {
         return chatIds.flatMap(chatId -> sendMessageAsyncWithRetry(chatId, text, 10));
+    }
+
+    public Flux<Void> sendMessagesAsync(LinkUpdate linkUpdate) {
+        return sendMessagesAsync(Flux.fromIterable(linkUpdate.tgChatIds()), getUpdateInfo(linkUpdate));
     }
 
     public Mono<Void> sendMessageAsync(Long chatId, String text) {
@@ -70,5 +76,9 @@ public class TelegramAPI {
         SendMessage request =
                 new SendMessage(chatId, text).parseMode(ParseMode.HTML).replyMarkup(keyboard);
         telegramBot.execute(request);
+    }
+
+    public static @NotNull String getUpdateInfo(LinkUpdate linkUpdate) {
+        return "Update in %s\n\n%s".formatted(linkUpdate.url(), linkUpdate.description());
     }
 }

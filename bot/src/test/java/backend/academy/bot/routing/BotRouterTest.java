@@ -1,6 +1,6 @@
 package backend.academy.bot.routing;
 
-import static backend.academy.bot.rest.BotController.getUpdateInfo;
+import static backend.academy.bot.telegram.sdk.utils.TelegramAPI.getUpdateInfo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;

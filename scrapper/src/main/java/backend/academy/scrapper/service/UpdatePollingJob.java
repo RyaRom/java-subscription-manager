@@ -4,6 +4,7 @@ import backend.academy.scrapper.repository.links.LinkRepository;
 import backend.academy.scrapper.repository.links.entities.LinkEntity;
 import backend.academy.scrapper.service.parsers.LinkParsesContext;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +26,7 @@ public class UpdatePollingJob {
 
     @Scheduled(cron = "#{@updateCron}")
     public void update() {
+        lastUpdated = Instant.now().minus(100000, ChronoUnit.DAYS);
         log.info("Polling all links");
         Flux.generate(() -> -1L, (lastId, sink) -> {
                     List<LinkEntity> page = linkRepository.findAllPaginated(lastId, pageSize);
