@@ -21,7 +21,7 @@ public record ClientsConfig(
     @NotEmpty String botUrl,
     @NotEmpty String stackOverflowUrl,
     @NotEmpty String githubUrl,
-    @Nullable String botClientType
+    @Nullable String clientType
 ) {
 
     @Bean
@@ -55,12 +55,12 @@ public record ClientsConfig(
         WebClient botWebClient,
         KafkaTemplate<Object, Object> kafkaTemplate
     ) throws ConfigurationException {
-        if (botClientType == null || botClientType.equalsIgnoreCase("http")) {
+        if (clientType == null || clientType.equalsIgnoreCase("http")) {
             return new BotHttpClient(botWebClient);
-        } else if (botClientType.equalsIgnoreCase("kafka")) {
+        } else if (clientType.equalsIgnoreCase("kafka")) {
             return new BotKafkaClient(kafkaTemplate);
         } else {
-            throw new ConfigurationException("Unknown client type " + botClientType);
+            throw new ConfigurationException("Unknown client type " + clientType);
         }
     }
 }

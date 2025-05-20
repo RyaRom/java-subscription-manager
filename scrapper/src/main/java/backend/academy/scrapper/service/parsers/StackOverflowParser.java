@@ -43,6 +43,10 @@ public class StackOverflowParser implements AbstractParser {
         if (link.getLinkInfo() instanceof StackOverflowInfoEntity stackOverflowInfo) {
             var answers = stackOverflowHttpClient
                 .getStackOverflowNewAnswers(stackOverflowInfo.getQuestionId(), lastUpdated)
+                .onErrorResume(it -> {
+                    log.error("Error while getting stackoverflow answers", it);
+                    return Mono.empty();
+                })
                 .flatMapMany(res -> Flux.fromIterable(res.items()))
                 .doOnNext(activity -> log.info("so answer update in {}", link.getLinkId()))
                 .zipWith(
@@ -53,6 +57,10 @@ public class StackOverflowParser implements AbstractParser {
 
             var comments = stackOverflowHttpClient
                 .getStackOverflowNewComments(stackOverflowInfo.getQuestionId(), lastUpdated)
+                .onErrorResume(it -> {
+                    log.error("Error while getting stackoverflow comments", it);
+                    return Mono.empty();
+                })
                 .flatMapMany(res -> Flux.fromIterable(res.items()))
                 .doOnNext(activity -> log.info("so comment update in {}", link.getLinkId()))
                 .zipWith(

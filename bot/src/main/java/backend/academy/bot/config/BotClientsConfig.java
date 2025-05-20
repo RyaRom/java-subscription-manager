@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @ConfigurationProperties(prefix = "app.clients", ignoreUnknownFields = false)
 public record BotClientsConfig(@NotEmpty String scrapperUrl) {
     @Bean
-    public WebClient scrapperHttpClient() {
+    public WebClient scrapperWebClient() {
         return WebClient.builder()
                 .baseUrl(scrapperUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -22,7 +22,7 @@ public record BotClientsConfig(@NotEmpty String scrapperUrl) {
     }
 
     @Bean
-    public WebClient scrapperWebClient(String telegramToken) {
+    public WebClient botHttpClient(String telegramToken) {
         return WebClient.builder()
                 .baseUrl("https://api.telegram.org/bot" + telegramToken)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

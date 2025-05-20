@@ -26,7 +26,7 @@ public class UpdatePollingJob {
 
     @Scheduled(cron = "#{@updateCron}")
     public void update() {
-        lastUpdated = Instant.now().minus(100000, ChronoUnit.DAYS);
+        lastUpdated = Instant.now().minus(10000, ChronoUnit.DAYS);
         log.info("Polling all links");
         Flux.generate(() -> -1L, (lastId, sink) -> {
                     List<LinkEntity> page = linkRepository.findAllPaginated(lastId, pageSize);

@@ -2,7 +2,9 @@ package backend.academy.scrapper.config;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import jakarta.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,34 +14,50 @@ import org.springframework.kafka.config.TopicBuilder;
 @Log4j2
 @ConfigurationProperties(prefix = "spring.kafka")
 public record KafkaConfig(
-        Map<String, Topic> kafkaTopics
+    Map<String, Topic> kafkaTopics
 ) {
 
     @Bean
     public NewTopic linkUpdatesTopic() {
         var topic = kafkaTopics.get("link-updates");
-        return TopicBuilder.name(topic.name)
-                .partitions(topic.partitions)
-                .replicas(topic.replicas)
-                .configs(topic.config)
-                .build();
+        return TopicBuilder.name(topic.getName())
+            .partitions(topic.getPartitions())
+            .replicas(topic.getReplicas())
+            .configs(topic.getConfig())
+            .build();
     }
 
     @Bean
-    public NewTopic linkUpdatesDLTTopic() {
-        var topic = kafkaTopics.get("link-updates-DLT");
-        return TopicBuilder.name(topic.name)
-                .partitions(topic.partitions)
-                .replicas(topic.replicas)
-                .configs(topic.config)
-                .build();
+    public NewTopic linkUpdatesDLQTopic() {
+        var topic = kafkaTopics.get("dlq");
+        return TopicBuilder.name(topic.getName())
+            .partitions(topic.getPartitions())
+            .replicas(topic.getReplicas())
+            .configs(topic.getConfig())
+            .build();
     }
 
-    @lombok.Value
+    @Getter
+    @Setter
     public static class Topic {
-        String name;
-        int partitions = 1;
-        short replicas = 1;
-        Map<String, String> config = new HashMap<>();
+        private String name;
+        @Nullable
+        private Integer partitions;
+        @Nullable
+        private Integer replicas;
+        @Nullable
+        private Map<String, String> config;
+
+        public int getPartitions() {
+            return partitions == null ? 1 : partitions;
+        }
+
+        public int getReplicas() {
+            return replicas == null ? 1 : replicas;
+        }
+
+        public Map<String, String> getConfig() {
+            return config == null ? new HashMap<>() : config;
+        }
     }
 }

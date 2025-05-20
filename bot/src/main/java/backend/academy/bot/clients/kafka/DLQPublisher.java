@@ -9,10 +9,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class DLQPublisher {
     private final KafkaTemplate<Object, Object> kafkaTemplate;
-    @Value("spring.kafka.dql")
+    @Value("${spring.kafka.kafka-topics-names.dlq}")
     private String dlq;
 
     public void sendError(Throwable e) {
-        kafkaTemplate.send(dlq, e);
+        kafkaTemplate.send(dlq, new ExceptionMessage(
+            e.getMessage(),
+            e.getClass(),
+            e.getCause().getClass()
+        ));
+    }
+
+    private record ExceptionMessage(
+        String message,
+        Class<? extends Throwable> type,
+        Class<? extends Throwable> cause
+    ) {
     }
 }

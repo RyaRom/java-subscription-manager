@@ -10,7 +10,7 @@ app:
     github-token: ${GITHUB_TOKEN}
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
-    bot-client-type: kafka
+    client-type: kafka
   data:
     type: sql
   links-pagesize: 30
@@ -40,12 +40,20 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
     kafka-topics:
       link-updates:
         name: link-updates
-        partitions: 1
-      link-updates-DLT:
-        name: link-updates-dlt
+        partitions: 3
+      dlq:
+        name: dlq
         partitions: 1
 
 server:

@@ -47,6 +47,10 @@ public class GithubParser implements AbstractParser {
         if (link.getLinkInfo() instanceof GithubInfoEntity githubInfo) {
             var activities = githubHttpClient
                 .getRepoActivities(githubInfo.getOwner(), githubInfo.getRepo())
+                .onErrorResume(it ->{
+                    log.error("Error while getting github activities", it);
+                    return Mono.empty();
+                })
                 .doOnNext(activity -> {
                     log.info("activity {}", activity);
                     log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
@@ -59,6 +63,10 @@ public class GithubParser implements AbstractParser {
                 .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromResponse(activity), link));
             var issues = githubHttpClient
                 .getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
+                .onErrorResume(it -> {
+                    log.error("Error while getting github issues", it);
+                    return Mono.empty();
+                })
                 .filter(activity -> {
                     try {
                         return DATE_FORMAT
@@ -73,6 +81,10 @@ public class GithubParser implements AbstractParser {
                 .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
             var pulls = githubHttpClient
                 .getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
+                .onErrorResume(it -> {
+                    log.error("Error while getting github pulls", it);
+                    return Mono.empty();
+                })
                 .filter(activity -> {
                     try {
                         return DATE_FORMAT
