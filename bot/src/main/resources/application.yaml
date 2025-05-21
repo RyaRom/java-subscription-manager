@@ -16,7 +16,8 @@ app:
     telegram-token: ${TELEGRAM_TOKEN}
   clients:
     scrapper-url: http://localhost:8081/scrapper/api
-
+  data:
+    redis: ${REDIS_URL}
 
 spring:
   application:

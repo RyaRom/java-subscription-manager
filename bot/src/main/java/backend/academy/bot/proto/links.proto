@@ -1,0 +1,14 @@
+syntax = "proto3";
+package backend.academy.proto.impl;
+
+message LinkProto {
+    int64 linkId = 1;
+    string url = 2;
+    repeated string tags = 3;
+    repeated string filters = 4;
+}
+
+message ListLinksProto {
+    repeated LinkProto links = 1;
+}
+

@@ -14,23 +14,24 @@ import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@Component
 @RequiredArgsConstructor
 @Log4j2
-public class ScrapperHttpClient {
+public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     private final WebClient scrapperWebClient;
 
+
+    @Override
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
+    @Override
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
                 .get()
@@ -40,6 +41,7 @@ public class ScrapperHttpClient {
         return handleErrorsDefault(result).bodyToMono(ListLinkResponse.class).publishOn(Schedulers.boundedElastic());
     }
 
+    @Override
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         var result = scrapperWebClient
                 .post()
@@ -50,6 +52,7 @@ public class ScrapperHttpClient {
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
+    @Override
     public Mono<Void> removeLink(Long chatId, String link) {
         var result = scrapperWebClient
                 // body in delete is not allowed by default
