@@ -90,6 +90,14 @@ services:
     links:
       - kafka
       - zookeeper
+  redis:
+    image: "redis:latest"
+    restart: always
+    command: redis-server --save 20 1
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
 
 
 volumes:
@@ -100,4 +108,6 @@ volumes:
   zookeeper-log:
     driver: local
   kafka-data:
+    driver: local
+  redis:
     driver: local
