@@ -7,11 +7,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "app.data", ignoreUnknownFields = false)
 public record DataConnectionProperties(
-    @NotEmpty String type,
-    @NotEmpty String redis,
-    Integer redisExMs,
-    Integer linksPagesize
-) {
+        @NotEmpty String type, @NotEmpty String redis, Integer redisExMs, Integer linksPagesize) {
     public DataConnectionProperties {
         if (redisExMs == null) {
             redisExMs = 60 * 60;

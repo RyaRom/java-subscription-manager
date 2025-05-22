@@ -18,27 +18,22 @@ public class DatabaseConfig {
 
     @Bean
     public LinkRepository linkRepository(
-        EnvType envType,
-        DataConnectionProperties dataConnectionProperties,
-        SessionFactory sessionFactory,
-        @Value("${spring.datasource.url}") String url,
-        @Value("${spring.datasource.username}") String username,
-        @Value("${spring.datasource.password}") String password,
-        RedisAsyncCommands<String, LinkEntities.FullLinkProto> redisAsyncCommands
-    ) {
+            EnvType envType,
+            DataConnectionProperties dataConnectionProperties,
+            SessionFactory sessionFactory,
+            @Value("${spring.datasource.url}") String url,
+            @Value("${spring.datasource.username}") String username,
+            @Value("${spring.datasource.password}") String password,
+            RedisAsyncCommands<String, LinkEntities.FullLinkProto> redisAsyncCommands) {
         if (dataConnectionProperties.type().equalsIgnoreCase("orm")) {
             return new CachedLinkRepository(
-                dataConnectionProperties,
-                redisAsyncCommands,
-                new ORMLinkRepository(envType, sessionFactory)
-            );
+                    dataConnectionProperties, redisAsyncCommands, new ORMLinkRepository(envType, sessionFactory));
         }
         if (dataConnectionProperties.type().equalsIgnoreCase("sql")) {
             return new CachedLinkRepository(
-                dataConnectionProperties,
-                redisAsyncCommands,
-                new SQLLinkRepository(envType, url, username, password)
-            );
+                    dataConnectionProperties,
+                    redisAsyncCommands,
+                    new SQLLinkRepository(envType, url, username, password));
         }
         throw new ConfigurationException("data.type should be sql or orm");
     }

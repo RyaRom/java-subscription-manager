@@ -40,20 +40,20 @@ public class TelegramAPI {
 
     public Mono<Void> sendMessageAsync(Long chatId, String text) {
         return Mono.fromCallable(() -> {
-                sendMessage(chatId, text);
-                return null;
-            })
-            .subscribeOn(Schedulers.boundedElastic())
-            .then();
+                    sendMessage(chatId, text);
+                    return null;
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     public Mono<Void> sendMessageAsyncWithRetry(Long chatId, String text, int retries) {
         return sendMessageAsync(chatId, text)
-            .retryWhen(Retry.fixedDelay(retries, Duration.ofSeconds(1)))
-            .onErrorMap(e -> {
-                log.error("Final failure after {} retries", retries, e);
-                return new TelegramServerError(e);
-            });
+                .retryWhen(Retry.fixedDelay(retries, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("Final failure after {} retries", retries, e);
+                    return new TelegramServerError(e);
+                });
     }
 
     public Mono<Void> sendMessageAsync(Message message, String text) {
@@ -62,12 +62,12 @@ public class TelegramAPI {
 
     public Mono<Void> sendMessageAsync(Message message, String text, Keyboard keyboard) {
         return Mono.fromRunnable(() -> sendMessage(message.chat().id(), text, keyboard))
-            .subscribeOn(Schedulers.boundedElastic())
-            .onErrorMap(e -> {
-                logTelegramError(e);
-                return e;
-            })
-            .then();
+                .subscribeOn(Schedulers.boundedElastic())
+                .onErrorMap(e -> {
+                    logTelegramError(e);
+                    return e;
+                })
+                .then();
     }
 
     public void sendMessage(Long chatId, String text) {
@@ -77,7 +77,7 @@ public class TelegramAPI {
 
     public void sendMessage(Long chatId, String text, Keyboard keyboard) {
         SendMessage request =
-            new SendMessage(chatId, text).parseMode(ParseMode.HTML).replyMarkup(keyboard);
+                new SendMessage(chatId, text).parseMode(ParseMode.HTML).replyMarkup(keyboard);
         telegramBot.execute(request);
     }
 

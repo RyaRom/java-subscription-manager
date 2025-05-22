@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 public class BotKafkaClient implements BotClient {
     @Value("${spring.kafka.kafka-topics.link-updates.name}")
     public String linkUpdatesTopic;
+
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 
     @Override

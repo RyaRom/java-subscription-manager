@@ -34,10 +34,10 @@ public class SQLLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> findById(Long linkId) {
         String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
-            + "FROM link l "
-            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
-            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
-            + "WHERE l.link_id = ?";
+                + "FROM link l "
+                + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+                + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
+                + "WHERE l.link_id = ?";
         try (var connection = openConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setLong(1, linkId);
@@ -99,10 +99,10 @@ public class SQLLinkRepository implements LinkRepository {
     @Override
     public Optional<LinkEntity> findByUrl(String url) {
         String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
-            + "FROM link l "
-            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
-            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
-            + "WHERE l.url = ?";
+                + "FROM link l "
+                + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+                + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
+                + "WHERE l.url = ?";
         try (var connection = openConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, url);
@@ -118,9 +118,9 @@ public class SQLLinkRepository implements LinkRepository {
     @Override
     public List<LinkEntity> findAll() {
         String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
-            + "FROM link l "
-            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
-            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id";
+                + "FROM link l "
+                + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+                + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id";
         List<LinkEntity> links = new ArrayList<>();
         try (var connection = openConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -139,11 +139,11 @@ public class SQLLinkRepository implements LinkRepository {
     @Override
     public List<LinkEntity> findAllPaginated(long lastId, int limit) {
         String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
-            + "FROM link l "
-            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
-            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
-            + "WHERE l.link_id > ? ORDER BY l.link_id ASC "
-            + "LIMIT ?";
+                + "FROM link l "
+                + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+                + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
+                + "WHERE l.link_id > ? ORDER BY l.link_id ASC "
+                + "LIMIT ?";
         List<LinkEntity> links = new ArrayList<>();
         try (var connection = openConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -172,11 +172,11 @@ public class SQLLinkRepository implements LinkRepository {
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             try (PreparedStatement insertLinkQuery =
-                     connection.prepareStatement(insertLink, Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement insertChatQuery = connection.prepareStatement(insertChat);
-                 PreparedStatement insertInfoQuery = connection.prepareStatement(insertInfo);
-                 PreparedStatement insertStackInfoQuery = connection.prepareStatement(insertStackInfo);
-                 PreparedStatement githubInfoQuery = connection.prepareStatement(insertGithubInfo);) {
+                            connection.prepareStatement(insertLink, Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement insertChatQuery = connection.prepareStatement(insertChat);
+                    PreparedStatement insertInfoQuery = connection.prepareStatement(insertInfo);
+                    PreparedStatement insertStackInfoQuery = connection.prepareStatement(insertStackInfo);
+                    PreparedStatement githubInfoQuery = connection.prepareStatement(insertGithubInfo); ) {
                 insertLinkQuery.setString(1, link.getUrl());
                 insertLinkQuery.setLong(2, link.getLinkType().ordinal());
                 insertLinkQuery.executeUpdate();
@@ -209,8 +209,8 @@ public class SQLLinkRepository implements LinkRepository {
     }
 
     private static void saveLinkInfo(
-        LinkEntity link, PreparedStatement githubInfoQuery, long linkId, PreparedStatement insertStackInfoQuery)
-        throws SQLException {
+            LinkEntity link, PreparedStatement githubInfoQuery, long linkId, PreparedStatement insertStackInfoQuery)
+            throws SQLException {
         switch (link.getLinkType()) {
             case GITHUB -> {
                 GithubInfoEntity githubInfo = (GithubInfoEntity) link.getLinkInfo();
@@ -267,10 +267,10 @@ public class SQLLinkRepository implements LinkRepository {
             try (var connection = openConnection()) {
                 connection.setAutoCommit(false);
                 try (PreparedStatement deleteLink = connection.prepareStatement(deleteQuery);
-                     PreparedStatement deleteChats = connection.prepareStatement(deleteChatsQuery);
-                     PreparedStatement deleteInfo = connection.prepareStatement(deleteInfoQuery);
-                     PreparedStatement deleteSo = connection.prepareStatement(deleteSoQuery);
-                     PreparedStatement deleteGh = connection.prepareStatement(deleteGhQuery);) {
+                        PreparedStatement deleteChats = connection.prepareStatement(deleteChatsQuery);
+                        PreparedStatement deleteInfo = connection.prepareStatement(deleteInfoQuery);
+                        PreparedStatement deleteSo = connection.prepareStatement(deleteSoQuery);
+                        PreparedStatement deleteGh = connection.prepareStatement(deleteGhQuery); ) {
                     deleteChats.setLong(1, link.getLinkId());
                     deleteChats.executeUpdate();
                     deleteGh.setLong(1, link.getLinkId());
@@ -323,11 +323,11 @@ public class SQLLinkRepository implements LinkRepository {
     @Override
     public List<LinkEntity> findWithChatId(Long chatId) {
         String query = "SELECT l.*, gi.owner, gi.repo, soi.question_id "
-            + "FROM link l "
-            + "JOIN chat c ON l.link_id = c.link_id "
-            + "LEFT JOIN github_info gi ON l.link_id = gi.id "
-            + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
-            + "WHERE c.chat_id = ?";
+                + "FROM link l "
+                + "JOIN chat c ON l.link_id = c.link_id "
+                + "LEFT JOIN github_info gi ON l.link_id = gi.id "
+                + "LEFT JOIN stack_overflow_info soi ON l.link_id = soi.id "
+                + "WHERE c.chat_id = ?";
 
         List<LinkEntity> links = new ArrayList<>();
         try (var connection = openConnection()) {

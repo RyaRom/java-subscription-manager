@@ -6,7 +6,6 @@ import static backend.academy.bot.telegram.sdk.filters.FilterParameter.COMMANDS;
 
 import backend.academy.bot.SubscriptionBotState;
 import backend.academy.bot.clients.ScrapperClient;
-import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.repository.UserDataCacheRepository;
 import backend.academy.bot.telegram.sdk.annotations.FilterParam;

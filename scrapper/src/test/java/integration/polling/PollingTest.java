@@ -1,5 +1,11 @@
 package integration.polling;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.GithubHttpClient;
 import backend.academy.scrapper.clients.StackOverflowHttpClient;
@@ -30,24 +36,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class PollingTest extends BaseIntegrationTest {
     public static final GithubInfoEntity GITHUB_INFO_ENTITY =
-        new GithubInfoEntity("academy-frontend", "academy-frontend");
+            new GithubInfoEntity("academy-frontend", "academy-frontend");
     public static final StackOverflowInfoEntity STACK_OVERFLOW_INFO_ENTITY = new StackOverflowInfoEntity(1732348L);
     private final LinkEntity githubLink = new LinkEntity()
-        .setUrl("https://github.com/academy-frontend/academy-frontend")
-        .setLinkType(LinkType.GITHUB)
-        .setLinkInfo(GITHUB_INFO_ENTITY);
+            .setUrl("https://github.com/academy-frontend/academy-frontend")
+            .setLinkType(LinkType.GITHUB)
+            .setLinkInfo(GITHUB_INFO_ENTITY);
     private final LinkEntity soLink = new LinkEntity()
-        .setUrl("https://stackoverflow.com/questions/1732348/text")
-        .setLinkInfo(STACK_OVERFLOW_INFO_ENTITY)
-        .setLinkType(LinkType.STACK_OVERFLOW);
+            .setUrl("https://stackoverflow.com/questions/1732348/text")
+            .setLinkInfo(STACK_OVERFLOW_INFO_ENTITY)
+            .setLinkType(LinkType.STACK_OVERFLOW);
 
     @Autowired
     private UpdatePollingJob updatePollingJob;
@@ -101,49 +102,49 @@ public class PollingTest extends BaseIntegrationTest {
     @Test
     void botUpdateTest() {
         StackResponseForUpdatesDto stackResponseForUpdatesDto =
-            new StackResponseForUpdatesDto(List.of(new StackResponseForUpdatesDto.StackAnswersResponseDto(
-                Instant.ofEpochMilli(123), "body", new StackResponseForUpdatesDto.Owner("Name"))));
+                new StackResponseForUpdatesDto(List.of(new StackResponseForUpdatesDto.StackAnswersResponseDto(
+                        Instant.ofEpochMilli(123), "body", new StackResponseForUpdatesDto.Owner("Name"))));
         GithubIssueOrPrResponse githubIssueOrPrResponse = new GithubIssueOrPrResponse(
-            "title",
-            "body",
-            OffsetDateTime.of(2100, 1, 26, 19, 6, 43, 0, ZoneOffset.UTC).toString(),
-            new GithubIssueOrPrResponse.User("user"));
+                "title",
+                "body",
+                OffsetDateTime.of(2100, 1, 26, 19, 6, 43, 0, ZoneOffset.UTC).toString(),
+                new GithubIssueOrPrResponse.User("user"));
         GithubActivityResponse githubActivityResponse = new GithubActivityResponse(
-            OffsetDateTime.of(2100, 1, 26, 19, 6, 43, 0, ZoneOffset.UTC),
-            GithubActivityResponse.ActivityType.PR_MERGE,
-            new GithubActivityResponse.Actor("user"));
+                OffsetDateTime.of(2100, 1, 26, 19, 6, 43, 0, ZoneOffset.UTC),
+                GithubActivityResponse.ActivityType.PR_MERGE,
+                new GithubActivityResponse.Actor("user"));
         StackOverflowFullInfo stackOverflowFullInfoAnswer = new StackOverflowFullInfo(
-            "Question title",
-            "Name",
-            LocalDateTime.from(Instant.ofEpochMilli(123).atZone(ZoneId.of("UTC")))
-                .format(DateTimeFormatter.BASIC_ISO_DATE),
-            "body",
-            "Answer");
+                "Question title",
+                "Name",
+                LocalDateTime.from(Instant.ofEpochMilli(123).atZone(ZoneId.of("UTC")))
+                        .format(DateTimeFormatter.BASIC_ISO_DATE),
+                "body",
+                "Answer");
         StackOverflowFullInfo stackOverflowFullInfoComments = new StackOverflowFullInfo(
-            "Question title",
-            "Name",
-            LocalDateTime.from(Instant.ofEpochMilli(123).atZone(ZoneId.of("UTC")))
-                .format(DateTimeFormatter.BASIC_ISO_DATE),
-            "body",
-            "Comment");
+                "Question title",
+                "Name",
+                LocalDateTime.from(Instant.ofEpochMilli(123).atZone(ZoneId.of("UTC")))
+                        .format(DateTimeFormatter.BASIC_ISO_DATE),
+                "body",
+                "Comment");
         GithubFullInfo githubFullInfoIssue =
-            new GithubFullInfo("title", "user", "2100-01-26T19:06:43Z", "body", "issue");
+                new GithubFullInfo("title", "user", "2100-01-26T19:06:43Z", "body", "issue");
         GithubFullInfo githubFullInfoPr = new GithubFullInfo("title", "user", "2100-01-26T19:06:43Z", "body", "pr");
 
         GithubFullInfo githubFullInfoActivity =
-            new GithubFullInfo("Activity", "user", "2100-01-26T19:06:43Z", "git update", "pr_merge");
+                new GithubFullInfo("Activity", "user", "2100-01-26T19:06:43Z", "git update", "pr_merge");
 
         when(stackOverflowHttpClient.getStackOverflowNewAnswers(eq(1732348L), any()))
-            .thenReturn(Mono.just(stackResponseForUpdatesDto));
+                .thenReturn(Mono.just(stackResponseForUpdatesDto));
         when(stackOverflowHttpClient.getStackOverflowNewComments(eq(1732348L), any()))
-            .thenReturn(Mono.just(stackResponseForUpdatesDto));
+                .thenReturn(Mono.just(stackResponseForUpdatesDto));
         when(stackOverflowHttpClient.getQuestionTitle(eq(1732348L))).thenReturn(Mono.just("Question title"));
         when(githubHttpClient.getRepoPulls(any(), any()))
-            .thenReturn(Flux.fromIterable(List.of(githubIssueOrPrResponse)));
+                .thenReturn(Flux.fromIterable(List.of(githubIssueOrPrResponse)));
         when(githubHttpClient.getRepoIssues(any(), any()))
-            .thenReturn(Flux.fromIterable(List.of(githubIssueOrPrResponse)));
+                .thenReturn(Flux.fromIterable(List.of(githubIssueOrPrResponse)));
         when(githubHttpClient.getRepoActivities(any(), any()))
-            .thenReturn(Flux.fromIterable(List.of(githubActivityResponse)));
+                .thenReturn(Flux.fromIterable(List.of(githubActivityResponse)));
         linkRepository.saveAll(List.of(soLink, githubLink));
         updatePollingJob.update();
 

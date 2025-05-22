@@ -1,5 +1,7 @@
 package backend.academy.scrapper.config;
 
+import static backend.academy.configuration.CustomHeaders.GITHUB_API_VERSION;
+
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.BotHttpClient;
 import backend.academy.scrapper.clients.BotKafkaClient;
@@ -12,24 +14,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
-import static backend.academy.configuration.CustomHeaders.GITHUB_API_VERSION;
 
 @Validated
 @ConfigurationProperties(prefix = "app.clients", ignoreUnknownFields = false)
 public record ClientsConfig(
-    @Nullable String githubToken,
-    @NotEmpty String botUrl,
-    @NotEmpty String stackOverflowUrl,
-    @NotEmpty String githubUrl,
-    @Nullable String clientType
-) {
+        @Nullable String githubToken,
+        @NotEmpty String botUrl,
+        @NotEmpty String stackOverflowUrl,
+        @NotEmpty String githubUrl,
+        @Nullable String clientType) {
 
     @Bean
     public WebClient githubWebClient() {
         var builder = WebClient.builder()
-            .baseUrl(githubUrl)
-            .defaultHeader(GITHUB_API_VERSION, "2022-11-28")
-            .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json");
+                .baseUrl(githubUrl)
+                .defaultHeader(GITHUB_API_VERSION, "2022-11-28")
+                .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json");
         if (githubToken != null) {
             builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
         }
@@ -45,16 +45,14 @@ public record ClientsConfig(
     @Bean
     public WebClient botWebClient() {
         return WebClient.builder()
-            .baseUrl(botUrl)
-            .defaultHeader("Content-Type", "application/json")
-            .build();
+                .baseUrl(botUrl)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 
     @Bean
-    public BotClient botClient(
-        WebClient botWebClient,
-        KafkaTemplate<Object, Object> kafkaTemplate
-    ) throws ConfigurationException {
+    public BotClient botClient(WebClient botWebClient, KafkaTemplate<Object, Object> kafkaTemplate)
+            throws ConfigurationException {
         if (clientType == null || clientType.equalsIgnoreCase("http")) {
             return new BotHttpClient(botWebClient);
         } else if (clientType.equalsIgnoreCase("kafka")) {

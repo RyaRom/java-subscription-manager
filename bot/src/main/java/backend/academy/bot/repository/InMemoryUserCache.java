@@ -3,7 +3,6 @@ package backend.academy.bot.repository;
 import backend.academy.bot.telegram.sdk.fsm.BotState;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 public class InMemoryUserCache implements UserDataCacheRepository {

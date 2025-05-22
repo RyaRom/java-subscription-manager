@@ -1,8 +1,8 @@
 package backend.academy.scrapper.config;
 
+import jakarta.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -13,38 +13,39 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Log4j2
 @ConfigurationProperties(prefix = "spring.kafka")
-public record KafkaConfig(
-    Map<String, Topic> kafkaTopics
-) {
+public record KafkaConfig(Map<String, Topic> kafkaTopics) {
 
     @Bean
     public NewTopic linkUpdatesTopic() {
         var topic = kafkaTopics.get("link-updates");
         return TopicBuilder.name(topic.getName())
-            .partitions(topic.getPartitions())
-            .replicas(topic.getReplicas())
-            .configs(topic.getConfig())
-            .build();
+                .partitions(topic.getPartitions())
+                .replicas(topic.getReplicas())
+                .configs(topic.getConfig())
+                .build();
     }
 
     @Bean
     public NewTopic linkUpdatesDLQTopic() {
         var topic = kafkaTopics.get("dlq");
         return TopicBuilder.name(topic.getName())
-            .partitions(topic.getPartitions())
-            .replicas(topic.getReplicas())
-            .configs(topic.getConfig())
-            .build();
+                .partitions(topic.getPartitions())
+                .replicas(topic.getReplicas())
+                .configs(topic.getConfig())
+                .build();
     }
 
     @Getter
     @Setter
     public static class Topic {
         private String name;
+
         @Nullable
         private Integer partitions;
+
         @Nullable
         private Integer replicas;
+
         @Nullable
         private Map<String, String> config;
 

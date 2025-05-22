@@ -24,7 +24,6 @@ import reactor.core.scheduler.Schedulers;
 public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     private final WebClient scrapperWebClient;
 
-
     @Override
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
@@ -71,9 +70,9 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                         .flatMap(body -> Mono.error(new ResourceNotFoundException("Not found resource"))))
                 .onStatus(HttpStatusCode::is5xxServerError, response -> response.bodyToMono(String.class)
                         .flatMap(body -> Mono.error(new RuntimeException("Server error: " + body))))
-                .onStatus(
-                        code -> code.equals(HttpStatusCode.valueOf(400)),
-                        response -> response.bodyToMono(ApiErrorResponse.class).flatMap(ScrapperHttpClient::map400Error));
+                .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response -> response.bodyToMono(
+                                ApiErrorResponse.class)
+                        .flatMap(ScrapperHttpClient::map400Error));
     }
 
     private static @NotNull Mono<Throwable> map400Error(ApiErrorResponse body) {

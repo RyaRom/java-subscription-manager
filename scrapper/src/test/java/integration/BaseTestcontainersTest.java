@@ -1,5 +1,7 @@
 package integration;
 
+import static integration.testcontainers.kafka.BotKafkaClientTest.TEST_TOPIC;
+
 import backend.academy.scrapper.ScrapperApplication;
 import integration.testcontainers.redis.CachedLinkRepositoryTest;
 import java.sql.Connection;
@@ -24,30 +26,28 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import static integration.testcontainers.kafka.BotKafkaClientTest.TEST_TOPIC;
 
 @Testcontainers
 @SpringBootTest(classes = ScrapperApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("testing")
 public class BaseTestcontainersTest {
     @Container
-    protected static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:latest")
-        .withExposedPorts(6379)
-        .waitingFor(Wait.forListeningPort());
+    protected static final GenericContainer<?> redisContainer =
+            new GenericContainer<>("redis:latest").withExposedPorts(6379).waitingFor(Wait.forListeningPort());
 
     @Container
     protected static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
-        .waitingFor(Wait.forListeningPort())
-        .withExposedPorts(5432)
-        .withDatabaseName("local")
-        .withUsername("postgres")
-        .withPassword("test")
-        .withReuse(true);
+            .waitingFor(Wait.forListeningPort())
+            .withExposedPorts(5432)
+            .withDatabaseName("local")
+            .withUsername("postgres")
+            .withPassword("test")
+            .withReuse(true);
 
     @Container
     protected static KafkaContainer kafkaContainer = new KafkaContainer(
-        DockerImageName.parse("confluentinc/cp-kafka:latest")
-    ).waitingFor(Wait.forListeningPort());
+                    DockerImageName.parse("confluentinc/cp-kafka:latest"))
+            .waitingFor(Wait.forListeningPort());
 
     @LocalServerPort
     protected int port;
@@ -69,9 +69,9 @@ public class BaseTestcontainersTest {
     @BeforeAll
     static void liquibase() {
         try (Connection connection = DriverManager.getConnection(
-            postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword())) {
+                postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword())) {
             Database database =
-                DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+                    DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
 
             Liquibase liquibase = new Liquibase("master-test.yaml", new ClassLoaderResourceAccessor(), database);
 

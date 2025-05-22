@@ -35,7 +35,7 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         Optional<LinkEntity> found = getLinkRepository().findById(link.getLinkId());
 
         assertTrue(found.isPresent());
-        LinkEntity result = found.get();
+        LinkEntity result = found.orElseThrow();
         assertEquals(link.getUrl(), result.getUrl());
         assertEquals(link.getLinkType(), result.getLinkType());
         assertEquals(link.getLinkInfo(), result.getLinkInfo());
@@ -51,7 +51,7 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         Optional<LinkEntity> found = getLinkRepository().findByUrl(url);
 
         assertTrue(found.isPresent());
-        LinkEntity result = found.get();
+        LinkEntity result = found.orElseThrow();
         assertEquals(url, result.getUrl());
         assertEquals(LinkType.GITHUB, result.getLinkType());
         assertNotNull(result.getLinkInfo());
@@ -66,9 +66,9 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         assertNotNull(saved.getLinkId());
         Optional<LinkEntity> found = getLinkRepository().findById(saved.getLinkId());
         assertTrue(found.isPresent());
-        assertEquals(saved.getUrl(), found.get().getUrl());
-        assertEquals(saved.getLinkType(), found.get().getLinkType());
-        assertEquals(saved.getLinkInfo(), found.get().getLinkInfo());
+        assertEquals(saved.getUrl(), found.orElseThrow().getUrl());
+        assertEquals(saved.getLinkType(), found.orElseThrow().getLinkType());
+        assertEquals(saved.getLinkInfo(), found.orElseThrow().getLinkInfo());
     }
 
     @Test
@@ -112,7 +112,7 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         Optional<LinkEntity> deleted = getLinkRepository().deleteByUrl(url);
 
         assertTrue(deleted.isPresent());
-        assertEquals(url, deleted.get().getUrl());
+        assertEquals(url, deleted.orElseThrow().getUrl());
         assertTrue(getLinkRepository().findByUrl(url).isEmpty());
 
         List<LinkEntity> linksWithChat = getLinkRepository().findWithChatId(99999L);

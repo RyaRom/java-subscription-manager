@@ -23,7 +23,8 @@ public class BotController {
     public Mono<ResponseEntity<Void>> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
         log.info("Got update in link {}, {}", linkUpdate.linkId(), linkUpdate.url());
 
-        return telegramAPI.sendMessagesAsync(linkUpdate)
-            .then(Mono.just(ResponseEntity.ok().build()));
+        return telegramAPI
+                .sendMessagesAsync(linkUpdate)
+                .then(Mono.just(ResponseEntity.ok().build()));
     }
 }

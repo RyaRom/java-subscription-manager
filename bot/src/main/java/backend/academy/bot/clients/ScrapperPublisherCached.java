@@ -16,8 +16,9 @@ public class ScrapperPublisherCached implements ScrapperPublisher {
     @Override
     public Mono<Void> removeLink(Long chatId, String link) {
         log.info("removeLink: Removing link from cache for chat {}", chatId);
-        return redisReactiveCommandsProto.del(ScrapperClientCached.prefix(chatId))
-            .then(delegated.removeLink(chatId, link));
+        return redisReactiveCommandsProto
+                .del(ScrapperClientCached.prefix(chatId))
+                .then(delegated.removeLink(chatId, link));
     }
 
     @Override
@@ -28,7 +29,8 @@ public class ScrapperPublisherCached implements ScrapperPublisher {
     @Override
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         log.info("addLink: Removing link from cache for chat {}", chatId);
-        return redisReactiveCommandsProto.del(ScrapperClientCached.prefix(chatId))
-            .then(delegated.addLink(chatId, addLinkRequest));
+        return redisReactiveCommandsProto
+                .del(ScrapperClientCached.prefix(chatId))
+                .then(delegated.addLink(chatId, addLinkRequest));
     }
 }

@@ -46,57 +46,57 @@ public class GithubParser implements AbstractParser {
         }
         if (link.getLinkInfo() instanceof GithubInfoEntity githubInfo) {
             var activities = githubHttpClient
-                .getRepoActivities(githubInfo.getOwner(), githubInfo.getRepo())
-                .onErrorResume(it ->{
-                    log.error("Error while getting github activities", it);
-                    return Mono.empty();
-                })
-                .doOnNext(activity -> {
-                    log.info("activity {}", activity);
-                    log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
-                    log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
-                })
-                .filter(activity -> activity.timestamp()
-                    .toInstant()
-                    .atOffset(ZoneOffset.UTC)
-                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
-                .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromResponse(activity), link));
+                    .getRepoActivities(githubInfo.getOwner(), githubInfo.getRepo())
+                    .onErrorResume(it -> {
+                        log.error("Error while getting github activities", it);
+                        return Mono.empty();
+                    })
+                    .doOnNext(activity -> {
+                        log.info("activity {}", activity);
+                        log.info("time :{}", activity.timestamp().toInstant().atOffset(ZoneOffset.UTC));
+                        log.info("last updated :{}", lastUpdated.atOffset(ZoneOffset.UTC));
+                    })
+                    .filter(activity -> activity.timestamp()
+                            .toInstant()
+                            .atOffset(ZoneOffset.UTC)
+                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC)))
+                    .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromResponse(activity), link));
             var issues = githubHttpClient
-                .getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
-                .onErrorResume(it -> {
-                    log.error("Error while getting github issues", it);
-                    return Mono.empty();
-                })
-                .filter(activity -> {
-                    try {
-                        return DATE_FORMAT
-                            .parse(activity.updatedAt())
-                            .toInstant()
-                            .atOffset(ZoneOffset.UTC)
-                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
+                    .getRepoIssues(githubInfo.getOwner(), githubInfo.getRepo())
+                    .onErrorResume(it -> {
+                        log.error("Error while getting github issues", it);
+                        return Mono.empty();
+                    })
+                    .filter(activity -> {
+                        try {
+                            return DATE_FORMAT
+                                    .parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromUpdate(activity, "issue"), link));
             var pulls = githubHttpClient
-                .getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
-                .onErrorResume(it -> {
-                    log.error("Error while getting github pulls", it);
-                    return Mono.empty();
-                })
-                .filter(activity -> {
-                    try {
-                        return DATE_FORMAT
-                            .parse(activity.updatedAt())
-                            .toInstant()
-                            .atOffset(ZoneOffset.UTC)
-                            .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link));
+                    .getRepoPulls(githubInfo.getOwner(), githubInfo.getRepo())
+                    .onErrorResume(it -> {
+                        log.error("Error while getting github pulls", it);
+                        return Mono.empty();
+                    })
+                    .filter(activity -> {
+                        try {
+                            return DATE_FORMAT
+                                    .parse(activity.updatedAt())
+                                    .toInstant()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .isAfter(lastUpdated.atOffset(ZoneOffset.UTC));
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .flatMap(activity -> sendGhUpdate(GithubFullInfo.fromUpdate(activity, "pr"), link));
 
             return Flux.merge(activities, issues, pulls).then(Mono.just(true));
         }
@@ -109,23 +109,22 @@ public class GithubParser implements AbstractParser {
             log.warn("Unknown type in github update {}", githubActivity);
         }
         LinkUpdate linkUpdate = LinkUpdate.builder()
-            .linkId(link.getLinkId())
-            .url(link.getUrl())
-            .tgChatIds(link.getChatIdList())
-            .description(getGithubUpdate(githubActivity))
-            .build();
+                .linkId(link.getLinkId())
+                .url(link.getUrl())
+                .tgChatIds(link.getChatIdList())
+                .description(getGithubUpdate(githubActivity))
+                .build();
         return botClient.sendUpdate(linkUpdate);
     }
 
     private String getGithubUpdate(GithubFullInfo info) {
         return String.format(
-            """
+                """
                 New Github update (%s): %s
                 User: %s
                 Text: %s""",
-            info.type(), info.title(), info.username(), info.body());
+                info.type(), info.title(), info.username(), info.body());
     }
-
 
     @Override
     public int getOrder() {

@@ -15,16 +15,15 @@ public class LinkUpdatesConsumer {
     private final TelegramAPI telegramAPI;
     private final DLQPublisher dlqPublisher;
 
-    @KafkaListener(
-        topics = "${spring.kafka.kafka-topics-names.link-updates}"
-    )
+    @KafkaListener(topics = "${spring.kafka.kafka-topics-names.link-updates}")
     public void getUpdate(@Payload LinkUpdate linkUpdate) {
         log.info("received update {}", linkUpdate);
-        telegramAPI.sendMessagesAsync(linkUpdate)
-            .onErrorMap(e -> {
-                dlqPublisher.sendError(e);
-                return e;
-            })
-            .subscribe();
+        telegramAPI
+                .sendMessagesAsync(linkUpdate)
+                .onErrorMap(e -> {
+                    dlqPublisher.sendError(e);
+                    return e;
+                })
+                .subscribe();
     }
 }

@@ -6,10 +6,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app.data", ignoreUnknownFields = false)
-public record DataProps(
-    @NotEmpty String redis,
-    Integer redisExMs
-) {
+public record DataProps(@NotEmpty String redis, Integer redisExMs) {
     public DataProps {
         if (redisExMs == null) {
             redisExMs = 60000;

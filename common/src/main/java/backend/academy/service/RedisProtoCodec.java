@@ -21,9 +21,7 @@ public class RedisProtoCodec<V extends GeneratedMessage> implements RedisCodec<S
         try {
             var lookup = MethodHandles.lookup();
             var type = MethodType.methodType(protoType, java.nio.ByteBuffer.class);
-            var method = lookup.findStatic(
-                protoType, "parseFrom", type
-            );
+            var method = lookup.findStatic(protoType, "parseFrom", type);
             return it -> {
                 try {
                     return protoType.cast(method.invoke(it));
@@ -33,7 +31,7 @@ public class RedisProtoCodec<V extends GeneratedMessage> implements RedisCodec<S
                 }
             };
         } catch (IllegalAccessException | NoSuchMethodException e) {
-            //will never happen
+            // will never happen
             log.fatal("Unexpected proto error {}", e.getMessage());
             throw new ProtoSerializationException(e);
         }

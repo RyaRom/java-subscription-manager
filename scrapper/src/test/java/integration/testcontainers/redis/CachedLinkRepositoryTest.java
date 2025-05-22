@@ -1,5 +1,10 @@
 package integration.testcontainers.redis;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.proto.impl.LinkEntities;
 import backend.academy.scrapper.config.DataConnectionProperties;
 import backend.academy.scrapper.repository.links.CachedLinkRepository;
@@ -21,22 +26,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = TestcontainersGenericConfiguration.class)
 public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
     public static final String URL_MOCK_GITHUB = "https://github.com/test/repo";
     public static final String URL_MOCK_GITHUB_1 = "https://github.com/test/repo1";
     public static final String URL_MOCK_GITHUB_2 = "https://github.com/test/repo2";
+
     @Autowired
     private DataConnectionProperties dataConnectionProperties;
+
     @Autowired
     private RedisAsyncCommands<String, LinkEntities.FullLinkProto> redisAsyncCommands;
+
     @Autowired
     private LinkRepository delegatedRepository;
+
     private CachedLinkRepository cachedLinkRepository;
 
     public static @NotNull String redisUrl() {
@@ -47,11 +52,8 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
     void setUp() {
         delegatedRepository.dropForTest();
 
-        cachedLinkRepository = new CachedLinkRepository(
-            dataConnectionProperties,
-            redisAsyncCommands,
-            delegatedRepository
-        );
+        cachedLinkRepository =
+                new CachedLinkRepository(dataConnectionProperties, redisAsyncCommands, delegatedRepository);
 
         redisAsyncCommands.flushall();
     }
@@ -77,7 +79,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         assertEquals(url, result2.get().getUrl());
 
         CompletableFuture<LinkEntities.FullLinkProto> future =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         LinkEntities.FullLinkProto cachedValue = future.join();
         assertNotNull(cachedValue);
     }
@@ -89,7 +91,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         delegatedRepository.save(expectedLink);
         cachedLinkRepository.findByUrl(url);
         CompletableFuture<LinkEntities.FullLinkProto> future =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         LinkEntities.FullLinkProto cachedValue = future.join();
 
         assertNotNull(cachedValue);
@@ -105,13 +107,13 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         delegatedRepository.save(link);
         cachedLinkRepository.findByUrl(url);
         CompletableFuture<LinkEntities.FullLinkProto> initialFuture =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNotNull(initialFuture.join());
 
         link.setUrl(url);
         cachedLinkRepository.save(link);
         CompletableFuture<LinkEntities.FullLinkProto> future =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         LinkEntities.FullLinkProto cachedValue = future.join();
         assertNull(cachedValue);
 
@@ -119,7 +121,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         assertTrue(result.isPresent());
 
         CompletableFuture<LinkEntities.FullLinkProto> newFuture =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNotNull(newFuture.join());
     }
 
@@ -137,13 +139,13 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         cachedLinkRepository.findByUrl(url);
 
         CompletableFuture<LinkEntities.FullLinkProto> initialFuture =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNotNull(initialFuture.join());
 
         cachedLinkRepository.addChatId(link, chatId);
 
         CompletableFuture<LinkEntities.FullLinkProto> future =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         LinkEntities.FullLinkProto cachedValue = future.join();
         assertNull(cachedValue);
 
@@ -165,17 +167,17 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         cachedLinkRepository.findByUrl(url2);
 
         CompletableFuture<LinkEntities.FullLinkProto> initialFuture1 =
-            redisAsyncCommands.get(getPrefix(url1)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url1)).toCompletableFuture();
         CompletableFuture<LinkEntities.FullLinkProto> initialFuture2 =
-            redisAsyncCommands.get(getPrefix(url2)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url2)).toCompletableFuture();
         assertNotNull(initialFuture1.join());
         assertNotNull(initialFuture2.join());
         cachedLinkRepository.saveAll(links);
 
         CompletableFuture<LinkEntities.FullLinkProto> future1 =
-            redisAsyncCommands.get(getPrefix(url1)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url1)).toCompletableFuture();
         CompletableFuture<LinkEntities.FullLinkProto> future2 =
-            redisAsyncCommands.get(getPrefix(url2)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url2)).toCompletableFuture();
 
         assertNull(future1.join());
         assertNull(future2.join());
@@ -191,7 +193,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         cachedLinkRepository.findByUrl(url);
 
         CompletableFuture<LinkEntities.FullLinkProto> initialFuture =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNotNull(initialFuture.join());
 
         Optional<LinkEntity> deleted = cachedLinkRepository.deleteByUrl(url);
@@ -200,7 +202,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         assertEquals(url, deleted.get().getUrl());
 
         CompletableFuture<LinkEntities.FullLinkProto> future =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         LinkEntities.FullLinkProto cachedValue = future.join();
         assertNull(cachedValue);
 
@@ -215,14 +217,14 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
         cachedLinkRepository.findByUrl(url);
 
         CompletableFuture<LinkEntities.FullLinkProto> future1 =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNotNull(future1.join());
 
         boolean result = cachedLinkRepository.dropForTest();
         assertTrue(result);
 
         CompletableFuture<LinkEntities.FullLinkProto> future2 =
-            redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
+                redisAsyncCommands.get(getPrefix(url)).toCompletableFuture();
         assertNull(future2.join());
         assertTrue(delegatedRepository.findAll().isEmpty());
     }
@@ -241,9 +243,7 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
     @Test
     void findAll_shouldDelegateToRepository() {
         List<LinkEntity> links = List.of(
-            createTestLink(URL_MOCK_GITHUB_1, LinkType.GITHUB),
-            createTestLink(URL_MOCK_GITHUB_2, LinkType.GITHUB)
-        );
+                createTestLink(URL_MOCK_GITHUB_1, LinkType.GITHUB), createTestLink(URL_MOCK_GITHUB_2, LinkType.GITHUB));
         delegatedRepository.saveAll(links);
         List<LinkEntity> result = cachedLinkRepository.findAll();
 
@@ -253,10 +253,9 @@ public class CachedLinkRepositoryTest extends BaseTestcontainersTest {
     @Test
     void findAllPaginated_shouldDelegateToRepository() {
         List<LinkEntity> links = List.of(
-            createTestLink(URL_MOCK_GITHUB_1, LinkType.GITHUB),
-            createTestLink(URL_MOCK_GITHUB_2, LinkType.GITHUB),
-            createTestLink("https://github.com/test/repo3", LinkType.GITHUB)
-        );
+                createTestLink(URL_MOCK_GITHUB_1, LinkType.GITHUB),
+                createTestLink(URL_MOCK_GITHUB_2, LinkType.GITHUB),
+                createTestLink("https://github.com/test/repo3", LinkType.GITHUB));
         List<LinkEntity> savedLinks = delegatedRepository.saveAll(links);
         long firstLinkId = savedLinks.get(0).getLinkId();
         int limit = 2;

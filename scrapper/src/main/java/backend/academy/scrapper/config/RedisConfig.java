@@ -21,17 +21,13 @@ public class RedisConfig {
 
     @Bean
     public StatefulRedisConnection<String, LinkEntities.FullLinkProto> statefulRedisConnection(
-        RedisClient redisClient
-    ) {
-        return redisClient.connect(new RedisProtoCodec<>(
-            LinkEntities.FullLinkProto.class
-        ));
+            RedisClient redisClient) {
+        return redisClient.connect(new RedisProtoCodec<>(LinkEntities.FullLinkProto.class));
     }
 
     @Bean
     public RedisAsyncCommands<String, LinkEntities.FullLinkProto> redisAsyncCommands(
-        StatefulRedisConnection<String, LinkEntities.FullLinkProto> statefulRedisConnection
-    ) {
+            StatefulRedisConnection<String, LinkEntities.FullLinkProto> statefulRedisConnection) {
         return statefulRedisConnection.async();
     }
 }

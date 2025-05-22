@@ -1,5 +1,8 @@
 package integration.testcontainers.kafka;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import backend.academy.configuration.EnvType;
 import backend.academy.dto.LinkUpdate;
 import backend.academy.scrapper.clients.BotKafkaClient;
@@ -33,8 +36,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DirtiesContext
 @ContextConfiguration(classes = BotKafkaClientTest.ConfigKafka.class)
@@ -60,9 +61,8 @@ public class BotKafkaClientTest extends BaseTestcontainersTest {
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
 
-        DefaultKafkaConsumerFactory<String, LinkUpdate> consumerFactory =
-            new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(),
-                new JsonDeserializer<>(LinkUpdate.class, false));
+        DefaultKafkaConsumerFactory<String, LinkUpdate> consumerFactory = new DefaultKafkaConsumerFactory<>(
+                consumerProps, new StringDeserializer(), new JsonDeserializer<>(LinkUpdate.class, false));
 
         ContainerProperties containerProperties = new ContainerProperties(TEST_TOPIC);
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
@@ -82,17 +82,11 @@ public class BotKafkaClientTest extends BaseTestcontainersTest {
 
     @Test
     void testSendUpdate() throws Exception {
-        LinkUpdate linkUpdate = new LinkUpdate(
-            1L,
-            "https://github.com/user/repo",
-            "Test description",
-            List.of(1L, 2L)
-        );
+        LinkUpdate linkUpdate = new LinkUpdate(1L, "https://github.com/user/repo", "Test description", List.of(1L, 2L));
 
         Mono<Void> result = botKafkaClient.sendUpdate(linkUpdate);
 
-        StepVerifier.create(result)
-            .verifyComplete();
+        StepVerifier.create(result).verifyComplete();
 
         ConsumerRecord<String, LinkUpdate> record = records.poll(10, TimeUnit.SECONDS);
         assertNotNull(record);
