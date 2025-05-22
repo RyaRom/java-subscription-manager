@@ -6,6 +6,7 @@ import backend.academy.scrapper.repository.links.SQLLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(classes = SQLLinkRepositoryTest.ConfigSqlRepo.class)
@@ -21,6 +22,7 @@ public class SQLLinkRepositoryTest extends LinkRepositoryTest {
     @Configuration
     static class ConfigSqlRepo {
         @Bean
+        @Primary
         public LinkRepository linkRepository() {
             return new SQLLinkRepository(
                     EnvType.TEST,

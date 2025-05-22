@@ -31,8 +31,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DirtiesContext
 @ContextConfiguration(classes = BotKafkaClientTest.ConfigKafka.class)
 public class BotKafkaClientTest extends BaseTestcontainersTest {
-
-    private static final String TEST_TOPIC = "link-updates-test";
+    public static final String TEST_TOPIC = "link-updates-test";
 
     @Autowired
     private BotKafkaClient botKafkaClient;
@@ -52,12 +49,6 @@ public class BotKafkaClientTest extends BaseTestcontainersTest {
 
     private BlockingQueue<ConsumerRecord<String, LinkUpdate>> records;
     private KafkaMessageListenerContainer<String, LinkUpdate> container;
-
-    @DynamicPropertySource
-    static void kafkaProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
-        registry.add("spring.kafka.kafka-topics.link-updates.name", () -> TEST_TOPIC);
-    }
 
     @BeforeEach
     void setUp() {

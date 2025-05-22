@@ -16,6 +16,9 @@ app:
     telegram-token: tg_token
   clients:
     scrapper-url: http://localhost:8081/scrapper/api
+  data:
+    redis: redis
+    redis-ex-ms: 600000
 
 
 spring:
