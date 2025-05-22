@@ -4,7 +4,8 @@ import static backend.academy.bot.telegram.sdk.filters.FilterParameter.COMMANDS;
 import static backend.academy.bot.telegram.sdk.logging.MDCLogger.logOnError;
 import static backend.academy.bot.telegram.sdk.logging.MDCLogger.logOnNext;
 
-import backend.academy.bot.clients.ScrapperHttpClient;
+import backend.academy.bot.clients.ScrapperClient;
+import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.config.BotConfig.BotCommands;
 import backend.academy.bot.repository.UserDataCacheRepository;
 import backend.academy.bot.telegram.sdk.annotations.FilterParam;
@@ -26,15 +27,11 @@ import reactor.core.publisher.Mono;
 @SuppressWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class BotRouter {
     private final TelegramAPI telegramAPI;
-
     private final WebClient botHttpClient;
-
     private final String helpMessage;
-
     private final BotCommands botCommands;
-
-    private final ScrapperHttpClient scrapperHttpClient;
-
+    private final ScrapperClient scrapperClient;
+    private final ScrapperPublisher scrapperPublisher;
     private final UserDataCacheRepository userDataCacheRepository;
 
     @MessageHandler(
@@ -43,7 +40,7 @@ public class BotRouter {
             priority = 0)
     public Mono<Void> start(Message message) {
         log.info("In handler start {}", message.chat().id());
-        return scrapperHttpClient
+        return scrapperPublisher
                 .registerChat(message.chat().id())
                 .then(userDataCacheRepository.clearUser(message.chat().id()))
                 .then(telegramAPI.sendMessageAsync(message, "Hello! Use /track command to start"));
@@ -65,7 +62,7 @@ public class BotRouter {
     public Mono<Void> listLinks(Message message) {
         return Mono.just(message)
                 .doOnEach(logOnNext(m -> log.info("In handler listLinks")))
-                .then(scrapperHttpClient.getLinks(message.chat().id()))
+                .then(scrapperClient.getLinks(message.chat().id()))
                 .flatMapMany(res -> Flux.fromIterable(res.links()))
                 .map(this::getPrettyLinkInfo)
                 .defaultIfEmpty("You haven't submitted any links yet")

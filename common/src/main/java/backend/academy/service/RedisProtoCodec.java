@@ -26,16 +26,16 @@ public class RedisProtoCodec<V extends GeneratedMessage> implements RedisCodec<S
             );
             return it -> {
                 try {
-                    return (V) method.invoke(it);
+                    return protoType.cast(method.invoke(it));
                 } catch (Throwable e) {
                     log.error("error parsing proto {}", e.getMessage());
-                    throw new RuntimeException(e);
+                    throw new ProtoSerializationException(e);
                 }
             };
         } catch (IllegalAccessException | NoSuchMethodException e) {
             //will never happen
             log.fatal("Unexpected proto error {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new ProtoSerializationException(e);
         }
     }
 
@@ -51,11 +51,23 @@ public class RedisProtoCodec<V extends GeneratedMessage> implements RedisCodec<S
 
     @Override
     public ByteBuffer encodeKey(String s) {
+        if (s == null) {
+            return ByteBuffer.wrap(new byte[0]);
+        }
         return ByteBuffer.wrap(s.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public ByteBuffer encodeValue(V v) {
+        if (v == null) {
+            return ByteBuffer.wrap(new byte[0]);
+        }
         return ByteBuffer.wrap(v.toByteArray());
+    }
+
+    public static class ProtoSerializationException extends RuntimeException {
+        public ProtoSerializationException(Throwable cause) {
+            super(cause);
+        }
     }
 }

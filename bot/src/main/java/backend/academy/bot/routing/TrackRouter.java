@@ -5,7 +5,9 @@ import static backend.academy.bot.BotKeyboards.getSkipButton;
 import static backend.academy.bot.telegram.sdk.filters.FilterParameter.COMMANDS;
 
 import backend.academy.bot.SubscriptionBotState;
+import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.clients.ScrapperHttpClient;
+import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.repository.UserDataCacheRepository;
 import backend.academy.bot.telegram.sdk.annotations.FilterParam;
 import backend.academy.bot.telegram.sdk.annotations.MessageHandler;
@@ -29,7 +31,8 @@ public class TrackRouter {
     private final TelegramAPI telegramAPI;
     private final FSMContext fsmContext;
     private final UserDataCacheRepository userDataCacheRepository;
-    private final ScrapperHttpClient scrapperHttpClient;
+    private final ScrapperClient scrapperClient;
+    private final ScrapperPublisher scrapperPublisher;
 
     @MessageHandler(
             filters = {FilterRegister.CommandFilter.class},
@@ -92,7 +95,7 @@ public class TrackRouter {
         }
         return result.then(Mono.defer(
                         () -> userDataCacheRepository.getUser(message.chat().id())))
-                .flatMap(data -> scrapperHttpClient.addLink(
+                .flatMap(data -> scrapperPublisher.addLink(
                         message.chat().id(),
                         AddLinkRequest.builder()
                                 .link(data.getLink().toLowerCase(Locale.ROOT))
@@ -123,7 +126,7 @@ public class TrackRouter {
             params = @FilterParam(key = FilterParameter.STATE, value = "WAITING_FOR_LINK_UNSUBSCRIBE"))
     public Mono<Void> unsubscribeParseLink(Message message) {
         log.info("In handler unsubscribeParseLink {}", message.chat().id());
-        return scrapperHttpClient
+        return scrapperPublisher
                 .removeLink(message.chat().id(), message.text())
                 .then(userDataCacheRepository.clearUser(message.chat().id()))
                 .then(telegramAPI.sendMessageAsync(message, "Unsubscribed"));
