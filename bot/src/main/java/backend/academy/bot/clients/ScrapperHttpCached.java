@@ -1,6 +1,7 @@
 package backend.academy.bot.clients;
 
 import backend.academy.dto.ListLinkResponse;
+import io.lettuce.core.api.StatefulRedisConnection;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,6 @@ public class ScrapperHttpCached implements ScrapperClient {
 
     @Override
     public Mono<ListLinkResponse> getLinks(Long chatId) {
-        return null;
+
     }
 }
