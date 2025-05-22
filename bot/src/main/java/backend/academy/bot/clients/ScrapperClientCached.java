@@ -16,11 +16,11 @@ import static io.lettuce.core.SetArgs.Builder.ex;
 public class ScrapperClientCached implements ScrapperClient {
     private final DataProps dataProps;
     private final ScrapperClient delegated;
-    private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands;
+    private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto;
 
     @Override
     public Mono<ListLinkResponse> getLinks(Long chatId) {
-        return redisReactiveCommands.get(prefix(chatId))
+        return redisReactiveCommandsProto.get(prefix(chatId))
             .map(proto -> {
                 log.info("getLinks: Using cached links for chat {}", chatId);
                 return mapProto(proto);
@@ -28,7 +28,7 @@ public class ScrapperClientCached implements ScrapperClient {
             .switchIfEmpty(delegated.getLinks(chatId)
                 .flatMap(fetched -> {
                     log.info("getLinks: Caching links for chat {}", chatId);
-                    return redisReactiveCommands.set(prefix(chatId), mapProto(fetched),
+                    return redisReactiveCommandsProto.set(prefix(chatId), mapProto(fetched),
                             ex(dataProps.redisExMs()))
                         .thenReturn(fetched);
                 }));

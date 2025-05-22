@@ -11,12 +11,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ScrapperPublisherCached implements ScrapperPublisher {
     private final ScrapperPublisher delegated;
-    private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands;
+    private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto;
 
     @Override
     public Mono<Void> removeLink(Long chatId, String link) {
         log.info("removeLink: Removing link from cache for chat {}", chatId);
-        return redisReactiveCommands.del(ScrapperClientCached.prefix(chatId))
+        return redisReactiveCommandsProto.del(ScrapperClientCached.prefix(chatId))
             .then(delegated.removeLink(chatId, link));
     }
 
@@ -28,7 +28,7 @@ public class ScrapperPublisherCached implements ScrapperPublisher {
     @Override
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         log.info("addLink: Removing link from cache for chat {}", chatId);
-        return redisReactiveCommands.del(ScrapperClientCached.prefix(chatId))
+        return redisReactiveCommandsProto.del(ScrapperClientCached.prefix(chatId))
             .then(delegated.addLink(chatId, addLinkRequest));
     }
 }

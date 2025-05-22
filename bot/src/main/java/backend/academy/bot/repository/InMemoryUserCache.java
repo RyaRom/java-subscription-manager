@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
-@Repository
 public class InMemoryUserCache implements UserDataCacheRepository {
     private final Map<Long, UserCache> userMap = new ConcurrentHashMap<>();
 

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Log4j2
 @Configuration
 @RequiredArgsConstructor
-public class DatabaseConfig {
+public class RedisConfig {
     private final DataProps dataProps;
 
     @Bean
@@ -22,7 +22,7 @@ public class DatabaseConfig {
         return RedisClient.create(dataProps.redis());
     }
 
-    @Bean(destroyMethod = "close")
+    @Bean
     public StatefulRedisConnection<String, Links.ListLinksProto> statefulRedisConnection(
         RedisClient redisClient
     ) {
@@ -32,9 +32,16 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands(
+    public RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto(
         StatefulRedisConnection<String, Links.ListLinksProto> statefulRedisConnection
     ) {
         return statefulRedisConnection.reactive();
+    }
+
+    @Bean
+    RedisReactiveCommands<String, String> redisReactiveCommandsString(
+        RedisClient redisClient
+    ) {
+        return redisClient.connect().reactive();
     }
 }

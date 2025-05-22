@@ -1,6 +1,5 @@
-package backend.academy.bot.clients;
+package backend.academy.bot.clients.kafka;
 
-import backend.academy.bot.clients.kafka.DLQPublisher;
 import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
