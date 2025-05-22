@@ -36,7 +36,7 @@ public class LinksService {
                     if (link.getChatIds().stream().anyMatch(it -> it.getChatId().equals(chatId))) {
                         throw new LinkDuplicatedException("Link already exists");
                     }
-                    linkRepository.addChatId(link.getLinkId(), chatId);
+                    linkRepository.addChatId(link, chatId);
                     return link;
                 })
                 .orElseGet(() -> {

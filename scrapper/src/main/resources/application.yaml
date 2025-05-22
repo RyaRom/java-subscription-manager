@@ -13,7 +13,9 @@ app:
     client-type: kafka
   data:
     type: sql
-  links-pagesize: 30
+    redis: ${REDIS_URL}
+    redis-ex-ms: 600000
+    links-pagesize: 30
 
 
 spring:

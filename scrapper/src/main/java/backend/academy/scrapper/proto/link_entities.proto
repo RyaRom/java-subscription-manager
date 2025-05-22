@@ -1,0 +1,27 @@
+syntax = "proto3";
+package backend.academy.proto.impl;
+
+message FullLinkProto{
+    int64 id = 1;
+    string url = 2;
+    LinkTypeProto link_type = 3;
+    oneof link_info{
+        GithubInfoProto githubInfo = 4;
+        StackOverflowInfoProto stackOverflowInfo = 5;
+    }
+    repeated int64 chat_ids = 6;
+}
+
+enum LinkTypeProto{
+    GITHUB = 0;
+    STACK_OVERFLOW = 1;
+}
+
+message GithubInfoProto{
+    string repo = 1;
+    string owner = 2;
+}
+
+message StackOverflowInfoProto{
+    int64 question_id = 1;
+}

@@ -39,6 +39,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     healthcheck:
       test: [ "CMD", "nc", "-vz", "localhost", "2181" ]
       interval: 10s
@@ -54,6 +55,7 @@ services:
       - zookeeper-log:/var/lib/zookeeper/log
 
   kafka:
+    container_name: kafka
     image: confluentinc/cp-kafka:latest
     depends_on:
       zookeeper:
@@ -91,6 +93,7 @@ services:
       - kafka
       - zookeeper
   redis:
+    container_name: redis
     image: "redis:latest"
     restart: always
     command: redis-server --save 20 1

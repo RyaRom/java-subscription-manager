@@ -10,25 +10,25 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @RequiredArgsConstructor
 public class ScrapperPublisherCached implements ScrapperPublisher {
-    private final ScrapperPublisher scrapperPublisher;
+    private final ScrapperPublisher delegated;
     private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands;
 
     @Override
     public Mono<Void> removeLink(Long chatId, String link) {
         log.info("removeLink: Removing link from cache for chat {}", chatId);
         return redisReactiveCommands.del(ScrapperClientCached.prefix(chatId))
-            .then(scrapperPublisher.removeLink(chatId, link));
+            .then(delegated.removeLink(chatId, link));
     }
 
     @Override
     public Mono<Void> registerChat(Long chatId) {
-        return scrapperPublisher.registerChat(chatId);
+        return delegated.registerChat(chatId);
     }
 
     @Override
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         log.info("addLink: Removing link from cache for chat {}", chatId);
         return redisReactiveCommands.del(ScrapperClientCached.prefix(chatId))
-            .then(scrapperPublisher.addLink(chatId, addLinkRequest));
+            .then(delegated.addLink(chatId, addLinkRequest));
     }
 }

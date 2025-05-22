@@ -1,5 +1,6 @@
 package backend.academy.bot.clients;
 
+import backend.academy.bot.config.DataProps;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.proto.impl.Links;
@@ -8,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Mono;
+import static io.lettuce.core.SetArgs.Builder.ex;
 
 @Log4j2
 @RequiredArgsConstructor
 public class ScrapperClientCached implements ScrapperClient {
-    private final ScrapperClient scrapperClient;
+    private final DataProps dataProps;
+    private final ScrapperClient delegated;
     private final RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands;
 
     @Override
@@ -22,10 +25,11 @@ public class ScrapperClientCached implements ScrapperClient {
                 log.info("getLinks: Using cached links for chat {}", chatId);
                 return mapProto(proto);
             })
-            .switchIfEmpty(scrapperClient.getLinks(chatId)
+            .switchIfEmpty(delegated.getLinks(chatId)
                 .flatMap(fetched -> {
                     log.info("getLinks: Caching links for chat {}", chatId);
-                    return redisReactiveCommands.set(prefix(chatId), mapProto(fetched))
+                    return redisReactiveCommands.set(prefix(chatId), mapProto(fetched),
+                            ex(dataProps.redisExMs()))
                         .thenReturn(fetched);
                 }));
     }

@@ -47,8 +47,8 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void addChatId(Long linkId, Long chatId) {
-        findById(linkId).ifPresent(link -> link.getChatIds().add(new ChatIdEntity(chatId, link)));
+    public void addChatId(LinkEntity link, Long chatId) {
+        findById(link.getLinkId()).ifPresent(link1 -> link1.getChatIds().add(new ChatIdEntity(chatId, link)));
     }
 
     @Override
@@ -69,11 +69,12 @@ public class InMemoryLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void dropForTest() {
+    public boolean dropForTest() {
         if (envType != EnvType.TEST) {
-            return;
+            return false;
         }
         storage.clear();
+        return true;
     }
 
     @Override

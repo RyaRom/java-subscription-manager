@@ -40,11 +40,13 @@ public class ClientsConfig {
 
     @Bean
     public ScrapperClient scrapperClient(
+        DataProps dataProps,
         WebClient scrapperWebClient,
         @Qualifier("redisReactiveCommands")
         RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommands
     ) {
         return new ScrapperClientCached(
+            dataProps,
             new ScrapperHttpClient(scrapperWebClient),
             redisReactiveCommands
         );

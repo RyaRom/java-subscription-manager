@@ -77,7 +77,7 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         getLinkRepository().save(link);
         Long chatId = 12345L;
 
-        getLinkRepository().addChatId(link.getLinkId(), chatId);
+        getLinkRepository().addChatId(link, chatId);
 
         List<LinkEntity> linksWithChat = getLinkRepository().findWithChatId(chatId);
         assertEquals(1, linksWithChat.size());
@@ -93,8 +93,8 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
 
         Long chatId1 = 11111L;
         Long chatId2 = 22222L;
-        getLinkRepository().addChatId(link1.getLinkId(), chatId1);
-        getLinkRepository().addChatId(link2.getLinkId(), chatId2);
+        getLinkRepository().addChatId(link1, chatId1);
+        getLinkRepository().addChatId(link2, chatId2);
 
         List<LinkEntity> results = getLinkRepository().findWithChatId(chatId1);
 
@@ -107,7 +107,7 @@ public abstract class LinkRepositoryTest extends BaseTestcontainersTest {
         String url = "https://github.com/to/delete";
         LinkEntity link = createTestLink(url);
         getLinkRepository().save(link);
-        getLinkRepository().addChatId(link.getLinkId(), 99999L);
+        getLinkRepository().addChatId(link, 99999L);
 
         Optional<LinkEntity> deleted = getLinkRepository().deleteByUrl(url);
 

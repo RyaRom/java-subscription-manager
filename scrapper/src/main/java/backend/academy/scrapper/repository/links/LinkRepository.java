@@ -17,13 +17,13 @@ public interface LinkRepository {
     @Nullable
     LinkEntity save(LinkEntity link);
 
-    void addChatId(Long linkId, Long chatId);
+    void addChatId(LinkEntity link, Long chatId);
 
     List<LinkEntity> saveAll(List<LinkEntity> links);
 
     Optional<LinkEntity> deleteByUrl(String url);
 
-    void dropForTest();
+    boolean dropForTest();
 
     List<LinkEntity> findWithChatId(Long chatId);
 }

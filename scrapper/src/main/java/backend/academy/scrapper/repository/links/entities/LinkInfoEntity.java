@@ -27,4 +27,12 @@ public abstract class LinkInfoEntity {
     @MapsId
     @JoinColumn(name = "id")
     private LinkEntity link;
+
+    public GithubInfoEntity getGithubInfo() {
+        return (GithubInfoEntity) this;
+    }
+
+    public StackOverflowInfoEntity getStackOverflowInfo() {
+        return (StackOverflowInfoEntity) this;
+    }
 }
