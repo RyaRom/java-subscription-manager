@@ -25,7 +25,6 @@
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
-            <version>6.6.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -42,6 +42,7 @@
         <java-telegram-bot-api.version>7.11.0</java-telegram-bot-api.version>
         <wiremock.version>3.10.0</wiremock.version>
         <protobuf.version>4.31.0</protobuf.version>
+        <lettuce.version>6.6.0.RELEASE</lettuce.version>
 
         <!-- annotations -->
         <jetbrains-annotations.version>26.0.1</jetbrains-annotations.version>
@@ -73,6 +74,17 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>3.5.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
                 <version>${jspecify.version}</version>
@@ -93,13 +105,6 @@
                 <artifactId>annotations</artifactId>
                 <version>${jetbrains-annotations.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>io.lettuce</groupId>
-                <artifactId>lettuce-core</artifactId>
-                <version>6.6.0.RELEASE</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
@@ -136,6 +141,11 @@
                 <groupId>com.giffing.bucket4j.spring.boot.starter</groupId>
                 <artifactId>bucket4j-spring-boot-starter</artifactId>
                 <version>${bucket4j-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.lettuce</groupId>
+                <artifactId>lettuce-core</artifactId>
+                <version>${lettuce.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -184,10 +194,11 @@
             <artifactId>annotations</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
-            <version>6.6.0.RELEASE</version>
+            <version>${lettuce.version}</version>
         </dependency>
 
         <dependency>
