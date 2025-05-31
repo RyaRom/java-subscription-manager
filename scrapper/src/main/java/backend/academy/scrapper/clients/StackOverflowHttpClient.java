@@ -1,9 +1,11 @@
 package backend.academy.scrapper.clients;
 
+import java.time.Instant;
+
 import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
-import java.time.Instant;
+import backend.academy.scrapper.resilience.RetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -16,43 +18,44 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class StackOverflowHttpClient {
     private final WebClient stackOverflowWebClient;
-
+    private final RetryService retryService;
     private final StackOverflowCredentials credentials;
 
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
-        return builder.uri(uriBuilder -> {
+        return retryService.withRetry(builder.uri(uriBuilder -> {
                     UriBuilder building = uriBuilder.path("/questions/{questionId}/answers");
                     basicQueriesFromDate(building, fromDate, true);
                     addCredentials(building);
                     return building.build(questionId);
                 })
                 .retrieve()
-                .bodyToMono(StackResponseForUpdatesDto.class);
+                .bodyToMono(StackResponseForUpdatesDto.class));
     }
 
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
-        return builder.uri(uriBuilder -> {
+        return retryService.withRetry(builder.uri(uriBuilder -> {
                     UriBuilder building = uriBuilder.path("/questions/{questionId}/comments");
                     basicQueriesFromDate(building, fromDate, false);
                     addCredentials(building);
                     return building.build(questionId);
                 })
                 .retrieve()
-                .bodyToMono(StackResponseForUpdatesDto.class);
+                .bodyToMono(StackResponseForUpdatesDto.class));
     }
 
     public Mono<String> getQuestionTitle(Long questionId) {
         var builder = stackOverflowWebClient.get();
-        return builder.uri(uriBuilder -> {
+        var request = builder.uri(uriBuilder -> {
                     UriBuilder building = uriBuilder.path("/questions/{questionId}");
                     basicQueries(building);
                     addCredentials(building);
                     return building.build(questionId);
                 })
                 .retrieve()
-                .bodyToMono(StackResponseForQuestionInfoDto.class)
+                .bodyToMono(StackResponseForQuestionInfoDto.class);
+        return retryService.withRetry(request)
                 .map(it -> {
                     var items = it.items();
                     if (items.isEmpty()) {

@@ -1,6 +1,7 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
+import backend.academy.scrapper.resilience.RetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -14,15 +15,16 @@ import reactor.core.publisher.Mono;
 @SuppressWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class BotHttpClient implements BotClient {
     private final WebClient botWebClient;
+    private final RetryService retryService;
 
     @Override
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
-        return botWebClient
+        return retryService.withRetry(botWebClient
                 .post()
                 .uri("/updates")
                 .body(BodyInserters.fromValue(linkUpdate))
                 .retrieve()
                 .toBodilessEntity()
-                .then();
+                .then());
     }
 }

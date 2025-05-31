@@ -1,7 +1,8 @@
 package backend.academy.bot.clients;
 
-import static backend.academy.configuration.CustomHeaders.TG_CHAT_ID;
+import java.time.Duration;
 
+import backend.academy.bot.config.ClientsProps;
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.ApiErrorResponse;
 import backend.academy.dto.ListLinkResponse;
@@ -16,18 +17,25 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
+
+import static backend.academy.configuration.CustomHeaders.TG_CHAT_ID;
 
 @RequiredArgsConstructor
 @Log4j2
 public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     private final WebClient scrapperWebClient;
+    private final ClientsProps clientsProps;
 
     @Override
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
-        return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
+        return withRetry(handleErrorsDefault(result).toBodilessEntity())
+                .then().publishOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -37,7 +45,8 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                 .uri("/links")
                 .header(TG_CHAT_ID, chatId.toString())
                 .retrieve();
-        return handleErrorsDefault(result).bodyToMono(ListLinkResponse.class).publishOn(Schedulers.boundedElastic());
+        return withRetry(handleErrorsDefault(result).bodyToMono(ListLinkResponse.class))
+                .publishOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -48,7 +57,8 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                 .header(TG_CHAT_ID, chatId.toString())
                 .body(BodyInserters.fromValue(addLinkRequest))
                 .retrieve();
-        return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
+        return withRetry(handleErrorsDefault(result).toBodilessEntity())
+                .then().publishOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -60,7 +70,8 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                 .header(TG_CHAT_ID, chatId.toString())
                 .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
                 .retrieve();
-        return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
+        return withRetry(handleErrorsDefault(result).toBodilessEntity())
+                .then().publishOn(Schedulers.boundedElastic());
     }
 
     private WebClient.ResponseSpec handleErrorsDefault(WebClient.ResponseSpec responseSpec) {
@@ -73,6 +84,22 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                 .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response -> response.bodyToMono(
                                 ApiErrorResponse.class)
                         .flatMap(ScrapperHttpClient::map400Error));
+    }
+
+    private <T> Mono<T> withRetry(Mono<T> request) {
+        return request.retryWhen(Retry.backoff(clientsProps.retry().maxAttempts(),
+                        Duration.ofMillis(clientsProps.retry().waitDuration()))
+                .filter(e -> {
+                    log.info("Got error {} : {} in request", e.getMessage(), e);
+                    if (e instanceof WebClientResponseException responseException) {
+                        log.info("Error {} status {}",
+                                responseException.getMessage(),
+                                responseException.getStatusCode());
+                        return responseException.getStatusCode().is5xxServerError()
+                                || responseException.getStatusCode().value() == 429;
+                    }
+                    return e instanceof WebClientRequestException;
+                }));
     }
 
     private static @NotNull Mono<Throwable> map400Error(ApiErrorResponse body) {
