@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import backend.academy.bot.BaseIntegrationTest;
 import backend.academy.bot.BotKeyboards;
 import backend.academy.bot.clients.ScrapperHttpClient;
+import backend.academy.bot.config.BotProps;
 import backend.academy.bot.rest.BotController;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.LinkUpdate;
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
 
 class BotRouterTest extends BaseIntegrationTest {
     @Autowired
-    private String helpMessage;
+    private BotProps botProps;
 
     @MockitoBean
     private ScrapperHttpClient scrapperHttpClient;
@@ -100,7 +101,7 @@ class BotRouterTest extends BaseIntegrationTest {
         Thread.sleep(2000);
 
         verify(telegramAPI, times(1)).sendMessage(1L, "Hello! Use /track command to start");
-        verify(telegramAPI, times(1)).sendMessage(1L, helpMessage);
+        verify(telegramAPI, times(1)).sendMessage(1L, botProps.helpMessage());
         verify(telegramAPI, times(1)).sendMessage(1L, "Subscribed");
         verify(telegramAPI, times(1)).sendMessage(1L, "Unsubscribed");
         verify(telegramAPI, times(1)).sendMessage(1L, "Incorrect url, try again");

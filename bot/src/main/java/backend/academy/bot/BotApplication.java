@@ -1,20 +1,22 @@
 package backend.academy.bot;
 
+import backend.academy.bot.config.BotProps;
 import backend.academy.bot.config.ClientsProps;
-import backend.academy.bot.config.BotConfig;
 import backend.academy.bot.config.DataProps;
-import backend.academy.bot.config.TelegramConfig;
+import backend.academy.bot.config.TelegramProps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication
 @EnableWebFlux
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableConfigurationProperties({
-    BotConfig.class,
+    BotProps.class,
     ClientsProps.class,
-    TelegramConfig.class,
+    TelegramProps.class,
     DataProps.class,
 })
 public class BotApplication {

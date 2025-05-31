@@ -39,12 +39,12 @@ public class ClientsConfig {
     }
 
     @Bean
-    public WebClient botHttpClient(String telegramToken) {
+    public WebClient botHttpClient(TelegramProps telegramProps) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl("https://api.telegram.org/bot" + telegramToken)
+                .baseUrl("https://api.telegram.org/bot" + telegramProps.telegramToken())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
