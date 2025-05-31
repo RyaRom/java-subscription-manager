@@ -50,22 +50,21 @@ public class ClientsConfig {
     }
 
     @Bean
+    @Profile({"dev"})
     public ScrapperClient scrapperClient(
             DataProps dataProps,
-            ClientsProps clientsProps,
-            WebClient scrapperWebClient,
+            ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return new ScrapperClientCached(
-                dataProps, new ScrapperHttpClient(scrapperWebClient, clientsProps),
+                dataProps, scrapperHttpClient,
                 redisReactiveCommandsProto);
     }
 
     @Bean
+    @Profile({"dev"})
     public ScrapperPublisher scrapperPublisher(
-            WebClient scrapperWebClient,
-            ClientsProps clientsProps,
+            ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
-        return new ScrapperPublisherCached(new ScrapperHttpClient(scrapperWebClient, clientsProps),
-                redisReactiveCommandsProto);
+        return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
     }
 }
