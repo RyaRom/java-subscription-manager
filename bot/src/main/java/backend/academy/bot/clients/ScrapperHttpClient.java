@@ -9,6 +9,7 @@ import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.exception.BadLinkException;
 import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +26,14 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     private final WebClient scrapperWebClient;
 
     @Override
+    @Retry(name = "base")
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
     @Override
+    @Retry(name = "base")
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
                 .get()
@@ -41,6 +44,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     }
 
     @Override
+    @Retry(name = "base")
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         var result = scrapperWebClient
                 .post()
@@ -52,6 +56,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     }
 
     @Override
+    @Retry(name = "base")
     public Mono<Void> removeLink(Long chatId, String link) {
         var result = scrapperWebClient
                 // body in delete is not allowed by default
@@ -68,8 +73,6 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
                 .onStatus(code -> code.equals(HttpStatusCode.valueOf(404)), response -> response.bodyToMono(
                                 ApiErrorResponse.class)
                         .flatMap(body -> Mono.error(new ResourceNotFoundException("Not found resource"))))
-                .onStatus(HttpStatusCode::is5xxServerError, response -> response.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server error: " + body))))
                 .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response -> response.bodyToMono(
                                 ApiErrorResponse.class)
                         .flatMap(ScrapperHttpClient::map400Error));

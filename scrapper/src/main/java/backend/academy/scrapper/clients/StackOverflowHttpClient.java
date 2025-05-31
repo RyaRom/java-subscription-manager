@@ -4,6 +4,7 @@ import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
 import java.time.Instant;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class StackOverflowHttpClient {
 
     private final StackOverflowCredentials credentials;
 
+    @Retry(name = "base")
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
@@ -31,6 +33,7 @@ public class StackOverflowHttpClient {
                 .bodyToMono(StackResponseForUpdatesDto.class);
     }
 
+    @Retry(name = "base")
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
@@ -43,6 +46,7 @@ public class StackOverflowHttpClient {
                 .bodyToMono(StackResponseForUpdatesDto.class);
     }
 
+    @Retry(name = "base")
     public Mono<String> getQuestionTitle(Long questionId) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {

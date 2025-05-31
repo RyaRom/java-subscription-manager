@@ -24,6 +24,16 @@ app:
     redis: ${REDIS_URL}
     redis-ex-ms: 600000
 
+resilience4j:
+  retry:
+    instances:
+      base:
+        maxAttempts: 4
+        waitDuration: 1s
+        retryExceptionPredicate: backend.academy.bot.resilience.RetryErrorPredicate.java
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+
 spring:
   application:
     name: Bot
