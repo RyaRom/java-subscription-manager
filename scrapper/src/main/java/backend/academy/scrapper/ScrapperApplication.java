@@ -1,5 +1,6 @@
 package backend.academy.scrapper;
 
+import backend.academy.scrapper.config.ClientProps;
 import backend.academy.scrapper.config.ClientsConfig;
 import backend.academy.scrapper.config.DataConnectionProperties;
 import backend.academy.scrapper.config.KafkaConfig;
@@ -15,7 +16,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableScheduling
 @EnableConfigurationProperties({
     ScrapperConfig.class,
-    ClientsConfig.class,
+    ClientProps.class,
     DataConnectionProperties.class,
     KafkaConfig.class
 })

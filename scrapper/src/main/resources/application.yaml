@@ -11,6 +11,7 @@ app:
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
     client-type: kafka
+    timeout: 3000
   data:
     type: sql
     redis: ${REDIS_URL}

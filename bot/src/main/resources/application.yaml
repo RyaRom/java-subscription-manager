@@ -16,6 +16,7 @@ app:
     telegram-token: ${TELEGRAM_TOKEN}
   clients:
     scrapper-url: http://localhost:8081/scrapper/api
+    timeout: 3000
   data:
     redis: ${REDIS_URL}
     redis-ex-ms: 600000

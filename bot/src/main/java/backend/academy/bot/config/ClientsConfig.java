@@ -7,6 +7,7 @@ import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.clients.ScrapperPublisherCached;
 import backend.academy.proto.impl.Links;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 @Profile({"dev", "testing"})
 @Log4j2
@@ -25,18 +28,24 @@ public class ClientsConfig {
 
     @Bean
     public WebClient scrapperWebClient() {
+        HttpClient httpClient = HttpClient.create()
+            .responseTimeout(Duration.ofMillis(botClientsProps.timeout()));
         return WebClient.builder()
-                .baseUrl(botClientsProps.scrapperUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .baseUrl(botClientsProps.scrapperUrl())
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
     }
 
     @Bean
     public WebClient botHttpClient(String telegramToken) {
+        HttpClient httpClient = HttpClient.create()
+            .responseTimeout(Duration.ofMillis(botClientsProps.timeout()));
         return WebClient.builder()
-                .baseUrl("https://api.telegram.org/bot" + telegramToken)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .baseUrl("https://api.telegram.org/bot" + telegramToken)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
     }
 
     @Bean
