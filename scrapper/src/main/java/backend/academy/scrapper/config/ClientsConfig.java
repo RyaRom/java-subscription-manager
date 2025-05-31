@@ -5,6 +5,7 @@ import backend.academy.scrapper.clients.BotHttpClient;
 import backend.academy.scrapper.clients.BotKafkaClient;
 import java.time.Duration;
 import javax.naming.ConfigurationException;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,5 +69,10 @@ public class ClientsConfig {
         } else {
             throw new ConfigurationException("Unknown client type " + clientProps.clientType());
         }
+    }
+
+    @Bean
+    public RetryRegistry retryRegistry() {
+        return RetryRegistry.ofDefaults();
     }
 }

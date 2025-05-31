@@ -41,6 +41,7 @@
         <java-telegram-bot-api.version>7.11.0</java-telegram-bot-api.version>
         <wiremock.version>3.10.0</wiremock.version>
         <protobuf.version>4.31.0</protobuf.version>
+        <resilience4jVersion>2.3.0</resilience4jVersion>
         <lettuce.version>6.6.0.RELEASE</lettuce.version>
 
         <!-- annotations -->
@@ -100,11 +101,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-reactor</artifactId>
-                <version>2.3.0</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${jetbrains-annotations.version}</version>
@@ -151,6 +147,16 @@
                 <artifactId>lettuce-core</artifactId>
                 <version>${lettuce.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-spring-boot3</artifactId>
+                <version>${resilience4jVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>3.5.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -178,6 +184,16 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>${resilience4jVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>3.5.0</version>
         </dependency>
         <dependency>
             <groupId>co.elastic.logging</groupId>
@@ -233,6 +249,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-core</artifactId>
+            <version>2.3.0</version>
         </dependency>
     </dependencies>
 
