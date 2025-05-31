@@ -21,15 +21,6 @@ app:
     redis-ex-ms: 600000
     links-pagesize: 30
 
-resilience4j:
-  retry:
-    instances:
-      base:
-        maxAttempts: 4
-        waitDuration: 1s
-        retryExceptionPredicate: backend.academy.scrapper.resilience.RetryErrorPredicate.java
-        enableExponentialBackoff: true
-        exponentialBackoffMultiplier: 2
 
 spring:
   application:

@@ -2,7 +2,6 @@ package backend.academy.scrapper.clients;
 
 import backend.academy.scrapper.repository.links.dto.github.GithubActivityResponse;
 import backend.academy.scrapper.repository.links.dto.github.GithubIssueOrPrResponse;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,7 +12,6 @@ import reactor.core.publisher.Flux;
 public class GithubHttpClient {
     private final WebClient githubWebClient;
 
-    @Retry(name = "base")
     public Flux<GithubActivityResponse> getRepoActivities(String owner, String repo) {
         return githubWebClient
                 .get()
@@ -22,7 +20,6 @@ public class GithubHttpClient {
                 .bodyToFlux(GithubActivityResponse.class);
     }
 
-    @Retry(name = "base")
     public Flux<GithubIssueOrPrResponse> getRepoIssues(String owner, String repo) {
         return githubWebClient
                 .get()
@@ -31,7 +28,6 @@ public class GithubHttpClient {
                 .bodyToFlux(GithubIssueOrPrResponse.class);
     }
 
-    @Retry(name = "base")
     public Flux<GithubIssueOrPrResponse> getRepoPulls(String owner, String repo) {
         return githubWebClient
                 .get()
