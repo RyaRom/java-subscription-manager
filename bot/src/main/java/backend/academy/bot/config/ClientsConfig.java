@@ -6,6 +6,8 @@ import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.clients.ScrapperPublisherCached;
 import backend.academy.proto.impl.Links;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.netty.http.client.HttpClient;
 
 @Profile({"dev", "testing"})
@@ -24,15 +28,15 @@ import reactor.netty.http.client.HttpClient;
 @RequiredArgsConstructor
 @Configuration
 public class ClientsConfig {
-    private final BotClientsProps botClientsProps;
+    private final ClientsProps clientsProps;
 
     @Bean
     public WebClient scrapperWebClient() {
         HttpClient httpClient = HttpClient.create()
-            .responseTimeout(Duration.ofMillis(botClientsProps.timeout()));
+            .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
             .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .baseUrl(botClientsProps.scrapperUrl())
+            .baseUrl(clientsProps.scrapperUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
     }
@@ -40,7 +44,7 @@ public class ClientsConfig {
     @Bean
     public WebClient botHttpClient(String telegramToken) {
         HttpClient httpClient = HttpClient.create()
-            .responseTimeout(Duration.ofMillis(botClientsProps.timeout()));
+            .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
             .clientConnector(new ReactorClientHttpConnector(httpClient))
             .baseUrl("https://api.telegram.org/bot" + telegramToken)
@@ -62,5 +66,26 @@ public class ClientsConfig {
             WebClient scrapperWebClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return new ScrapperPublisherCached(new ScrapperHttpClient(scrapperWebClient), redisReactiveCommandsProto);
+    }
+
+    @Bean
+    public RetryRegistry retryRegistry() {
+        RetryConfig config = RetryConfig.custom()
+            .maxAttempts(clientsProps.retry().maxAttempts())
+            .waitDuration(Duration.ofMillis(clientsProps.retry().waitDuration()))
+            .retryOnException(e -> {
+                log.info("Got error {} : {} in request", e.getMessage(), e);
+                if (e instanceof WebClientResponseException responseException) {
+                    log.info("Error {} status {}",
+                        responseException.getMessage(),
+                        responseException.getStatusCode());
+                    return responseException.getStatusCode().is5xxServerError()
+                        || responseException.getStatusCode().value() == 429;
+                }
+                return e instanceof WebClientRequestException;
+            })
+            .build();
+
+        return RetryRegistry.of(config);
     }
 }

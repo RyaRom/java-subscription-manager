@@ -1,6 +1,6 @@
 package backend.academy.bot;
 
-import backend.academy.bot.config.BotClientsProps;
+import backend.academy.bot.config.ClientsProps;
 import backend.academy.bot.config.BotConfig;
 import backend.academy.bot.config.DataProps;
 import backend.academy.bot.config.TelegramConfig;
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableWebFlux
 @EnableConfigurationProperties({
     BotConfig.class,
-    BotClientsProps.class,
+    ClientsProps.class,
     TelegramConfig.class,
     DataProps.class,
 })

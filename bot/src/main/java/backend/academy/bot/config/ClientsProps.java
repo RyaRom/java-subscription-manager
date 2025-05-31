@@ -6,11 +6,19 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app.clients", ignoreUnknownFields = false)
-public record BotClientsProps(
+public record ClientsProps(
     @NotEmpty String scrapperUrl,
-    Integer timeout
+    Integer timeout,
+    Retry retry
 ) {
-    public BotClientsProps {
+    public ClientsProps {
         timeout = 3000;
+        retry = new Retry(2, 100L);
+    }
+
+    public record Retry(
+        Integer maxAttempts,
+        Long waitDuration
+    ) {
     }
 }

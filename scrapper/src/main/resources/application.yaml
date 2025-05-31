@@ -12,6 +12,9 @@ app:
     github-url: https://api.github.com
     client-type: kafka
     timeout: 3000
+    retry:
+      max-attempts: 2
+      wait-duration: 100
   data:
     type: sql
     redis: ${REDIS_URL}
