@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -29,29 +28,28 @@ public class LinksController {
     @GetMapping
     @RateLimit
     public Mono<ResponseEntity<ListLinkResponse>> getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
-        System.err.println("METHOD LOGIC");
+        log.info("METHOD LOGIC");
         log.info("Get links for chat {}", chatId);
         return linksService.getLinks(chatId).map(ResponseEntity::ok);
     }
 
-    @RateLimit
-    @GetMapping("/f")
-    public Flux<String> getLinksFlux(@RequestHeader("Tg-Chat-Id") Long chatId) {
-        System.err.println("METHOD LOGIC");
-        return Flux.just("Hello", "World");
-    }
-
     @PostMapping
+    @RateLimit
     public Mono<ResponseEntity<LinkResponse>> addLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody AddLinkRequest request) {
+        @RequestHeader("Tg-Chat-Id") Long chatId,
+        @RequestBody AddLinkRequest request
+    ) {
         log.info("Add link for chat {}", chatId);
         log.info("request {}", request);
         return linksService.addLink(chatId, request).map(ResponseEntity::ok);
     }
 
     @DeleteMapping
+    @RateLimit
     public Mono<ResponseEntity<LinkResponse>> removeLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody RemoveLinkRequest request) {
+        @RequestHeader("Tg-Chat-Id") Long chatId,
+        @RequestBody RemoveLinkRequest request
+    ) {
         log.info("Remove link for chat {}", chatId);
         return linksService.removeLink(request.link()).map(ResponseEntity::ok);
     }

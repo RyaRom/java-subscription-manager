@@ -1,13 +1,16 @@
 package backend.academy.configuration;
 
-import java.util.List;
 import jakarta.annotation.Nullable;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "resilience2")
-public record ResilienceProps(@Nullable Retry retry) {
+public record ResilienceProps(
+    @Nullable Retry retry,
+    @Nullable RateLimiter rateLimiter
+) {
 
     public record Retry(
         Integer maxAttempts,
@@ -19,6 +22,16 @@ public record ResilienceProps(@Nullable Retry retry) {
             waitDuration = waitDuration != null ? waitDuration : 1000;
             blacklistedStatusCodes = blacklistedStatusCodes != null
                 ? blacklistedStatusCodes : List.of(400, 401, 403, 404, 405);
+        }
+    }
+
+    public record RateLimiter(
+        Integer maxTokens,
+        Integer tokensPerSecond
+    ) {
+        public RateLimiter {
+            maxTokens = maxTokens != null ? maxTokens : 10;
+            tokensPerSecond = tokensPerSecond != null ? tokensPerSecond : 1;
         }
     }
 }

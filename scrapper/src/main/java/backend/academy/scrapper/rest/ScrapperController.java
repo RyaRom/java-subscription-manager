@@ -1,5 +1,6 @@
 package backend.academy.scrapper.rest;
 
+import backend.academy.resilience2.RateLimit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,14 @@ import reactor.core.publisher.Mono;
 public class ScrapperController {
 
     @PostMapping("/tg-chat/{chatId}")
+    @RateLimit
     public Mono<ResponseEntity<Void>> registerChat(@PathVariable Long chatId) {
         log.info("Chat registered {}", chatId);
         return Mono.just(ResponseEntity.ok().build());
     }
 
     @DeleteMapping("/tg-chat/{chatId}")
+    @RateLimit
     public Mono<ResponseEntity<Void>> deleteChat(@PathVariable Long chatId) {
         log.info("Chat deleted {}", chatId);
         return Mono.just(ResponseEntity.ok().build());

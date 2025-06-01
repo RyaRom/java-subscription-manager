@@ -2,6 +2,7 @@ package backend.academy.bot.rest;
 
 import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.LinkUpdate;
+import backend.academy.resilience2.RateLimit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 public class BotController {
     private final TelegramAPI telegramAPI;
 
+    @RateLimit
     @PostMapping("/updates")
     public Mono<ResponseEntity<Void>> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
         log.info("Got update in link {}, {}", linkUpdate.linkId(), linkUpdate.url());

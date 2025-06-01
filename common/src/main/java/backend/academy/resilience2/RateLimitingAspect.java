@@ -11,6 +11,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -30,7 +31,7 @@ import reactor.util.context.ContextView;
 public class RateLimitingAspect {
     // could be done with separated properties for name and get name in annotation
     private final ResilienceProps resilienceProps;
-    private final Map<Integer, RateLimiter> limiterForEndpoint = new HashMap<>();
+    private final Map<String, RateLimiter> limiterForEndpoint = new HashMap<>();
 
     @Around("@annotation(rateLimit)")
     public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
@@ -51,7 +52,7 @@ public class RateLimitingAspect {
         ProceedingJoinPoint joinPoint
     ) {
         return Mono.deferContextual(contextView -> {
-            System.err.println("BEFORE METHOD IN MONO ASPECT");
+            log.info("BEFORE METHOD IN MONO ASPECT");
             int retryAfterMs = getRetryAfterMs(joinPoint, contextView);
             if (retryAfterMs == -1) {
                 try {
@@ -66,7 +67,7 @@ public class RateLimitingAspect {
 
     private Flux<?> limitFlux(ProceedingJoinPoint joinPoint) {
         return Flux.deferContextual(contextView -> {
-            System.err.println("BEFORE METHOD IN FLUX ASPECT");
+            log.info("BEFORE METHOD IN FLUX ASPECT");
             int retryAfterMs = getRetryAfterMs(joinPoint, contextView);
             if (retryAfterMs == -1) {
                 try {
@@ -82,8 +83,8 @@ public class RateLimitingAspect {
     private int getRetryAfterMs(ProceedingJoinPoint joinPoint, ContextView contextView) {
         String ip = contextView.get(GlobalConstants.USER_IP_CONTEXT);
         log.info("User IP: {}", ip);
-        RateLimiter limiter = limiterForEndpoint.computeIfAbsent(signatureHash(joinPoint),
-            k -> new InMemoryTokenBucketRateLimiter(resilienceProps)
+        RateLimiter limiter = limiterForEndpoint.computeIfAbsent(joinPoint.getSignature().toLongString(),
+            k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter())
         );
         return limiter.processRequest(ip);
     }
@@ -95,10 +96,5 @@ public class RateLimitingAspect {
                 Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs)))
             )),
             null, null);
-    }
-
-    private static int signatureHash(ProceedingJoinPoint joinPoint) {
-        return joinPoint.getSignature().hashCode()
-            + Arrays.hashCode(joinPoint.getArgs());
     }
 }

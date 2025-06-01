@@ -1,26 +1,63 @@
 package backend.academy.resilience2.impl;
 
+import backend.academy.configuration.ResilienceProps;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import backend.academy.configuration.ResilienceProps;
-import lombok.Data;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 public class InMemoryTokenBucketRateLimiter implements RateLimiter {
-    private final ResilienceProps resilienceProps;
+    private final ResilienceProps.RateLimiter rateLimiterProps;
     //possible redis or other shared storage implementation
     private final Map<String, TokenBucket> tokenBuckets = new ConcurrentHashMap<>();
 
     @Override
     public int processRequest(String userIp) {
-        return 1;
+        TokenBucket tokenBucket = tokenBuckets.computeIfAbsent(
+            userIp,
+            k -> new TokenBucket(
+                new AtomicInteger(rateLimiterProps.maxTokens()),
+                new AtomicLong(System.currentTimeMillis())
+            )
+        );
+        if (tokenBucket.refill(rateLimiterProps.tokensPerSecond(), rateLimiterProps.maxTokens())) {
+            return -1;
+        } else {
+            int elapsedMs = (int) (System.currentTimeMillis() - tokenBucket.lastRefillTimeMs.get());
+            int msPerToken = 1000 / rateLimiterProps.tokensPerSecond();
+            return msPerToken - elapsedMs;
+        }
     }
 
+    private record TokenBucket(AtomicInteger tokensLeft, AtomicLong lastRefillTimeMs) {
+        public boolean refill(int tokensPerSecond, int maxTokens) {
+            log.error("REFILLING TOKENS");
+            log.error("TOKENS LEFT: " + tokensLeft.get());
+            log.error("LAST REFILL TIME: " + lastRefillTimeMs.get());
+            long now = System.currentTimeMillis();
+            long lastTime = lastRefillTimeMs.get();
+            double elapsedSec = (now - lastTime) / 1000f;
+            int newTokens = (int) (tokensPerSecond * elapsedSec);
+            int current, updated;
+            do {
+                current = tokensLeft.get();
+                updated = Math.min(current + newTokens, maxTokens);
+                log.error("UPDATED: " + updated);
+                log.error("CURRENT: " + current);
+                log.error("NEW TOKENS: " + newTokens);
 
-    @Data
-    private static class TokenBucket {
-        private int tokensLeft;
-        private long lastRefillTime;
+                if (updated <= 0) {
+                    return false;
+                }
+            } while (!tokensLeft.compareAndSet(current, updated - 1));
+            log.error("TOKENS LEFT: " + tokensLeft.get());
+
+            lastRefillTimeMs.compareAndSet(lastTime, System.currentTimeMillis());
+            return true;
+        }
     }
 }

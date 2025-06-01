@@ -66,6 +66,9 @@ resilience2:
       - 403
       - 404
       - 405
+  rate-limiter:
+    max-tokens: 50
+    tokens-per-second: 10
 
 
 springdoc:
