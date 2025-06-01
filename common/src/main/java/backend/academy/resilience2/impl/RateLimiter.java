@@ -1,5 +1,8 @@
 package backend.academy.resilience2.impl;
 
 public interface RateLimiter {
-    boolean processRequest();
+    /**
+     * @return retry-after in ms, or -1 if was allowed
+     */
+    int processRequest(String userIp);
 }

@@ -4,6 +4,7 @@ import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.LinkResponse;
 import backend.academy.dto.ListLinkResponse;
 import backend.academy.dto.RemoveLinkRequest;
+import backend.academy.resilience2.RateLimit;
 import backend.academy.scrapper.service.LinksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -25,9 +27,18 @@ public class LinksController {
     private final LinksService linksService;
 
     @GetMapping
+    @RateLimit
     public Mono<ResponseEntity<ListLinkResponse>> getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
+        System.err.println("METHOD LOGIC");
         log.info("Get links for chat {}", chatId);
         return linksService.getLinks(chatId).map(ResponseEntity::ok);
+    }
+
+    @RateLimit
+    @GetMapping("/f")
+    public Flux<String> getLinksFlux(@RequestHeader("Tg-Chat-Id") Long chatId) {
+        System.err.println("METHOD LOGIC");
+        return Flux.just("Hello", "World");
     }
 
     @PostMapping

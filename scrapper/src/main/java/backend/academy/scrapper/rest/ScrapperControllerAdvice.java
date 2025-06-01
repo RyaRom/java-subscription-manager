@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.MissingRequestValueException;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import reactor.core.publisher.Mono;
@@ -41,6 +42,21 @@ public class ScrapperControllerAdvice {
         return Mono.just(ResponseEntity.status(404)
                 .body(ApiErrorResponse.builder()
                         .code("404")
+                        .description(e.getMessage())
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .build()));
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleWebClientResponseException(
+        WebClientResponseException e
+    ) {
+        log.debug(e.getMessage());
+        return Mono.just(ResponseEntity.status(e.getStatusCode())
+                .headers(e.getHeaders())
+                .body(ApiErrorResponse.builder()
+                        .code(String.valueOf(e.getStatusCode().value()))
                         .description(e.getMessage())
                         .exceptionName(e.getClass().getName())
                         .exceptionMessage(e.getMessage())

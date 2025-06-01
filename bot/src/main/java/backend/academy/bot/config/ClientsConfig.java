@@ -55,9 +55,10 @@ public class ClientsConfig {
             DataProps dataProps,
             ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
-        return new ScrapperClientCached(
-                dataProps, scrapperHttpClient,
-                redisReactiveCommandsProto);
+        return scrapperHttpClient;
+//        return new ScrapperClientCached(
+//                dataProps, scrapperHttpClient,
+//                redisReactiveCommandsProto);
     }
 
     @Bean
@@ -65,6 +66,7 @@ public class ClientsConfig {
     public ScrapperPublisher scrapperPublisher(
             ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
-        return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
+        return scrapperHttpClient;
+//        return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
     }
 }

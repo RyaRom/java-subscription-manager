@@ -1,8 +1,7 @@
-package backend.academy.service;
+package backend.academy.resilience2.utils;
 
 import backend.academy.configuration.GlobalConstants;
 import lombok.extern.log4j.Log4j2;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;

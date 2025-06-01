@@ -26,9 +26,9 @@ public class RetryAspect {
     public Object retry(ProceedingJoinPoint joinPoint, Retry retry) throws Throwable {
         log.info("Retry aspect triggered for {}", joinPoint.getSignature());
         var chain = joinPoint.proceed();
-        if (chain instanceof Mono<?> mono){
+        if (chain instanceof Mono<?> mono) {
             return mono.transformDeferred(defaultRetry::withRetry);
-        }else if (chain instanceof Flux<?> flux){
+        } else if (chain instanceof Flux<?> flux) {
             return flux.transformDeferred(defaultRetry::withRetry);
         }
         throw new IllegalStateException("Unsupported chain type");
