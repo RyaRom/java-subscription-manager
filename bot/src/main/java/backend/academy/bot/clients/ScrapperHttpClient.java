@@ -7,6 +7,7 @@ import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.exception.BadLinkException;
 import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
+import backend.academy.resilience2.Fallback;
 import backend.academy.resilience2.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,6 +31,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
+    @Fallback("errorOnChatRegister")
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
         return handleErrorsDefault(result).toBodilessEntity()
@@ -103,5 +105,13 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
             return Mono.error(new LinkDuplicatedException("Link duplicated: " + body));
         }
         return Mono.error(new RuntimeException("Unexpected error type: " + body.exceptionName()));
+    }
+
+    public Mono<Void> errorOnChatRegister(){
+        System.err.println("IN CHAT REGISTER FALLBACK");
+        return Mono.fromRunnable(() -> {
+            System.err.println("IN CHAT REGISTER FALLBACK MONO");
+            log.error("Error on chat register");
+        });
     }
 }
