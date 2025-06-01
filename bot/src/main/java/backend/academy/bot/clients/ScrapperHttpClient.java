@@ -9,6 +9,7 @@ import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.resilience2.Fallback;
 import backend.academy.resilience2.Retry;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
+//    @Fallback("errorOnGetLinks")
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
             .get()
@@ -107,11 +109,20 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
         return Mono.error(new RuntimeException("Unexpected error type: " + body.exceptionName()));
     }
 
-    public Mono<Void> errorOnChatRegister(){
+    public Mono<Void> errorOnChatRegister() {
+        // possible to get mono context and add chain as parameter
+        // but this logic is already in ExceptionHandlerInterceptor
         System.err.println("IN CHAT REGISTER FALLBACK");
         return Mono.fromRunnable(() -> {
             System.err.println("IN CHAT REGISTER FALLBACK MONO");
             log.error("Error on chat register");
         });
+    }
+
+    public Mono<ListLinkResponse> errorOnGetLinks() {
+        System.err.println("IN GET LINKS FALLBACK");
+        return Mono.just(new ListLinkResponse(
+            List.of(), 0
+        ));
     }
 }

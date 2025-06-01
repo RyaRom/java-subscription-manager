@@ -2,6 +2,7 @@ package backend.academy.scrapper.clients;
 
 import java.time.Instant;
 
+import backend.academy.resilience2.Retry;
 import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
@@ -21,6 +22,7 @@ public class StackOverflowHttpClient {
     private final RetryService retryService;
     private final StackOverflowCredentials credentials;
 
+    @Retry
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return retryService.withRetry(builder.uri(uriBuilder -> {
@@ -33,6 +35,7 @@ public class StackOverflowHttpClient {
                 .bodyToMono(StackResponseForUpdatesDto.class));
     }
 
+    @Retry
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return retryService.withRetry(builder.uri(uriBuilder -> {
@@ -45,6 +48,7 @@ public class StackOverflowHttpClient {
                 .bodyToMono(StackResponseForUpdatesDto.class));
     }
 
+    @Retry
     public Mono<String> getQuestionTitle(Long questionId) {
         var builder = stackOverflowWebClient.get();
         var request = builder.uri(uriBuilder -> {

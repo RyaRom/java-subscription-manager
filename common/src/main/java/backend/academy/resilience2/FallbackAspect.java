@@ -1,6 +1,6 @@
 package backend.academy.resilience2;
 
-import java.lang.reflect.InvocationTargetException;
+import backend.academy.resilience2.impl.ReactorFallback;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Aspect
@@ -30,29 +30,19 @@ public class FallbackAspect {
                 throw new RuntimeException(e);
             }
         });
+        Object chain = joinPoint.proceed();
 
-        Mono originalMono = (Mono) joinPoint.proceed();
-
-        return originalMono
-            .onErrorResume(e -> getFallback(joinPoint, method));
-    }
-
-    private static @NotNull Mono<Object> getFallback(ProceedingJoinPoint joinPoint, Method method) {
-        if (method.getReturnType() == Mono.class) {
-            try {
-                return (Mono<Object>) method.invoke(joinPoint.getTarget());
-            } catch (IllegalAccessException | InvocationTargetException ex) {
-                throw new RuntimeException("Fallback execution failed", ex);
-            }
+        Mono<Object> fallbackMono = ReactorFallback.getFallbackMono(joinPoint, method);
+        if (chain instanceof Mono mono) {
+            return mono.onErrorResume(
+                e -> fallbackMono
+            );
+        } else if (chain instanceof Flux flux) {
+            return flux.onErrorResume(
+                e -> fallbackMono
+            );
         }
-        log.error("Fallback aspect triggered for {}", joinPoint.getSignature());
-        return Mono.fromRunnable(() -> {
-            try {
-                method.invoke(joinPoint.getTarget());
-            } catch (IllegalAccessException | InvocationTargetException ex) {
-                throw new RuntimeException("Fallback execution failed", ex);
-            }
-        });
+        throw new RuntimeException("Fallback aspect only supports Mono and Flux");
     }
 }
 

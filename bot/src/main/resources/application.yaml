@@ -59,7 +59,7 @@ server:
 resilience2:
   retry:
     max-attempts: 4
-    wait-duration: 1000
+    wait-duration: 100
     blacklisted-status-codes:
       - 400
       - 401

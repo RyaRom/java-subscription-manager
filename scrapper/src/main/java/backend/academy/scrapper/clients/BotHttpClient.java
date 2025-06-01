@@ -1,6 +1,7 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
+import backend.academy.resilience2.Retry;
 import backend.academy.scrapper.resilience.RetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,13 +19,14 @@ public class BotHttpClient implements BotClient {
     private final RetryService retryService;
 
     @Override
+    @Retry
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return retryService.withRetry(botWebClient
-                .post()
-                .uri("/updates")
-                .body(BodyInserters.fromValue(linkUpdate))
-                .retrieve()
-                .toBodilessEntity()
-                .then());
+            .post()
+            .uri("/updates")
+            .body(BodyInserters.fromValue(linkUpdate))
+            .retrieve()
+            .toBodilessEntity()
+            .then());
     }
 }

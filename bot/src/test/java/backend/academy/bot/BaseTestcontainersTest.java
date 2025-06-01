@@ -46,8 +46,7 @@ public class BaseTestcontainersTest {
     public static class IntegrationTestConfig {
         @Bean
         public ScrapperHttpClient scrapperHttpClient() {
-            return new ScrapperHttpClient(Mockito.mock(WebClient.class),
-                Mockito.mock(ClientsProps.class));
+            return new ScrapperHttpClient(Mockito.mock(WebClient.class));
         }
 
         @Bean

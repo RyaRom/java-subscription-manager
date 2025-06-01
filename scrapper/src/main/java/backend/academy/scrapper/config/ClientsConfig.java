@@ -18,7 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
-import static backend.academy.configuration.CustomHeaders.GITHUB_API_VERSION;
+import static backend.academy.configuration.GlobalConstants.GITHUB_API_VERSION;
 
 @Log4j2
 @Configuration

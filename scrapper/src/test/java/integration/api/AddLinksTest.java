@@ -1,6 +1,6 @@
 package integration.api;
 
-import static backend.academy.configuration.CustomHeaders.TG_CHAT_ID;
+import static backend.academy.configuration.GlobalConstants.TG_CHAT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import backend.academy.dto.AddLinkRequest;
