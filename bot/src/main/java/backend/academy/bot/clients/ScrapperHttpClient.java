@@ -8,7 +8,7 @@ import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.exception.BadLinkException;
 import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
-import java.time.Duration;
+import backend.academy.resilience2.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +18,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.retry.Retry;
 import static backend.academy.configuration.CustomHeaders.TG_CHAT_ID;
 
 @RequiredArgsConstructor
@@ -41,6 +38,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     }
 
     @Override
+    @Retry
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
             .get()
@@ -89,19 +87,20 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     }
 
     private <T> Mono<T> withRetry(Mono<T> request) {
-        return request.retryWhen(Retry.backoff(clientsProps.retry().maxAttempts(),
-                Duration.ofMillis(clientsProps.retry().waitDuration()))
-            .filter(e -> {
-                log.info("Got error {} : {} in request", e.getMessage(), e);
-                if (e instanceof WebClientResponseException responseException) {
-                    log.info("Error {} status {}",
-                        responseException.getMessage(),
-                        responseException.getStatusCode());
-                    return responseException.getStatusCode().is5xxServerError()
-                        || responseException.getStatusCode().value() == 429;
-                }
-                return e instanceof WebClientRequestException;
-            }));
+        return request;
+//        return request.retryWhen(Retry.backoff(clientsProps.retry().maxAttempts(),
+//                Duration.ofMillis(clientsProps.retry().waitDuration()))
+//            .filter(e -> {
+//                log.info("Got error {} : {} in request", e.getMessage(), e);
+//                if (e instanceof WebClientResponseException responseException) {
+//                    log.info("Error {} status {}",
+//                        responseException.getMessage(),
+//                        responseException.getStatusCode());
+//                    return responseException.getStatusCode().is5xxServerError()
+//                        || responseException.getStatusCode().value() == 429;
+//                }
+//                return e instanceof WebClientRequestException;
+//            }));
     }
 
     private static @NotNull Mono<Throwable> map400Error(ApiErrorResponse body) {

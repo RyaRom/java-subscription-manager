@@ -1,4 +1,4 @@
-package backend.academy.resilience;
+package backend.academy.resilience2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class RateLimitingAspect {
+public class FallbackAspect {
     @Around("@annotation(rateLimit)")
     public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
         log.info("RateLimit aspect triggered for {}", joinPoint.getSignature());
@@ -20,7 +20,7 @@ public class RateLimitingAspect {
         Mono<?> originalMono = (Mono<?>) joinPoint.proceed();
 
         return originalMono
-            .doOnSubscribe(sub -> log.info("Applying rate limiting with {} permits", rateLimit.value()))
+//            .doOnSubscribe(sub -> log.info("Applying rate limiting with {} permits", rateLimit.limitForWindow()))
             .doOnNext(val -> log.info("Request completed successfully"));
     }
 }

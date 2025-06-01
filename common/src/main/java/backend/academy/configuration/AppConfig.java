@@ -1,9 +1,11 @@
 package backend.academy.configuration;
 
 import java.util.Arrays;
+import backend.academy.resilience2.impl.RetryService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 @Configuration
@@ -17,5 +19,11 @@ public class AppConfig {
             return EnvType.UNKNOWN;
         }
         return EnvType.getFromType(profiles[0]);
+    }
+
+    @Bean
+    public RetryService defaultRetry(ResilienceProps resilienceProps){
+        //TODO inject bean by config name from properties for multiple configs
+        return new RetryService(resilienceProps.retry());
     }
 }

@@ -4,7 +4,6 @@ import backend.academy.bot.clients.ScrapperClient;
 import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.config.BotProps;
 import backend.academy.bot.repository.UserDataCacheRepository;
-import backend.academy.bot.rest.SimpleComponent;
 import backend.academy.bot.telegram.sdk.annotations.FilterParam;
 import backend.academy.bot.telegram.sdk.annotations.MessageHandler;
 import backend.academy.bot.telegram.sdk.annotations.Router;
@@ -32,7 +31,6 @@ public class BotRouter {
     private final ScrapperClient scrapperClient;
     private final ScrapperPublisher scrapperPublisher;
     private final UserDataCacheRepository userDataCacheRepository;
-    private final SimpleComponent simpleComponent;
 
     @MessageHandler(
         filters = {FilterRegister.CommandFilter.class},
@@ -61,7 +59,6 @@ public class BotRouter {
         priority = 0)
     public Mono<Void> listLinks(Message message) {
         return Mono.just(message)
-            .then(simpleComponent.doStuff())
             .doOnEach(logOnNext(m -> log.info("In handler listLinks")))
             .then(scrapperClient.getLinks(message.chat().id()))
             .flatMapMany(res -> Flux.fromIterable(res.links()))

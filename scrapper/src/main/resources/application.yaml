@@ -21,6 +21,17 @@ app:
     redis-ex-ms: 600000
     links-pagesize: 30
 
+resilience2:
+  retry:
+    max-attempts: 4
+    wait-duration: 100
+    blacklisted-status-codes:
+      - 400
+      - 401
+      - 403
+      - 404
+      - 405
+
 
 spring:
   application:
