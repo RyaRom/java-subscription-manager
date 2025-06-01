@@ -10,7 +10,7 @@ import reactor.util.retry.Retry;
 
 @Log4j2
 @RequiredArgsConstructor
-public class RetryService {
+public class MonoRetrier {
     private final ResilienceProps.Retry retryProps;
 
     public <T> Mono<T> withRetry(Mono<T> mono) {
@@ -28,6 +28,10 @@ public class RetryService {
             })
             .doAfterRetry(signal ->
                 log.info("Retrying for {} error {}",
-                    signal.totalRetries(), signal.failure())));
+                    signal.totalRetries(), signal.failure())))
+            .onErrorMap(e -> {
+                log.error("Retry failed", e);
+                return e.getCause();
+            });
     }
 }

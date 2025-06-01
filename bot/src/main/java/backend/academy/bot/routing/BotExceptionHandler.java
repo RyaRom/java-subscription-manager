@@ -20,10 +20,13 @@ public class BotExceptionHandler {
     @ExceptionHandler({Throwable.class, Exception.class})
     public Mono<Void> unknownError(Exception e, Update update) {
         log.error("In unknown error {}. update = {}", e, update);
-        return telegramAPI.sendMessageAsync(update.message(), "Unexpected error: " + e.getMessage());
+        return telegramAPI.sendMessageAsync(update.message(), "Unexpected error: " + e.getMessage()
+            + "\n\n" + e.getClass());
     }
 
-    @ExceptionHandler(WebClientRequestException.class)
+    @ExceptionHandler({
+        WebClientRequestException.class,
+    })
     public Mono<Void> cantConnect(WebClientRequestException e, Update update) {
         log.error("In cantConnect {}. update = {}", e, update);
         return telegramAPI.sendMessageAsync(update.message(), "Can't connect to internal server");
