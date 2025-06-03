@@ -1,7 +1,6 @@
 package backend.academy.bot.clients;
 
-import static backend.academy.configuration.GlobalConstants.TG_CHAT_ID;
-
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.AddLinkRequest;
 import backend.academy.dto.ApiErrorResponse;
 import backend.academy.dto.ListLinkResponse;
@@ -9,9 +8,9 @@ import backend.academy.dto.RemoveLinkRequest;
 import backend.academy.exception.BadLinkException;
 import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
+import backend.academy.exception.ServerUnavailableException;
 import backend.academy.resilience2.Fallback;
 import backend.academy.resilience2.Retry;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +23,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import static backend.academy.configuration.GlobalConstants.TG_CHAT_ID;
+
 @RequiredArgsConstructor
 @Log4j2
 @Component
 @Profile({"dev"})
 public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     private final WebClient scrapperWebClient;
+    private final TelegramAPI telegramAPI;
 
     @Override
     @Retry
@@ -41,7 +43,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
-    //    @Fallback("errorOnGetLinks")
+    @Fallback("errorOnGetLinks")
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
                 .get()
@@ -106,18 +108,17 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
         return Mono.error(new RuntimeException("Unexpected error type: " + body.exceptionName()));
     }
 
-    public Mono<Void> errorOnChatRegister() {
-        // possible to get mono context and add chain as parameter
-        // but this logic is already in ExceptionHandlerInterceptor
+    public Mono<Void> errorOnChatRegister(Long chatId) {
         System.err.println("IN CHAT REGISTER FALLBACK");
-        return Mono.fromRunnable(() -> {
-            System.err.println("IN CHAT REGISTER FALLBACK MONO");
-            log.error("Error on chat register");
-        });
+        return telegramAPI.sendMessageAsync(chatId,
+                "Your chat's wasn't registered because server doesn't respond");
     }
 
-    public Mono<ListLinkResponse> errorOnGetLinks() {
+    public Mono<ListLinkResponse> errorOnGetLinks(Long chatId) {
         System.err.println("IN GET LINKS FALLBACK");
-        return Mono.just(new ListLinkResponse(List.of(), 0));
+//        telegramAPI.sendMessageAsync(
+//                chatId, "Server doesn't respond (duplicated fallback for demonstration)")
+//                .subscribe();
+        return Mono.error(new ServerUnavailableException());
     }
 }
