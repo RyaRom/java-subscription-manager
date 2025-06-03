@@ -16,11 +16,9 @@ public class LinkUpdatesConsumer {
     private final TelegramAPI telegramAPI;
 
     @KafkaListener(topics = "${spring.kafka.kafka-topics-names.link-updates}")
-    public void getUpdate(@Payload LinkUpdate linkUpdate,
-                          ConsumerRecord<String, String> record) {
+    public void getUpdate(@Payload LinkUpdate linkUpdate, ConsumerRecord<String, String> record) {
         log.info("Received update: {}", linkUpdate);
 
-        telegramAPI.sendMessagesAsync(linkUpdate)
-            .subscribe();
+        telegramAPI.sendMessagesAsync(linkUpdate).subscribe();
     }
 }

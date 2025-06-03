@@ -16,8 +16,8 @@ public class RedisUserDataCache implements UserDataCacheRepository {
     @Override
     public Mono<Void> updateState(Long chatId, BotState state) {
         return redisReactiveCommandsString
-            .hset(prefix(chatId), "state", state.toString())
-            .then();
+                .hset(prefix(chatId), "state", state.toString())
+                .then();
     }
 
     @Override
@@ -28,8 +28,8 @@ public class RedisUserDataCache implements UserDataCacheRepository {
     @Override
     public Mono<Void> updateFilters(Long chatId, String filters) {
         return redisReactiveCommandsString
-            .hset(prefix(chatId), "filters", filters)
-            .then();
+                .hset(prefix(chatId), "filters", filters)
+                .then();
     }
 
     @Override
@@ -40,17 +40,16 @@ public class RedisUserDataCache implements UserDataCacheRepository {
     @Override
     public Mono<UserCache> getUser(Long chatId) {
         return redisReactiveCommandsString
-            .hgetall(prefix(chatId))
-            .collectMap(KeyValue::getKey, Value::getValue)
-            .map(map -> UserCache.builder()
-                .filters(map.get("filters") == null ? "" : map.get("filters"))
-                .tags(map.get("tags") == null ? "" : map.get("tags"))
-                .botState(Optional.ofNullable(map.get("state"))
-                    .map(SubscriptionBotState::valueOf)
-                    .orElse(null))
-                .link(map.get("link") == null ? "" : map.get("link"))
-                .build()
-            );
+                .hgetall(prefix(chatId))
+                .collectMap(KeyValue::getKey, Value::getValue)
+                .map(map -> UserCache.builder()
+                        .filters(map.get("filters") == null ? "" : map.get("filters"))
+                        .tags(map.get("tags") == null ? "" : map.get("tags"))
+                        .botState(Optional.ofNullable(map.get("state"))
+                                .map(SubscriptionBotState::valueOf)
+                                .orElse(null))
+                        .link(map.get("link") == null ? "" : map.get("link"))
+                        .build());
     }
 
     @Override

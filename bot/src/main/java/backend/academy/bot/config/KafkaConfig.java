@@ -17,17 +17,14 @@ public class KafkaConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-        ConsumerFactory<String, Object> consumerFactory,
-        KafkaTemplate<String, Object> dlqTemplate) {
+            ConsumerFactory<String, Object> consumerFactory, KafkaTemplate<String, Object> dlqTemplate) {
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
-            new ConcurrentKafkaListenerContainerFactory<>();
+                new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
 
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler(
-            new DeadLetterPublishingRecoverer(dlqTemplate),
-            new FixedBackOff(0, 3)
-        );
+        DefaultErrorHandler errorHandler =
+                new DefaultErrorHandler(new DeadLetterPublishingRecoverer(dlqTemplate), new FixedBackOff(0, 3));
 
         errorHandler.addNotRetryableExceptions(DeserializationException.class);
         factory.setCommonErrorHandler(errorHandler);

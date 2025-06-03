@@ -26,32 +26,32 @@ public class ClientsConfig {
     @Bean
     public WebClient scrapperWebClient() {
         return WebClient.builder()
-            .baseUrl(botClientsProps.scrapperUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .baseUrl(botClientsProps.scrapperUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     public WebClient botHttpClient(String telegramToken) {
         return WebClient.builder()
-            .baseUrl("https://api.telegram.org/bot" + telegramToken)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .baseUrl("https://api.telegram.org/bot" + telegramToken)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     public ScrapperClient scrapperClient(
-        DataProps dataProps,
-        WebClient scrapperWebClient,
-        RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
+            DataProps dataProps,
+            WebClient scrapperWebClient,
+            RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return new ScrapperClientCached(
-            dataProps, new ScrapperHttpClient(scrapperWebClient), redisReactiveCommandsProto);
+                dataProps, new ScrapperHttpClient(scrapperWebClient), redisReactiveCommandsProto);
     }
 
     @Bean
     public ScrapperPublisher scrapperPublisher(
-        WebClient scrapperWebClient,
-        RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
+            WebClient scrapperWebClient,
+            RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return new ScrapperPublisherCached(new ScrapperHttpClient(scrapperWebClient), redisReactiveCommandsProto);
     }
 }
