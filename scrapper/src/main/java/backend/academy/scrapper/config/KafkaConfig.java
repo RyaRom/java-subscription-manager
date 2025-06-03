@@ -25,16 +25,6 @@ public record KafkaConfig(Map<String, Topic> kafkaTopics) {
                 .build();
     }
 
-    @Bean
-    public NewTopic linkUpdatesDLQTopic() {
-        var topic = kafkaTopics.get("dlq");
-        return TopicBuilder.name(topic.getName())
-                .partitions(topic.getPartitions())
-                .replicas(topic.getReplicas())
-                .configs(topic.getConfig())
-                .build();
-    }
-
     @Getter
     @Setter
     public static class Topic {

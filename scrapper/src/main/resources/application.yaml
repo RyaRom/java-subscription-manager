@@ -54,9 +54,6 @@ spring:
       link-updates:
         name: link-updates
         partitions: 3
-      dlq:
-        name: dlq
-        partitions: 1
 
 server:
   port: 8081

@@ -4,6 +4,7 @@ import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -13,17 +14,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LinkUpdatesConsumer {
     private final TelegramAPI telegramAPI;
-    private final DLQPublisher dlqPublisher;
 
     @KafkaListener(topics = "${spring.kafka.kafka-topics-names.link-updates}")
-    public void getUpdate(@Payload LinkUpdate linkUpdate) {
-        log.info("received update {}", linkUpdate);
-        telegramAPI
-                .sendMessagesAsync(linkUpdate)
-                .onErrorMap(e -> {
-                    dlqPublisher.sendError(e);
-                    return e;
-                })
-                .subscribe();
+    public void getUpdate(@Payload LinkUpdate linkUpdate,
+                          ConsumerRecord<String, String> record) {
+        log.info("Received update: {}", linkUpdate);
+
+        telegramAPI.sendMessagesAsync(linkUpdate)
+            .subscribe();
     }
 }
