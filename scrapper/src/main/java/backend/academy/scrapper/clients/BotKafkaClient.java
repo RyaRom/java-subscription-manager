@@ -1,9 +1,11 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
+import backend.academy.resilience2.Fallback;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -16,8 +18,10 @@ public class BotKafkaClient implements BotClient {
     public String linkUpdatesTopic;
 
     private final KafkaTemplate<Object, Object> kafkaTemplate;
+    private final ApplicationContext applicationContext;
 
     @Override
+    @Fallback("switchToHttp")
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return Mono.fromFuture(kafkaTemplate.send(linkUpdatesTopic, linkUpdate))
                 .doOnEach(signal -> {
@@ -28,5 +32,12 @@ public class BotKafkaClient implements BotClient {
                     }
                 })
                 .then();
+    }
+
+    public Mono<Void> switchToHttp(LinkUpdate linkUpdate) {
+        var proxy = applicationContext.getBean(BotClientProxy.class);
+        var httpClient = applicationContext.getBean(BotHttpClient.class);
+        proxy.switchStrategy(httpClient);
+        return httpClient.sendUpdate(linkUpdate);
     }
 }

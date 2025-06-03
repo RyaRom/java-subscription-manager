@@ -11,6 +11,7 @@ import backend.academy.scrapper.clients.BotKafkaClient;
 import backend.academy.scrapper.resilience.RetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -62,16 +63,18 @@ public class ClientsConfig {
 
     @Bean
     public BotClient botClient(
-            WebClient botWebClient, KafkaTemplate<Object, Object> kafkaTemplate, RetryService retryService)
+            WebClient botWebClient,
+            KafkaTemplate<Object, Object> kafkaTemplate,
+            RetryService retryService,
+            ApplicationContext applicationContext
+    )
             throws ConfigurationException {
-        BotClient client;
         if (clientsProps.clientType() == null || clientsProps.clientType().equalsIgnoreCase("http")) {
-            client = new BotHttpClient(botWebClient, retryService);
+            client = new BotHttpClient(botWebClient, retryService, applicationContext);
         } else if (clientsProps.clientType().equalsIgnoreCase("kafka")) {
-            client = new BotKafkaClient(kafkaTemplate);
+            client = new BotKafkaClient(kafkaTemplate, applicationContext);
         } else {
             throw new ConfigurationException("Unknown client type " + clientsProps.clientType());
         }
-        return new BotClientProxy(client);
     }
 }
