@@ -4,14 +4,12 @@ import backend.academy.configuration.GlobalConstants;
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.InMemoryTokenBucketRateLimiter;
 import backend.academy.resilience2.impl.RateLimiter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -44,13 +42,11 @@ public class RateLimitingAspect {
         } else if (returnType.equals(Flux.class)) {
             return limitFlux(joinPoint);
         }
-        //won't have context if not reactive
+        // won't have context if not reactive
         throw new IllegalArgumentException("Unsupported return type: " + returnType);
     }
 
-    private Mono<?> limitMono(
-        ProceedingJoinPoint joinPoint
-    ) {
+    private Mono<?> limitMono(ProceedingJoinPoint joinPoint) {
         return Mono.deferContextual(contextView -> {
             log.info("BEFORE METHOD IN MONO ASPECT");
             int retryAfterMs = getRetryAfterMs(joinPoint, contextView);
@@ -83,18 +79,19 @@ public class RateLimitingAspect {
     private int getRetryAfterMs(ProceedingJoinPoint joinPoint, ContextView contextView) {
         String ip = contextView.get(GlobalConstants.USER_IP_CONTEXT);
         log.info("User IP: {}", ip);
-        RateLimiter limiter = limiterForEndpoint.computeIfAbsent(joinPoint.getSignature().toLongString(),
-            k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter())
-        );
+        RateLimiter limiter = limiterForEndpoint.computeIfAbsent(
+                joinPoint.getSignature().toLongString(),
+                k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter()));
         return limiter.processRequest(ip);
     }
 
     private static @NotNull WebClientResponseException getTooManyRequests(int retryAfterMs) {
         return new WebClientResponseException(
-            429, "Too Many Requests",
-            new HttpHeaders(MultiValueMap.fromMultiValue(
-                Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs)))
-            )),
-            null, null);
+                429,
+                "Too Many Requests",
+                new HttpHeaders(MultiValueMap.fromMultiValue(
+                        Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs))))),
+                null,
+                null);
     }
 }

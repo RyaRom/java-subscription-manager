@@ -18,25 +18,25 @@ public class RetryService {
     private final ClientsProps clientsProps;
 
     public <T> Mono<T> withRetry(Mono<T> request) {
-        return request.retryWhen(Retry.backoff(clientsProps.retry().maxAttempts(),
-                Duration.ofMillis(clientsProps.retry().waitDuration()))
-            .filter(RetryService::retryWhen));
+        return request.retryWhen(Retry.backoff(
+                        clientsProps.retry().maxAttempts(),
+                        Duration.ofMillis(clientsProps.retry().waitDuration()))
+                .filter(RetryService::retryWhen));
     }
 
     public <T> Flux<T> withRetry(Flux<T> request) {
-        return request.retryWhen(Retry.backoff(clientsProps.retry().maxAttempts(),
-                Duration.ofMillis(clientsProps.retry().waitDuration()))
-            .filter(RetryService::retryWhen));
+        return request.retryWhen(Retry.backoff(
+                        clientsProps.retry().maxAttempts(),
+                        Duration.ofMillis(clientsProps.retry().waitDuration()))
+                .filter(RetryService::retryWhen));
     }
 
     private static boolean retryWhen(Throwable e) {
         log.info("Got error {} : {} in request", e.getMessage(), e);
         if (e instanceof WebClientResponseException responseException) {
-            log.info("Error {} status {}",
-                responseException.getMessage(),
-                responseException.getStatusCode());
+            log.info("Error {} status {}", responseException.getMessage(), responseException.getStatusCode());
             return responseException.getStatusCode().is5xxServerError()
-                || responseException.getStatusCode().value() == 429;
+                    || responseException.getStatusCode().value() == 429;
         }
         return e instanceof WebClientRequestException;
     }

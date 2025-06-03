@@ -18,11 +18,11 @@ public class TelegramConfig {
     public TelegramBot telegramBot(BotContext botContext) {
         var telegramBot = new TelegramBot(telegramProps.telegramToken());
         telegramBot.setUpdatesListener(
-            updates -> {
-                updates.forEach(botContext::emmitUpdate);
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            },
-            e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
+                updates -> {
+                    updates.forEach(botContext::emmitUpdate);
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                },
+                e -> log.error("ERROR IN TELEGRAM {}", e.response().description()));
         return telegramBot;
     }
 }

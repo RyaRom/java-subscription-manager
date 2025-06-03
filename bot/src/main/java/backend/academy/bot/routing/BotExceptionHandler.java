@@ -20,8 +20,8 @@ public class BotExceptionHandler {
     @ExceptionHandler({Throwable.class, Exception.class})
     public Mono<Void> unknownError(Exception e, Update update) {
         log.error("In unknown error {}. update = {}", e, update);
-        return telegramAPI.sendMessageAsync(update.message(), "Unexpected error: " + e.getMessage()
-            + "\n\n" + e.getClass());
+        return telegramAPI.sendMessageAsync(
+                update.message(), "Unexpected error: " + e.getMessage() + "\n\n" + e.getClass());
     }
 
     @ExceptionHandler({

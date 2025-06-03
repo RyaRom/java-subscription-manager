@@ -15,41 +15,36 @@ public class ReactorRetrier {
     private final ResilienceProps.Retry retryProps;
 
     public <T> Mono<T> withRetry(Mono<T> mono) {
-        return mono.retryWhen(Retry.fixedDelay(
-                    retryProps.maxAttempts(),
-                    Duration.ofMillis(retryProps.waitDuration())
-                ).filter(this::willBeRetried)
-                .doAfterRetry(signal ->
-                    log.info("Retrying for {} error {}",
-                        signal.totalRetries(), signal.failure())))
-            .onErrorMap(e -> {
-                log.error("Retry failed", e);
-                return e.getCause();
-            });
+        return mono.retryWhen(Retry.fixedDelay(retryProps.maxAttempts(), Duration.ofMillis(retryProps.waitDuration()))
+                        .filter(this::willBeRetried)
+                        .doAfterRetry(signal ->
+                                log.info("Retrying for {} error {}", signal.totalRetries(), signal.failure())))
+                .onErrorMap(e -> {
+                    log.error("Retry failed", e);
+                    return e.getCause();
+                });
     }
 
     public <T> Flux<T> withRetry(Flux<T> flux) {
-        return flux.retryWhen(Retry.fixedDelay(
-                    retryProps.maxAttempts(),
-                    Duration.ofMillis(retryProps.waitDuration())
-                ).filter(this::willBeRetried)
-                .doAfterRetry(signal ->
-                    log.info("Retrying for {} error {}",
-                        signal.totalRetries(), signal.failure())))
-            .onErrorMap(e -> {
-                log.error("Retries exhausted", e);
-                return e.getCause();
-            });
+        return flux.retryWhen(Retry.fixedDelay(retryProps.maxAttempts(), Duration.ofMillis(retryProps.waitDuration()))
+                        .filter(this::willBeRetried)
+                        .doAfterRetry(signal ->
+                                log.info("Retrying for {} error {}", signal.totalRetries(), signal.failure())))
+                .onErrorMap(e -> {
+                    log.error("Retries exhausted", e);
+                    return e.getCause();
+                });
     }
 
     private boolean willBeRetried(Throwable e) {
         if (e instanceof WebClientResponseException responseException) {
-            boolean toRetry = !retryProps.blacklistedStatusCodes().contains(
-                responseException.getStatusCode().value());
+            boolean toRetry = !retryProps
+                    .blacklistedStatusCodes()
+                    .contains(responseException.getStatusCode().value());
             log.info("Will be retried? : {}", toRetry);
             return toRetry;
         }
-//                return !retryProps.blacklistedExceptions().contains(e.getClass().getName());
+        //                return !retryProps.blacklistedExceptions().contains(e.getClass().getName());
         return true;
     }
 }

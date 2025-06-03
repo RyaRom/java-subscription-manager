@@ -1,13 +1,13 @@
 package backend.academy.scrapper.config;
 
-import java.time.Duration;
-
-import javax.naming.ConfigurationException;
+import static backend.academy.configuration.GlobalConstants.GITHUB_API_VERSION;
 
 import backend.academy.scrapper.clients.BotClient;
 import backend.academy.scrapper.clients.BotHttpClient;
 import backend.academy.scrapper.clients.BotKafkaClient;
 import backend.academy.scrapper.resilience.RetryService;
+import java.time.Duration;
+import javax.naming.ConfigurationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +18,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
-import static backend.academy.configuration.GlobalConstants.GITHUB_API_VERSION;
-
 @Log4j2
 @Configuration
 @RequiredArgsConstructor
@@ -28,24 +26,21 @@ public class ClientsConfig {
 
     @Bean
     public WebClient githubWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
+        HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         var builder = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(clientsProps.githubUrl())
                 .defaultHeader(GITHUB_API_VERSION, "2022-11-28")
                 .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json");
         if (clientsProps.githubToken() != null) {
-            builder.defaultHeader(HttpHeaders.AUTHORIZATION,
-                    "Bearer " + clientsProps.githubToken());
+            builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + clientsProps.githubToken());
         }
         return builder.build();
     }
 
     @Bean
     public WebClient stackOverflowWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
+        HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         var builder = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(clientsProps.stackOverflowUrl());
@@ -54,8 +49,7 @@ public class ClientsConfig {
 
     @Bean
     public WebClient botWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
+        HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(clientsProps.botUrl())
@@ -65,13 +59,9 @@ public class ClientsConfig {
 
     @Bean
     public BotClient botClient(
-            WebClient botWebClient,
-            KafkaTemplate<Object, Object> kafkaTemplate,
-            RetryService retryService
-    )
+            WebClient botWebClient, KafkaTemplate<Object, Object> kafkaTemplate, RetryService retryService)
             throws ConfigurationException {
-        if (clientsProps.clientType() == null ||
-                clientsProps.clientType().equalsIgnoreCase("http")) {
+        if (clientsProps.clientType() == null || clientsProps.clientType().equalsIgnoreCase("http")) {
             return new BotHttpClient(botWebClient, retryService);
         } else if (clientsProps.clientType().equalsIgnoreCase("kafka")) {
             return new BotKafkaClient(kafkaTemplate);

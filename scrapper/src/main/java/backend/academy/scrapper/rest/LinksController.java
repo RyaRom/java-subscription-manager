@@ -36,9 +36,7 @@ public class LinksController {
     @PostMapping
     @RateLimit
     public Mono<ResponseEntity<LinkResponse>> addLink(
-        @RequestHeader("Tg-Chat-Id") Long chatId,
-        @RequestBody AddLinkRequest request
-    ) {
+            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody AddLinkRequest request) {
         log.info("Add link for chat {}", chatId);
         log.info("request {}", request);
         return linksService.addLink(chatId, request).map(ResponseEntity::ok);
@@ -47,9 +45,7 @@ public class LinksController {
     @DeleteMapping
     @RateLimit
     public Mono<ResponseEntity<LinkResponse>> removeLink(
-        @RequestHeader("Tg-Chat-Id") Long chatId,
-        @RequestBody RemoveLinkRequest request
-    ) {
+            @RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody RemoveLinkRequest request) {
         log.info("Remove link for chat {}", chatId);
         return linksService.removeLink(request.link()).map(ResponseEntity::ok);
     }

@@ -11,5 +11,4 @@ import org.springframework.context.annotation.Import;
     TelegramConfig.class,
     RedisConfig.class,
 })
-public class BotModuleConfig {
-}
+public class BotModuleConfig {}

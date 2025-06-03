@@ -1,8 +1,8 @@
 package backend.academy.configuration;
 
-import java.util.Arrays;
 import backend.academy.resilience2.impl.ReactorRetrier;
 import backend.academy.resilience2.utils.UserIpMiddleware;
+import java.util.Arrays;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +11,7 @@ import org.springframework.core.env.Environment;
 
 @Configuration
 @Log4j2
-@Import({
-    UserIpMiddleware.class,
-    AspectModulesConfig.class
-})
+@Import({UserIpMiddleware.class, AspectModulesConfig.class})
 public class AppConfig {
     @Bean
     public EnvType envType(Environment environment) {
@@ -27,8 +24,8 @@ public class AppConfig {
     }
 
     @Bean
-    public ReactorRetrier defaultRetry(ResilienceProps resilienceProps){
-        //TODO inject bean by config name from properties for multiple configs
+    public ReactorRetrier defaultRetry(ResilienceProps resilienceProps) {
+        // TODO inject bean by config name from properties for multiple configs
         return new ReactorRetrier(resilienceProps.retry());
     }
 }

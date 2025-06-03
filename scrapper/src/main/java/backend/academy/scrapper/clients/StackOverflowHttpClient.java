@@ -1,12 +1,11 @@
 package backend.academy.scrapper.clients;
 
-import java.time.Instant;
-
 import backend.academy.resilience2.Retry;
 import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
 import backend.academy.scrapper.resilience.RetryService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -59,15 +58,14 @@ public class StackOverflowHttpClient {
                 })
                 .retrieve()
                 .bodyToMono(StackResponseForQuestionInfoDto.class);
-        return retryService.withRetry(request)
-                .map(it -> {
-                    var items = it.items();
-                    if (items.isEmpty()) {
-                        log.error("QuestionId {} doesn't have real question", questionId);
-                        throw new IllegalStateException("Question is broken: " + questionId);
-                    }
-                    return items.getFirst().title();
-                });
+        return retryService.withRetry(request).map(it -> {
+            var items = it.items();
+            if (items.isEmpty()) {
+                log.error("QuestionId {} doesn't have real question", questionId);
+                throw new IllegalStateException("Question is broken: " + questionId);
+            }
+            return items.getFirst().title();
+        });
     }
 
     private void addCredentials(UriBuilder builder) {

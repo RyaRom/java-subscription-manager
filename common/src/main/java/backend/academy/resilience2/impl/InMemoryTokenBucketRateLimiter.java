@@ -12,18 +12,15 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class InMemoryTokenBucketRateLimiter implements RateLimiter {
     private final ResilienceProps.RateLimiter rateLimiterProps;
-    //possible redis or other shared storage implementation
+    // possible redis or other shared storage implementation
     private final Map<String, TokenBucket> tokenBuckets = new ConcurrentHashMap<>();
 
     @Override
     public int processRequest(String userIp) {
         TokenBucket tokenBucket = tokenBuckets.computeIfAbsent(
-            userIp,
-            k -> new TokenBucket(
-                new AtomicInteger(rateLimiterProps.maxTokens()),
-                new AtomicLong(System.currentTimeMillis())
-            )
-        );
+                userIp,
+                k -> new TokenBucket(
+                        new AtomicInteger(rateLimiterProps.maxTokens()), new AtomicLong(System.currentTimeMillis())));
         if (tokenBucket.refill(rateLimiterProps.tokensPerSecond(), rateLimiterProps.maxTokens())) {
             return -1;
         } else {

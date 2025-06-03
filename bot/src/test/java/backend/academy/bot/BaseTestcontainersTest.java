@@ -5,7 +5,6 @@ import backend.academy.bot.clients.ScrapperClientCached;
 import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.clients.ScrapperPublisherCached;
-import backend.academy.bot.config.ClientsProps;
 import backend.academy.bot.config.DataProps;
 import backend.academy.bot.testcontainers.redis.CacheRedisTest;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
@@ -31,7 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class BaseTestcontainersTest {
     @Container
     protected static final GenericContainer<?> redisContainer =
-        new GenericContainer<>("redis:latest").withExposedPorts(6379).waitingFor(Wait.forListeningPort());
+            new GenericContainer<>("redis:latest").withExposedPorts(6379).waitingFor(Wait.forListeningPort());
 
     @LocalServerPort
     protected int port;
@@ -52,16 +51,15 @@ public class BaseTestcontainersTest {
         @Bean
         public ScrapperClient scrapperClient() {
             return new ScrapperClientCached(
-                Mockito.mock(DataProps.class),
-                Mockito.mock(ScrapperHttpClient.class),
-                Mockito.mock(RedisReactiveCommands.class));
+                    Mockito.mock(DataProps.class),
+                    Mockito.mock(ScrapperHttpClient.class),
+                    Mockito.mock(RedisReactiveCommands.class));
         }
 
         @Bean
         public ScrapperPublisher scrapperPublisher() {
             return new ScrapperPublisherCached(
-                Mockito.mock(ScrapperHttpClient.class),
-                Mockito.mock(RedisReactiveCommands.class));
+                    Mockito.mock(ScrapperHttpClient.class), Mockito.mock(RedisReactiveCommands.class));
         }
     }
 }

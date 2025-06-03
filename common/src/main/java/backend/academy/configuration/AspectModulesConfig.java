@@ -12,5 +12,4 @@ import org.springframework.context.annotation.Import;
     RetryAspect.class,
     FallbackAspect.class,
 })
-public class AspectModulesConfig {
-}
+public class AspectModulesConfig {}

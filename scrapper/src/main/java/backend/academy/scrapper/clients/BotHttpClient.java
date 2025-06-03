@@ -22,11 +22,11 @@ public class BotHttpClient implements BotClient {
     @Retry
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return retryService.withRetry(botWebClient
-            .post()
-            .uri("/updates")
-            .body(BodyInserters.fromValue(linkUpdate))
-            .retrieve()
-            .toBodilessEntity()
-            .then());
+                .post()
+                .uri("/updates")
+                .body(BodyInserters.fromValue(linkUpdate))
+                .retrieve()
+                .toBodilessEntity()
+                .then());
     }
 }

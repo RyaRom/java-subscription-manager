@@ -34,15 +34,10 @@ public class FallbackAspect {
 
         Mono<Object> fallbackMono = ReactorFallback.getFallbackMono(joinPoint, method);
         if (chain instanceof Mono mono) {
-            return mono.onErrorResume(
-                e -> fallbackMono
-            );
+            return mono.onErrorResume(e -> fallbackMono);
         } else if (chain instanceof Flux flux) {
-            return flux.onErrorResume(
-                e -> fallbackMono
-            );
+            return flux.onErrorResume(e -> fallbackMono);
         }
         throw new RuntimeException("Fallback aspect only supports Mono and Flux");
     }
 }
-

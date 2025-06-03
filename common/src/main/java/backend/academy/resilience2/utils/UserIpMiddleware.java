@@ -12,13 +12,16 @@ public class UserIpMiddleware implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         var address = exchange.getRequest().getRemoteAddress();
-        log.info("UserIpMiddleware filter for ip {}",
-            address == null ? "null" : address.getAddress().getHostAddress());
+        log.info(
+                "UserIpMiddleware filter for ip {}",
+                address == null ? "null" : address.getAddress().getHostAddress());
         if (address != null) {
             return chain.filter(exchange)
-                .contextWrite(context ->
-                    //Forwarded-from
-                    context.put(GlobalConstants.USER_IP_CONTEXT, address.getAddress().getHostAddress()));
+                    .contextWrite(context ->
+                            // Forwarded-from
+                            context.put(
+                                    GlobalConstants.USER_IP_CONTEXT,
+                                    address.getAddress().getHostAddress()));
         }
         return chain.filter(exchange);
     }

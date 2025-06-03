@@ -49,9 +49,7 @@ public class ScrapperControllerAdvice {
     }
 
     @ExceptionHandler(WebClientResponseException.class)
-    public Mono<ResponseEntity<ApiErrorResponse>> handleWebClientResponseException(
-        WebClientResponseException e
-    ) {
+    public Mono<ResponseEntity<ApiErrorResponse>> handleWebClientResponseException(WebClientResponseException e) {
         log.debug("web client response exception", e);
         return Mono.just(ResponseEntity.status(e.getStatusCode())
                 .headers(e.getHeaders())

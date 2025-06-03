@@ -1,14 +1,11 @@
 package backend.academy.bot.config;
 
-import java.time.Duration;
-
 import backend.academy.bot.clients.ScrapperClient;
-import backend.academy.bot.clients.ScrapperClientCached;
 import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.clients.ScrapperPublisher;
-import backend.academy.bot.clients.ScrapperPublisherCached;
 import backend.academy.proto.impl.Links;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +26,7 @@ public class ClientsConfig {
 
     @Bean
     public WebClient scrapperWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
+        HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(clientsProps.scrapperUrl())
@@ -40,8 +36,7 @@ public class ClientsConfig {
 
     @Bean
     public WebClient botHttpClient(TelegramProps telegramProps) {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(clientsProps.timeout()));
+        HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl("https://api.telegram.org/bot" + telegramProps.telegramToken())
@@ -56,9 +51,9 @@ public class ClientsConfig {
             ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return scrapperHttpClient;
-//        return new ScrapperClientCached(
-//                dataProps, scrapperHttpClient,
-//                redisReactiveCommandsProto);
+        //        return new ScrapperClientCached(
+        //                dataProps, scrapperHttpClient,
+        //                redisReactiveCommandsProto);
     }
 
     @Bean
@@ -67,6 +62,6 @@ public class ClientsConfig {
             ScrapperHttpClient scrapperHttpClient,
             RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return scrapperHttpClient;
-//        return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
+        //        return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
     }
 }

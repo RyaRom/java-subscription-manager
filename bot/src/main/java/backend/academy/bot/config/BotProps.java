@@ -11,13 +11,12 @@ import org.springframework.validation.annotation.Validated;
 public record BotProps(BotCommands settings) {
     public String helpMessage() {
         return settings.commands().stream()
-            .map(BotCommand::toString)
-            .reduce((a, b) -> a + "\n" + b)
-            .orElse("No commands found");
+                .map(BotCommand::toString)
+                .reduce((a, b) -> a + "\n" + b)
+                .orElse("No commands found");
     }
 
-    public record BotCommands(List<BotCommand> commands) {
-    }
+    public record BotCommands(List<BotCommand> commands) {}
 
     public record BotCommand(String command, String description) {
         @Override

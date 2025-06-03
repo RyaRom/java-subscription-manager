@@ -14,16 +14,11 @@ public record ClientsProps(
         @NotEmpty String githubUrl,
         @Nullable String clientType,
         Integer timeout,
-        Retry retry
-) {
+        Retry retry) {
     public ClientsProps {
         timeout = 3000;
         retry = new Retry(2, 100L);
     }
 
-    public record Retry(
-            Integer maxAttempts,
-            Long waitDuration
-    ) {
-    }
+    public record Retry(Integer maxAttempts, Long waitDuration) {}
 }

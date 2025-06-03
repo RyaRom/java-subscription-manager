@@ -8,5 +8,4 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Log4j2
 @ConfigurationProperties(prefix = "app.telegram", ignoreUnknownFields = false)
-public record TelegramProps(@NotEmpty String telegramToken) {
-}
+public record TelegramProps(@NotEmpty String telegramToken) {}
