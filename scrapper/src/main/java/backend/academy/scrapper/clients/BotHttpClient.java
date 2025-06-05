@@ -24,10 +24,7 @@ public class BotHttpClient implements BotClient {
     private final ApplicationContext applicationContext;
 
         @Override
-        @Retry
         @Fallback("switchToKafka")
-        @RateLimit
-        @CircuitBreaker
         public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
             return retryService.withRetry(botWebClient
                     .post()

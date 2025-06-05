@@ -9,6 +9,7 @@ import backend.academy.exception.BadLinkException;
 import backend.academy.exception.LinkDuplicatedException;
 import backend.academy.exception.ResourceNotFoundException;
 import backend.academy.exception.ServerUnavailableException;
+import backend.academy.resilience2.CircuitBreaker;
 import backend.academy.resilience2.Fallback;
 import backend.academy.resilience2.Retry;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     @Override
     @Retry
     @Fallback("errorOnGetLinks")
+    @CircuitBreaker
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
                 .get()

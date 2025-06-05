@@ -36,6 +36,7 @@ public class CountBasedCircuitBreaker implements CircuitBreaker {
         if (initCalls > 0) {
             callsInWindow++;
             initCalls--;
+            log.info("Calls before cb startup: {}", initCalls);
             return true;
         }
 

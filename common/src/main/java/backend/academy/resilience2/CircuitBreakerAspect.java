@@ -27,7 +27,7 @@ public class CircuitBreakerAspect {
     private final ResilienceProps resilienceProps;
 
     @Around("@annotation(circuitBreaker)")
-    public Object retry(ProceedingJoinPoint joinPoint, CircuitBreaker circuitBreaker) throws Throwable {
+    public Object circuitBreaker(ProceedingJoinPoint joinPoint, CircuitBreaker circuitBreaker) throws Throwable {
         log.info("CircuitBreaker aspect triggered for {}", joinPoint.getSignature());
         var breaker = breakers.computeIfAbsent(joinPoint.getSignature().toLongString(),
             key -> new CountBasedCircuitBreaker(resilienceProps.circuitBreaker()));
@@ -44,10 +44,15 @@ public class CircuitBreakerAspect {
     private Object processMono(
         ProceedingJoinPoint joinPoint,
         backend.academy.resilience2.impl.CircuitBreaker breaker
-    ) throws Throwable {
+    ) {
         boolean result = breaker.process();
         if (result) {
-            Mono<?> mono = (Mono<?>) joinPoint.proceed();
+            Mono<?> mono;
+            try {
+                mono = (Mono<?>) joinPoint.proceed();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
             return breaker.addOnErrorCallback(mono);
         } else {
             return Mono.error(ResilienceUtils.getTooManyRequests(
@@ -58,10 +63,15 @@ public class CircuitBreakerAspect {
     private Object processFlux(
         ProceedingJoinPoint joinPoint,
         backend.academy.resilience2.impl.CircuitBreaker breaker
-    ) throws Throwable {
+    ) {
         boolean result = breaker.process();
         if (result) {
-            Flux<?> flux = (Flux<?>) joinPoint.proceed();
+            Flux<?> flux;
+            try {
+                flux = (Flux<?>) joinPoint.proceed();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
             return breaker.addOnErrorCallback(flux);
         } else {
             return Flux.error(ResilienceUtils.getTooManyRequests(
