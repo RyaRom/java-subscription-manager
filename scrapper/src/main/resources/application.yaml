@@ -10,7 +10,7 @@ app:
     github-token: ${GITHUB_TOKEN}
     stack-overflow-url: https://api.stackexchange.com/2.3
     github-url: https://api.github.com
-    client-type: kafka
+    client-type: http
     timeout: 3000
     retry:
       max-attempts: 2
@@ -34,6 +34,12 @@ resilience2:
   rate-limiter:
     max-tokens: 10
     tokens-per-second: 5
+  circuit-breaker:
+    init-calls: 5
+    window-size: 100
+    failure-rate-threshold: 50
+    wait-duration-in-open-state-ms: 1000
+    half-open-calls-permitted: 10
 
 
 spring:

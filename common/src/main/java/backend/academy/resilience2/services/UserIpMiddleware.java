@@ -1,4 +1,4 @@
-package backend.academy.resilience2.utils;
+package backend.academy.resilience2.services;
 
 import backend.academy.configuration.GlobalConstants;
 import lombok.extern.log4j.Log4j2;

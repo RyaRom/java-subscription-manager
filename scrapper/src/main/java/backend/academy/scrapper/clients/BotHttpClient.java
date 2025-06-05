@@ -1,6 +1,7 @@
 package backend.academy.scrapper.clients;
 
 import backend.academy.dto.LinkUpdate;
+import backend.academy.resilience2.CircuitBreaker;
 import backend.academy.resilience2.Fallback;
 import backend.academy.resilience2.RateLimit;
 import backend.academy.resilience2.Retry;
@@ -26,6 +27,7 @@ public class BotHttpClient implements BotClient {
         @Retry
         @Fallback("switchToKafka")
         @RateLimit
+        @CircuitBreaker
         public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
             return retryService.withRetry(botWebClient
                     .post()

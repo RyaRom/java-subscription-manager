@@ -69,6 +69,13 @@ resilience2:
   rate-limiter:
     max-tokens: 50
     tokens-per-second: 10
+  circuit-breaker:
+    init-calls: 5
+    window-size: 100
+    failure-rate-threshold: 50
+    wait-duration-in-open-state-ms: 1000
+    half-open-calls-permitted: 10
+
 
 
 springdoc:

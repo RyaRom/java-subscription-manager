@@ -1,7 +1,7 @@
 package backend.academy.configuration;
 
 import backend.academy.resilience2.impl.ReactorRetrier;
-import backend.academy.resilience2.utils.UserIpMiddleware;
+import backend.academy.resilience2.services.UserIpMiddleware;
 import java.util.Arrays;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;

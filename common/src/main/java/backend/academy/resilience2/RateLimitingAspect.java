@@ -5,7 +5,6 @@ import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.InMemoryTokenBucketRateLimiter;
 import backend.academy.resilience2.impl.RateLimiter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,14 +12,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.ContextView;
+import static backend.academy.resilience2.utils.ResilienceUtils.getTooManyRequests;
 
 @Aspect
 @Log4j2
@@ -80,18 +76,8 @@ public class RateLimitingAspect {
         String ip = contextView.get(GlobalConstants.USER_IP_CONTEXT);
         log.info("User IP: {}", ip);
         RateLimiter limiter = limiterForEndpoint.computeIfAbsent(
-                joinPoint.getSignature().toLongString(),
-                k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter()));
+            joinPoint.getSignature().toLongString(),
+            k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter()));
         return limiter.processRequest(ip);
-    }
-
-    private static @NotNull WebClientResponseException getTooManyRequests(int retryAfterMs) {
-        return new WebClientResponseException(
-                429,
-                "Too Many Requests",
-                new HttpHeaders(MultiValueMap.fromMultiValue(
-                        Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs))))),
-                null,
-                null);
     }
 }
