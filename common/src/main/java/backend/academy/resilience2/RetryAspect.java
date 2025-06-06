@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Aspect
 @Log4j2
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class RetryAspect {
     private final ReactorRetrier defaultRetry;
 

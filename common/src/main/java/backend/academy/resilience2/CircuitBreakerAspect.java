@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 @Aspect
 @Log4j2
 @Component
-@Order(2)
+@Order(0)
 public class CircuitBreakerAspect {
     private final Map<String, backend.academy.resilience2.impl.CircuitBreaker> breakers =
             new HashMap<>();
