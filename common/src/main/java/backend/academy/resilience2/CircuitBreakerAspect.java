@@ -41,26 +41,27 @@ public class CircuitBreakerAspect {
         throw new IllegalStateException("Unsupported chain type");
     }
 
-    private Object processMono(
+    private Mono<?> processMono(
         ProceedingJoinPoint joinPoint,
         backend.academy.resilience2.impl.CircuitBreaker breaker
     ) {
-        boolean result = breaker.process();
-        if (result) {
-            Mono<?> mono;
-            try {
-                mono = (Mono<?>) joinPoint.proceed();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
+        return Mono.just(breaker.process()).flatMap(result -> {
+            if (result) {
+                Mono<?> mono;
+                try {
+                    mono = (Mono<?>) joinPoint.proceed();
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+                return breaker.addOnErrorCallback(mono);
+            } else {
+                return Mono.error(ResilienceUtils.getTooManyRequests(
+                    resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
             }
-            return breaker.addOnErrorCallback(mono);
-        } else {
-            return Mono.error(ResilienceUtils.getTooManyRequests(
-                resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
-        }
+        });
     }
 
-    private Object processFlux(
+    private Flux<?> processFlux(
         ProceedingJoinPoint joinPoint,
         backend.academy.resilience2.impl.CircuitBreaker breaker
     ) {

@@ -70,9 +70,9 @@ public class ClientsConfig {
     )
             throws ConfigurationException {
         if (clientsProps.clientType() == null || clientsProps.clientType().equalsIgnoreCase("http")) {
-            client = new BotHttpClient(botWebClient, retryService, applicationContext);
+            return new BotHttpClient(botWebClient, retryService, applicationContext);
         } else if (clientsProps.clientType().equalsIgnoreCase("kafka")) {
-            client = new BotKafkaClient(kafkaTemplate, applicationContext);
+            return new BotKafkaClient(kafkaTemplate, applicationContext);
         } else {
             throw new ConfigurationException("Unknown client type " + clientsProps.clientType());
         }
