@@ -23,7 +23,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
 import static backend.academy.configuration.GlobalConstants.TG_CHAT_ID;
 
 @RequiredArgsConstructor
@@ -48,10 +47,10 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     @CircuitBreaker
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
-                .get()
-                .uri("/links")
-                .header(TG_CHAT_ID, chatId.toString())
-                .retrieve();
+            .get()
+            .uri("/links")
+            .header(TG_CHAT_ID, chatId.toString())
+            .retrieve();
         return handleErrorsDefault(result).bodyToMono(ListLinkResponse.class).publishOn(Schedulers.boundedElastic());
     }
 
@@ -59,11 +58,11 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     @Retry
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         var result = scrapperWebClient
-                .post()
-                .uri("/links")
-                .header(TG_CHAT_ID, chatId.toString())
-                .body(BodyInserters.fromValue(addLinkRequest))
-                .retrieve();
+            .post()
+            .uri("/links")
+            .header(TG_CHAT_ID, chatId.toString())
+            .body(BodyInserters.fromValue(addLinkRequest))
+            .retrieve();
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
@@ -71,25 +70,25 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     @Retry
     public Mono<Void> removeLink(Long chatId, String link) {
         var result = scrapperWebClient
-                // body in delete is not allowed by default
-                .method(HttpMethod.DELETE)
-                .uri("/links")
-                .header(TG_CHAT_ID, chatId.toString())
-                .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
-                .retrieve();
+            // body in delete is not allowed by default
+            .method(HttpMethod.DELETE)
+            .uri("/links")
+            .header(TG_CHAT_ID, chatId.toString())
+            .body(BodyInserters.fromValue(new RemoveLinkRequest(link)))
+            .retrieve();
         return handleErrorsDefault(result).toBodilessEntity().then().publishOn(Schedulers.boundedElastic());
     }
 
     private WebClient.ResponseSpec handleErrorsDefault(WebClient.ResponseSpec responseSpec) {
         return responseSpec
-                .onStatus(code -> code.equals(HttpStatusCode.valueOf(404)), response -> response.bodyToMono(
-                                ApiErrorResponse.class)
-                        .flatMap(body -> Mono.error(new ResourceNotFoundException("Not found resource"))))
-                .onStatus(HttpStatusCode::is5xxServerError, response -> response.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Server error: " + body))))
-                .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response -> response.bodyToMono(
-                                ApiErrorResponse.class)
-                        .flatMap(ScrapperHttpClient::map400Error));
+            .onStatus(code -> code.equals(HttpStatusCode.valueOf(404)), response -> response.bodyToMono(
+                    ApiErrorResponse.class)
+                .flatMap(body -> Mono.error(new ResourceNotFoundException("Not found resource"))))
+            .onStatus(HttpStatusCode::is5xxServerError, response -> response.bodyToMono(String.class)
+                .flatMap(body -> Mono.error(new RuntimeException("Server error: " + body))))
+            .onStatus(code -> code.equals(HttpStatusCode.valueOf(400)), response -> response.bodyToMono(
+                    ApiErrorResponse.class)
+                .flatMap(ScrapperHttpClient::map400Error));
     }
 
     private static @NotNull Mono<Throwable> map400Error(ApiErrorResponse body) {
@@ -112,15 +111,23 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     public Mono<Void> errorOnChatRegister(Long chatId) {
         System.err.println("IN CHAT REGISTER FALLBACK");
-        return telegramAPI.sendMessageAsync(chatId,
-                "Your chat's wasn't registered because server doesn't respond");
+        return Mono.fromRunnable(() -> telegramAPI.sendMessageAsync(chatId,
+            "Your chat's wasn't registered because server doesn't respond"));
     }
 
     public Mono<ListLinkResponse> errorOnGetLinks(Long chatId) {
         System.err.println("IN GET LINKS FALLBACK");
+
+//        ----------------------------------------------
+//        example of BAD code ---> all sync operation will be executed twice
 //        telegramAPI.sendMessageAsync(
 //                chatId, "Server doesn't respond (duplicated fallback for demonstration)")
 //                .subscribe();
-        return Mono.error(new ServerUnavailableException());
+//        return Mono.error()
+//        ----------------------------------------------
+
+        return Mono.fromRunnable(() -> telegramAPI.sendMessageAsync(
+                chatId, "Server doesn't respond")
+            .subscribe()).flatMap((it) -> Mono.error(new ServerUnavailableException()));
     }
 }
