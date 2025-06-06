@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class BotKafkaClient implements BotClient {
     private final KafkaTemplate<Object, Object> kafkaTemplate;
+
     @Value("${spring.kafka.kafka-topics.link-updates.name}")
     public String linkUpdatesTopic;
 
@@ -21,13 +22,13 @@ public class BotKafkaClient implements BotClient {
     @Fallback("switchToHttp")
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return Mono.fromFuture(kafkaTemplate.send(linkUpdatesTopic, linkUpdate))
-            .doOnEach(signal -> {
-                if (signal.isOnError()) {
-                    log.warn("Failing to send {}: {}", linkUpdate, signal.getThrowable());
-                } else {
-                    log.info("Successfully sent {}", linkUpdate);
-                }
-            })
-            .then();
+                .doOnEach(signal -> {
+                    if (signal.isOnError()) {
+                        log.warn("Failing to send {}: {}", linkUpdate, signal.getThrowable());
+                    } else {
+                        log.info("Successfully sent {}", linkUpdate);
+                    }
+                })
+                .then();
     }
 }

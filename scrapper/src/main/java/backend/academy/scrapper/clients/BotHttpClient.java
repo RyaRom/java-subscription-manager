@@ -18,11 +18,11 @@ public class BotHttpClient implements BotClient {
     @Override
     public Mono<Void> sendUpdate(LinkUpdate linkUpdate) {
         return botWebClient
-            .post()
-            .uri("/updates")
-            .body(BodyInserters.fromValue(linkUpdate))
-            .retrieve()
-            .toBodilessEntity()
-            .then();
+                .post()
+                .uri("/updates")
+                .body(BodyInserters.fromValue(linkUpdate))
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 }

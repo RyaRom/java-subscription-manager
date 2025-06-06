@@ -12,16 +12,16 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class ResilienceUtils {
     public static @NotNull WebClientResponseException getTooManyRequests(int retryAfterMs) {
         return new WebClientResponseException(
-            429,
-            "Too Many Requests",
-            new HttpHeaders(MultiValueMap.fromMultiValue(
-                Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs))))),
-            null,
-            null);
+                429,
+                "Too Many Requests",
+                new HttpHeaders(MultiValueMap.fromMultiValue(
+                        Map.of(HttpHeaders.RETRY_AFTER, List.of(String.valueOf(retryAfterMs))))),
+                null,
+                null);
     }
 
     public static boolean is4xx(Throwable throwable) {
-        return throwable instanceof WebClientResponseException &&
-            ((WebClientResponseException) throwable).getStatusCode().is4xxClientError();
+        return throwable instanceof WebClientResponseException
+                && ((WebClientResponseException) throwable).getStatusCode().is4xxClientError();
     }
 }

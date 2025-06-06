@@ -1,10 +1,9 @@
 package backend.academy.resilience2;
 
+import backend.academy.resilience2.impl.ReactorFallback;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import backend.academy.resilience2.impl.ReactorFallback;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,8 +30,8 @@ public class FallbackAspect {
         log.info("Fallback aspect triggered for {}", joinPoint.getSignature());
         var args = joinPoint.getArgs();
         var fallback = findFallback(joinPoint);
-        var method = nameToMethod.computeIfAbsent(fallback.value(), name ->
-                ReactorFallback.findMethod(joinPoint, name, args));
+        var method = nameToMethod.computeIfAbsent(
+                fallback.value(), name -> ReactorFallback.findMethod(joinPoint, name, args));
         Object chain = joinPoint.proceed();
 
         if (chain instanceof Mono mono) {
@@ -46,7 +45,7 @@ public class FallbackAspect {
     }
 
     private Fallback findFallback(ProceedingJoinPoint joinPoint) {
-        //could be bound in aspect method if spring aop wasn't that randomly broken
+        // could be bound in aspect method if spring aop wasn't that randomly broken
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         return signature.getMethod().getAnnotation(Fallback.class);
     }

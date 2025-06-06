@@ -9,9 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Fallback {
 
-    /**
-     * Fallback method name,
-     * Fallback should have same args and return type as parent method
-     */
+    /** Fallback method name, Fallback should have same args and return type as parent method */
     String value();
 }

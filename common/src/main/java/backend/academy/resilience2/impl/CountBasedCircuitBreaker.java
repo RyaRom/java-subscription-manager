@@ -29,10 +29,15 @@ public class CountBasedCircuitBreaker implements CircuitBreaker {
 
     @Override
     public boolean process() {
-        log.info("Request is in cb," +
-                " state: {}, calls in window: {}, init calls: {}," +
-                " failed calls: {}, half open calls: {}, opening time: {}",
-            state, callsInWindow, initCalls, failedCalls, halfOpenCalls, openingTime);
+        log.info(
+                "Request is in cb," + " state: {}, calls in window: {}, init calls: {},"
+                        + " failed calls: {}, half open calls: {}, opening time: {}",
+                state,
+                callsInWindow,
+                initCalls,
+                failedCalls,
+                halfOpenCalls,
+                openingTime);
         if (initCalls > 0) {
             callsInWindow++;
             initCalls--;
@@ -136,8 +141,7 @@ public class CountBasedCircuitBreaker implements CircuitBreaker {
             return;
         }
 
-        log.info("In cb callback, failed requests per window: {}, error {}",
-            failedCalls, e);
+        log.info("In cb callback, failed requests per window: {}, error {}", failedCalls, e);
         if (ResilienceUtils.is4xx(e)) {
             log.info("4xx error in cb callback");
             return;

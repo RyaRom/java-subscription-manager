@@ -14,11 +14,7 @@ import reactor.core.publisher.Mono;
 
 @Log4j2
 public class ReactorFallback {
-    public static @NotNull Mono<Object> getFallbackMono(
-        ProceedingJoinPoint joinPoint,
-        Method method,
-        Object[] args
-    ) {
+    public static @NotNull Mono<Object> getFallbackMono(ProceedingJoinPoint joinPoint, Method method, Object[] args) {
         if (method.getReturnType() == Mono.class) {
             try {
                 return (Mono<Object>) method.invoke(joinPoint.getTarget(), args);
@@ -36,11 +32,7 @@ public class ReactorFallback {
         });
     }
 
-    public static @NotNull Flux<Object> getFallbackFlux(
-        ProceedingJoinPoint joinPoint,
-        Method method,
-        Object[] args
-    ) {
+    public static @NotNull Flux<Object> getFallbackFlux(ProceedingJoinPoint joinPoint, Method method, Object[] args) {
         if (method.getReturnType() == Flux.class) {
             try {
                 return (Flux<Object>) method.invoke(joinPoint.getTarget(), args);
@@ -55,8 +47,8 @@ public class ReactorFallback {
     public static Method findMethod(JoinPoint joinPoint, String methodName, Object[] args) {
         Class<?> target = AopUtils.getTargetClass(joinPoint.getTarget());
         try {
-            return target.getMethod(methodName,
-                Arrays.stream(args).map(Object::getClass).toArray(Class[]::new));
+            return target.getMethod(
+                    methodName, Arrays.stream(args).map(Object::getClass).toArray(Class[]::new));
         } catch (NoSuchMethodException e) {
             log.error("Fallback method {} {} not found", methodName, Arrays.toString(args));
             throw new FallbackException("Fallback method not found");

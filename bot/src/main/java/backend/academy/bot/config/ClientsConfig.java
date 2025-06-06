@@ -30,38 +30,36 @@ public class ClientsConfig {
     public WebClient scrapperWebClient() {
         HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .baseUrl(clientsProps.scrapperUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(clientsProps.scrapperUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     public WebClient botHttpClient(TelegramProps telegramProps) {
         HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(clientsProps.timeout()));
         return WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .baseUrl("https://api.telegram.org/bot" + telegramProps.telegramToken())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl("https://api.telegram.org/bot" + telegramProps.telegramToken())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     @Bean
     @Profile({"dev"})
     public ScrapperClient scrapperClient(
-        DataProps dataProps,
-        ScrapperHttpClient scrapperHttpClient,
-        RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
-        return new ScrapperClientCached(
-            dataProps, scrapperHttpClient,
-            redisReactiveCommandsProto);
+            DataProps dataProps,
+            ScrapperHttpClient scrapperHttpClient,
+            RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
+        return new ScrapperClientCached(dataProps, scrapperHttpClient, redisReactiveCommandsProto);
     }
 
     @Bean
     @Profile({"dev"})
     public ScrapperPublisher scrapperPublisher(
-        ScrapperHttpClient scrapperHttpClient,
-        RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
+            ScrapperHttpClient scrapperHttpClient,
+            RedisReactiveCommands<String, Links.ListLinksProto> redisReactiveCommandsProto) {
         return new ScrapperPublisherCached(scrapperHttpClient, redisReactiveCommandsProto);
     }
 }

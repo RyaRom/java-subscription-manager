@@ -18,29 +18,29 @@ public class GithubHttpClient {
     @CircuitBreaker
     public Flux<GithubActivityResponse> getRepoActivities(String owner, String repo) {
         return githubWebClient
-            .get()
-            .uri("/repos/{owner}/{repo}/activity", owner, repo)
-            .retrieve()
-            .bodyToFlux(GithubActivityResponse.class);
+                .get()
+                .uri("/repos/{owner}/{repo}/activity", owner, repo)
+                .retrieve()
+                .bodyToFlux(GithubActivityResponse.class);
     }
 
     @Retry
     @CircuitBreaker
     public Flux<GithubIssueOrPrResponse> getRepoIssues(String owner, String repo) {
         return githubWebClient
-            .get()
-            .uri("/repos/{owner}/{repo}/issues", owner, repo)
-            .retrieve()
-            .bodyToFlux(GithubIssueOrPrResponse.class);
+                .get()
+                .uri("/repos/{owner}/{repo}/issues", owner, repo)
+                .retrieve()
+                .bodyToFlux(GithubIssueOrPrResponse.class);
     }
 
     @Retry
     @CircuitBreaker
     public Flux<GithubIssueOrPrResponse> getRepoPulls(String owner, String repo) {
         return githubWebClient
-            .get()
-            .uri("/repos/{owner}/{repo}/pulls", owner, repo)
-            .retrieve()
-            .bodyToFlux(GithubIssueOrPrResponse.class);
+                .get()
+                .uri("/repos/{owner}/{repo}/pulls", owner, repo)
+                .retrieve()
+                .bodyToFlux(GithubIssueOrPrResponse.class);
     }
 }

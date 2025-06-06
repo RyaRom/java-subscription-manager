@@ -1,12 +1,13 @@
 package backend.academy.resilience2;
 
-import java.util.HashMap;
-import java.util.Map;
+import static backend.academy.resilience2.utils.ResilienceUtils.getTooManyRequests;
 
 import backend.academy.configuration.GlobalConstants;
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.InMemoryTokenBucketRateLimiter;
 import backend.academy.resilience2.impl.RateLimiter;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.ContextView;
-
-import static backend.academy.resilience2.utils.ResilienceUtils.getTooManyRequests;
 
 @Aspect
 @Log4j2

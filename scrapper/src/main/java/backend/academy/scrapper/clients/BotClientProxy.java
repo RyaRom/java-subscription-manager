@@ -25,8 +25,7 @@ public class BotClientProxy implements BotClient {
 
     public Mono<Void> switchStrategy(LinkUpdate linkUpdate) {
         return Mono.fromRunnable(() -> {
-            log.info("Switching strategy to {}",
-                delegate instanceof BotKafkaClient ? "http" : "kafka");
+            log.info("Switching strategy to {}", delegate instanceof BotKafkaClient ? "http" : "kafka");
             if (delegate instanceof BotKafkaClient) {
                 delegate = botHttpClient;
             } else {

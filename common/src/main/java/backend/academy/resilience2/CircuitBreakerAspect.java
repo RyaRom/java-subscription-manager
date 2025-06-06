@@ -1,11 +1,10 @@
 package backend.academy.resilience2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.CountBasedCircuitBreaker;
 import backend.academy.resilience2.utils.ResilienceUtils;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,8 +20,7 @@ import reactor.core.publisher.Mono;
 @Component
 @Order(0)
 public class CircuitBreakerAspect {
-    private final Map<String, backend.academy.resilience2.impl.CircuitBreaker> breakers =
-            new HashMap<>();
+    private final Map<String, backend.academy.resilience2.impl.CircuitBreaker> breakers = new HashMap<>();
     private final ResilienceProps resilienceProps;
 
     public CircuitBreakerAspect(ResilienceProps resilienceProps) {
@@ -33,7 +31,8 @@ public class CircuitBreakerAspect {
     @Around(value = "@annotation(CircuitBreaker)", argNames = "joinPoint")
     public Object circuitBreaker(ProceedingJoinPoint joinPoint) {
         log.info("CircuitBreaker aspect triggered for {}", joinPoint.getSignature());
-        var breaker = breakers.computeIfAbsent(joinPoint.getSignature().toLongString(),
+        var breaker = breakers.computeIfAbsent(
+                joinPoint.getSignature().toLongString(),
                 key -> new CountBasedCircuitBreaker(resilienceProps.circuitBreaker()));
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         var returnType = signature.getReturnType();
@@ -46,9 +45,7 @@ public class CircuitBreakerAspect {
     }
 
     private Mono<?> processMono(
-            ProceedingJoinPoint joinPoint,
-            backend.academy.resilience2.impl.CircuitBreaker breaker
-    ) {
+            ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
         return Mono.just(breaker.process()).flatMap(result -> {
             if (result) {
                 Mono<?> mono;
@@ -66,9 +63,7 @@ public class CircuitBreakerAspect {
     }
 
     private Flux<?> processFlux(
-            ProceedingJoinPoint joinPoint,
-            backend.academy.resilience2.impl.CircuitBreaker breaker
-    ) {
+            ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
         boolean result = breaker.process();
         if (result) {
             Flux<?> flux;
