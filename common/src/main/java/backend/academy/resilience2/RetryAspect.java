@@ -23,7 +23,7 @@ public class RetryAspect {
         this.defaultRetry = defaultRetry;
     }
 
-    @Around("@annotation(retry)")
+    @Around(value = "@annotation(Retry)", argNames = "joinPoint")
     public Object retry(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Retry aspect triggered for {}", joinPoint.getSignature());
         var chain = joinPoint.proceed();

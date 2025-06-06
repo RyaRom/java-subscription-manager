@@ -1,11 +1,11 @@
 package backend.academy.resilience2;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.CountBasedCircuitBreaker;
 import backend.academy.resilience2.utils.ResilienceUtils;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -20,17 +20,21 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @Component
 @Order(2)
-@RequiredArgsConstructor
 public class CircuitBreakerAspect {
     private final Map<String, backend.academy.resilience2.impl.CircuitBreaker> breakers =
-        new HashMap<>();
+            new HashMap<>();
     private final ResilienceProps resilienceProps;
 
-    @Around("@annotation(circuitBreaker)")
-    public Object circuitBreaker(ProceedingJoinPoint joinPoint) throws Throwable {
+    public CircuitBreakerAspect(ResilienceProps resilienceProps) {
+        this.resilienceProps = resilienceProps;
+        log.info("Circuit breaker aspect initialized");
+    }
+
+    @Around(value = "@annotation(CircuitBreaker)", argNames = "joinPoint")
+    public Object circuitBreaker(ProceedingJoinPoint joinPoint) {
         log.info("CircuitBreaker aspect triggered for {}", joinPoint.getSignature());
         var breaker = breakers.computeIfAbsent(joinPoint.getSignature().toLongString(),
-            key -> new CountBasedCircuitBreaker(resilienceProps.circuitBreaker()));
+                key -> new CountBasedCircuitBreaker(resilienceProps.circuitBreaker()));
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         var returnType = signature.getReturnType();
         if (returnType.equals(Mono.class)) {
@@ -42,8 +46,8 @@ public class CircuitBreakerAspect {
     }
 
     private Mono<?> processMono(
-        ProceedingJoinPoint joinPoint,
-        backend.academy.resilience2.impl.CircuitBreaker breaker
+            ProceedingJoinPoint joinPoint,
+            backend.academy.resilience2.impl.CircuitBreaker breaker
     ) {
         return Mono.just(breaker.process()).flatMap(result -> {
             if (result) {
@@ -56,14 +60,14 @@ public class CircuitBreakerAspect {
                 return breaker.addOnErrorCallback(mono);
             } else {
                 return Mono.error(ResilienceUtils.getTooManyRequests(
-                    resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
+                        resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
             }
         });
     }
 
     private Flux<?> processFlux(
-        ProceedingJoinPoint joinPoint,
-        backend.academy.resilience2.impl.CircuitBreaker breaker
+            ProceedingJoinPoint joinPoint,
+            backend.academy.resilience2.impl.CircuitBreaker breaker
     ) {
         boolean result = breaker.process();
         if (result) {
@@ -76,7 +80,7 @@ public class CircuitBreakerAspect {
             return breaker.addOnErrorCallback(flux);
         } else {
             return Flux.error(ResilienceUtils.getTooManyRequests(
-                resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
+                    resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
         }
     }
 }
