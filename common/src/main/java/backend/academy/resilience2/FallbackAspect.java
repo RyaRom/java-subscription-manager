@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class FallbackAspect {
     private final Map<String, Method> nameToMethod = new HashMap<>();
 
-    @Around("@annotation(fallback)")
+    @Around(value = "@annotation(fallback)", argNames = "joinPoint,fallback")
     public Object fallback(ProceedingJoinPoint joinPoint, Fallback fallback) throws Throwable {
         log.info("Fallback aspect triggered for {}", joinPoint.getSignature());
         var args = joinPoint.getArgs();

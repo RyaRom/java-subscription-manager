@@ -27,7 +27,7 @@ public class CircuitBreakerAspect {
     private final ResilienceProps resilienceProps;
 
     @Around("@annotation(circuitBreaker)")
-    public Object circuitBreaker(ProceedingJoinPoint joinPoint, CircuitBreaker circuitBreaker) throws Throwable {
+    public Object circuitBreaker(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("CircuitBreaker aspect triggered for {}", joinPoint.getSignature());
         var breaker = breakers.computeIfAbsent(joinPoint.getSignature().toLongString(),
             key -> new CountBasedCircuitBreaker(resilienceProps.circuitBreaker()));

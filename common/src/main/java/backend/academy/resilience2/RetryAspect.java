@@ -24,7 +24,7 @@ public class RetryAspect {
     }
 
     @Around("@annotation(retry)")
-    public Object retry(ProceedingJoinPoint joinPoint, Retry retry) throws Throwable {
+    public Object retry(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Retry aspect triggered for {}", joinPoint.getSignature());
         var chain = joinPoint.proceed();
         if (chain instanceof Mono<?> mono) {

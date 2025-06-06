@@ -28,7 +28,7 @@ public class RateLimitingAspect {
     private final Map<String, RateLimiter> limiterForEndpoint = new HashMap<>();
 
     @Around("@annotation(rateLimit)")
-    public Object rateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
+    public Object rateLimit(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("RateLimit aspect triggered for {}", joinPoint.getSignature());
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
