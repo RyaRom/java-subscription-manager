@@ -26,6 +26,7 @@ import static backend.academy.resilience2.utils.ResilienceUtils.getTooManyReques
 @RequiredArgsConstructor
 public class RateLimitingAspect {
     // could be done with separated properties for name and get name in annotation
+    // for multiple config variations
     private final ResilienceProps resilienceProps;
     private final Map<String, RateLimiter> limiterForEndpoint = new HashMap<>();
 

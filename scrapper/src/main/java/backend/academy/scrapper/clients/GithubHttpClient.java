@@ -1,5 +1,6 @@
 package backend.academy.scrapper.clients;
 
+import backend.academy.resilience2.CircuitBreaker;
 import backend.academy.resilience2.Retry;
 import backend.academy.scrapper.repository.links.dto.github.GithubActivityResponse;
 import backend.academy.scrapper.repository.links.dto.github.GithubIssueOrPrResponse;
@@ -14,6 +15,7 @@ public class GithubHttpClient {
     private final WebClient githubWebClient;
 
     @Retry
+    @CircuitBreaker
     public Flux<GithubActivityResponse> getRepoActivities(String owner, String repo) {
         return githubWebClient
             .get()
@@ -23,6 +25,7 @@ public class GithubHttpClient {
     }
 
     @Retry
+    @CircuitBreaker
     public Flux<GithubIssueOrPrResponse> getRepoIssues(String owner, String repo) {
         return githubWebClient
             .get()
@@ -32,6 +35,7 @@ public class GithubHttpClient {
     }
 
     @Retry
+    @CircuitBreaker
     public Flux<GithubIssueOrPrResponse> getRepoPulls(String owner, String repo) {
         return githubWebClient
             .get()

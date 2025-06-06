@@ -1,5 +1,6 @@
 package backend.academy.scrapper.clients;
 
+import backend.academy.resilience2.CircuitBreaker;
 import backend.academy.resilience2.Retry;
 import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
@@ -20,6 +21,7 @@ public class StackOverflowHttpClient {
     private final StackOverflowCredentials credentials;
 
     @Retry
+    @CircuitBreaker
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewAnswers(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
@@ -33,6 +35,7 @@ public class StackOverflowHttpClient {
     }
 
     @Retry
+    @CircuitBreaker
     public Mono<StackResponseForUpdatesDto> getStackOverflowNewComments(Long questionId, Instant fromDate) {
         var builder = stackOverflowWebClient.get();
         return builder.uri(uriBuilder -> {
@@ -46,6 +49,7 @@ public class StackOverflowHttpClient {
     }
 
     @Retry
+    @CircuitBreaker
     public Mono<String> getQuestionTitle(Long questionId) {
         var builder = stackOverflowWebClient.get();
         var request = builder.uri(uriBuilder -> {

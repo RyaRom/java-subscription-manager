@@ -35,6 +35,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
+    @CircuitBreaker
     @Fallback("errorOnChatRegister")
     public Mono<Void> registerChat(Long chatId) {
         var result = scrapperWebClient.post().uri("/tg-chat/{chatId}", chatId).retrieve();
@@ -43,8 +44,8 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
-    @Fallback("errorOnGetLinks")
     @CircuitBreaker
+    @Fallback("errorOnGetLinks")
     public Mono<ListLinkResponse> getLinks(Long chatId) {
         var result = scrapperWebClient
             .get()
@@ -56,6 +57,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
+    @CircuitBreaker
     public Mono<Void> addLink(Long chatId, AddLinkRequest addLinkRequest) {
         var result = scrapperWebClient
             .post()
@@ -68,6 +70,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     @Override
     @Retry
+    @CircuitBreaker
     public Mono<Void> removeLink(Long chatId, String link) {
         var result = scrapperWebClient
             // body in delete is not allowed by default
