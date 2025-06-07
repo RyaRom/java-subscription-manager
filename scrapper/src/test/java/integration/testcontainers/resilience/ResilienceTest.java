@@ -1,5 +1,6 @@
 package integration.testcontainers.resilience;
 
+import backend.academy.resilience2.CircuitBreakerAspect;
 import integration.BaseTestcontainersTest;
 import integration.testcontainers.configuration.TestcontainersGenericConfiguration;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,28 +8,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ContextConfiguration(
         classes = {
-            TestcontainersGenericConfiguration.class,
-            ResilientTestConfig.class,
+                TestcontainersGenericConfiguration.class,
+                ResilientTestConfig.class,
         })
 @ExtendWith(MockitoExtension.class)
 public class ResilienceTest extends BaseTestcontainersTest {
     @MockitoSpyBean
     private ResilientClient resilientClient;
-
     @MockitoSpyBean
     private ResilientEndpoint resilientEndpoint;
+    @Autowired
+    private CircuitBreakerAspect circuitBreakerAspect;
 
     private WebClient client;
 
@@ -36,6 +41,7 @@ public class ResilienceTest extends BaseTestcontainersTest {
     void setUp() {
         String baseUrl = "http://localhost:" + port;
         client = WebClient.create(baseUrl);
+        circuitBreakerAspect.flush();
 
         Mockito.reset(resilientClient, resilientEndpoint);
     }

@@ -47,6 +47,17 @@ public class ResilientClient {
         });
     }
 
+    @CircuitBreaker
+    public Mono<String> doMonoCircuitBreakerConditional(boolean isError) {
+        return Mono.fromCallable(() -> {
+            if (isError) {
+                throw new RuntimeException("circuit breaker error");
+            }
+            innerLogic();
+            return "hiii:3";
+        });
+    }
+
     @Fallback("fallbackMethod")
     public Mono<String> doMonoFallback(String stuff) {
         return Mono.fromCallable(() -> {
@@ -62,10 +73,10 @@ public class ResilientClient {
     @CircuitBreaker
     public Mono<String> doMonoRetryWithBreaker(String stuff) {
         return Mono.fromCallable(() -> {
-            innerLogic();
             if (true) {
                 throw new RuntimeException("retry with breaker error");
             }
+            innerLogic();
             return stuff;
         });
     }

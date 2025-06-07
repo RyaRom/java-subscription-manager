@@ -1,8 +1,9 @@
 package backend.academy.resilience2.impl;
 
+import java.time.Instant;
+
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.utils.ResilienceUtils;
-import java.time.Instant;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,7 +51,7 @@ public class CountBasedCircuitBreaker implements CircuitBreaker {
                 halfOpenCb();
                 return true;
             } else {
-                log.info("Request is blocked by circuit breaker OPEN");
+                log.info("Request is blocked by circuit breaker OPEN. Time since open: {}", timeSinceOpen());
                 return false;
             }
         }

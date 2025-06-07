@@ -82,4 +82,11 @@ public class RateLimitingAspect {
                 k -> new InMemoryTokenBucketRateLimiter(resilienceProps.rateLimiter()));
         return limiter.processRequest(ip);
     }
+
+    /**
+     * Flush all limiters (mostly for tests)
+     */
+    public void flush() {
+        limiterForEndpoint.clear();
+    }
 }
