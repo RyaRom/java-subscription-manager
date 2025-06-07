@@ -254,7 +254,7 @@
                         <compilerArgs>
                             <arg>-XDcompilePolicy=simple</arg>
                             <arg>--should-stop=ifError=FLOW</arg>
-                            <arg>-Xplugin:ErrorProne</arg>
+                            <!--                            <arg>-Xplugin:ErrorProne</arg>-->
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -266,11 +266,11 @@
                                 <artifactId>lombok</artifactId>
                                 <version>1.18.36</version>
                             </path>
-                            <path>
-                                <groupId>com.google.errorprone</groupId>
-                                <artifactId>error_prone_core</artifactId>
-                                <version>${error-prone.version}</version>
-                            </path>
+                            <!--                            <path>-->
+                            <!--                                <groupId>com.google.errorprone</groupId>-->
+                            <!--                                <artifactId>error_prone_core</artifactId>-->
+                            <!--                                <version>${error-prone.version}</version>-->
+                            <!--                            </path>-->
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>

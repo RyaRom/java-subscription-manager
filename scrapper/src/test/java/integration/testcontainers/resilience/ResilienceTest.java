@@ -10,16 +10,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@ContextConfiguration(classes = {
-    TestcontainersGenericConfiguration.class,
-    ResilientTestConfig.class,
-})
+@ContextConfiguration(
+        classes = {
+            TestcontainersGenericConfiguration.class,
+            ResilientTestConfig.class,
+        })
 @ExtendWith(MockitoExtension.class)
 public class ResilienceTest extends BaseTestcontainersTest {
     @MockitoSpyBean
     private ResilientClient resilientClient;
+
     @MockitoSpyBean
     private ResilientEndpoint resilientEndpoint;
+
     private WebClient client;
 
     @BeforeEach

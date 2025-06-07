@@ -3,8 +3,8 @@ package backend.academy.scrapper;
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.scrapper.config.ClientsProps;
 import backend.academy.scrapper.config.DataConnectionProperties;
-import backend.academy.scrapper.config.KafkaConfig;
-import backend.academy.scrapper.config.ScrapperConfig;
+import backend.academy.scrapper.config.KafkaProps;
+import backend.academy.scrapper.config.ScrapperProps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,10 +17,10 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableScheduling
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableConfigurationProperties({
-    ScrapperConfig.class,
+    ScrapperProps.class,
     ClientsProps.class,
     DataConnectionProperties.class,
-    KafkaConfig.class,
+    KafkaProps.class,
     ResilienceProps.class,
 })
 public class ScrapperApplication {

@@ -8,5 +8,4 @@ import org.springframework.context.annotation.Import;
     ResilientClient.class,
     ResilientEndpoint.class,
 })
-public class ResilientTestConfig {
-}
+public class ResilientTestConfig {}

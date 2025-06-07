@@ -32,9 +32,10 @@ public class InMemoryTokenBucketRateLimiter implements RateLimiter {
 
     private record TokenBucket(AtomicInteger tokensLeft, AtomicLong lastRefillTimeMs) {
         public boolean refill(int tokensPerSecond, int maxTokens) {
-            log.error("REFILLING TOKENS");
-            log.error("TOKENS LEFT: " + tokensLeft.get());
-            log.error("LAST REFILL TIME: " + lastRefillTimeMs.get());
+            log.info(
+                    "TokenBucket refill - tokensLeft={}, lastRefillTimeMs={}",
+                    tokensLeft.get(),
+                    lastRefillTimeMs.get());
             long now = System.currentTimeMillis();
             long lastTime = lastRefillTimeMs.get();
             double elapsedSec = (now - lastTime) / 1000f;
@@ -43,15 +44,13 @@ public class InMemoryTokenBucketRateLimiter implements RateLimiter {
             do {
                 current = tokensLeft.get();
                 updated = Math.min(current + newTokens, maxTokens);
-                log.error("UPDATED: " + updated);
-                log.error("CURRENT: " + current);
-                log.error("NEW TOKENS: " + newTokens);
+                log.info("TokenBucket update - current={}, newTokens={}, updated={}", current, newTokens, updated);
 
                 if (updated <= 0) {
                     return false;
                 }
             } while (!tokensLeft.compareAndSet(current, updated - 1));
-            log.error("TOKENS LEFT: " + tokensLeft.get());
+            log.info("TOKENS LEFT: {}", tokensLeft.get());
 
             lastRefillTimeMs.compareAndSet(lastTime, System.currentTimeMillis());
             return true;

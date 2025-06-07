@@ -22,7 +22,7 @@ public class UpdatePollingJob {
     private final LinkParsesContext linkParsesContext;
     private Instant lastUpdated = Instant.now();
 
-    @Scheduled(cron = "#{@updateCron}")
+    @Scheduled(cron = "${app.main.update-cron}")
     public void update() {
         lastUpdated = Instant.now().minus(Duration.ofDays(1000));
         log.info("Polling all links");

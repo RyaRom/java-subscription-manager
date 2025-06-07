@@ -45,7 +45,7 @@ public class CircuitBreakerAspect {
     }
 
     private Mono<?> processMono(
-        ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
+            ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
         return Mono.fromCallable(breaker::process).flatMap(result -> {
             if (result) {
                 Mono<?> mono;
@@ -57,13 +57,13 @@ public class CircuitBreakerAspect {
                 return breaker.addOnErrorCallback(mono);
             } else {
                 return Mono.error(ResilienceUtils.getTooManyRequests(
-                    resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
+                        resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
             }
         });
     }
 
     private Flux<?> processFlux(
-        ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
+            ProceedingJoinPoint joinPoint, backend.academy.resilience2.impl.CircuitBreaker breaker) {
         boolean result = breaker.process();
         if (result) {
             Flux<?> flux;
@@ -75,7 +75,7 @@ public class CircuitBreakerAspect {
             return breaker.addOnErrorCallback(flux);
         } else {
             return Flux.error(ResilienceUtils.getTooManyRequests(
-                resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
+                    resilienceProps.circuitBreaker().waitDurationInOpenStateMs()));
         }
     }
 }

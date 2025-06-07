@@ -18,12 +18,15 @@ public class ResilientClient {
     @Fallback("fallbackMethod")
     public Mono<String> doMonoFull(String stuff) {
         return Mono.fromCallable(() -> {
-            innerLogic();
-            if (true) {
-                throw new RuntimeException("error");
-            }
-            return stuff;
-        }).doOnError((e) -> System.err.println("ERORRORROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROR"));
+                    innerLogic();
+                    if (true) {
+                        throw new RuntimeException("error");
+                    }
+                    return stuff;
+                })
+                .doOnError(
+                        (e) -> System.err.println(
+                                "ERORRORROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROROR"));
     }
 
     @Retry

@@ -115,8 +115,8 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
 
     public Mono<Void> errorOnChatRegister(Long chatId) {
         System.err.println("IN CHAT REGISTER FALLBACK");
-        return Mono.fromRunnable(() ->
-                telegramAPI.sendMessageAsync(chatId, "Your chat's wasn't registered because server doesn't respond"));
+        return Mono.from(telegramAPI.sendMessageAsync(
+                chatId, "Your chat's wasn't registered because server doesn't " + "respond"));
     }
 
     public Mono<ListLinkResponse> errorOnGetLinks(Long chatId) {
@@ -130,9 +130,7 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
         //        return Mono.error()
         //        ----------------------------------------------
 
-        return Mono.fromRunnable(() -> telegramAPI
-                        .sendMessageAsync(chatId, "Server doesn't respond")
-                        .subscribe())
+        return Mono.from(telegramAPI.sendMessageAsync(chatId, "Server doesn't respond"))
                 .flatMap((it) -> Mono.error(new ServerUnavailableException()));
     }
 }

@@ -2,7 +2,7 @@ package backend.academy.scrapper.clients;
 
 import backend.academy.resilience2.CircuitBreaker;
 import backend.academy.resilience2.Retry;
-import backend.academy.scrapper.config.ScrapperConfig.StackOverflowCredentials;
+import backend.academy.scrapper.config.ScrapperProps;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForQuestionInfoDto;
 import backend.academy.scrapper.repository.links.dto.stackOverflow.StackResponseForUpdatesDto;
 import java.time.Instant;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class StackOverflowHttpClient {
     private final WebClient stackOverflowWebClient;
-    private final StackOverflowCredentials credentials;
+    private final ScrapperProps scrapperProps;
 
     @Retry
     @CircuitBreaker
@@ -71,6 +71,7 @@ public class StackOverflowHttpClient {
     }
 
     private void addCredentials(UriBuilder builder) {
+        var credentials = scrapperProps.stackOverflow();
         if (!credentials.tokenDisabled()) {
             builder.queryParam("key", credentials.key()).queryParam("access_token", credentials.accessToken());
         }
