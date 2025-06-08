@@ -1,11 +1,10 @@
 package backend.academy.resilience2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.impl.CountBasedCircuitBreaker;
 import backend.academy.resilience2.utils.ResilienceUtils;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -80,9 +79,7 @@ public class CircuitBreakerAspect {
         }
     }
 
-    /**
-     * Flush all circuit breakers (mostly for tests)
-     */
+    /** Flush all circuit breakers (mostly for tests) */
     public void flush() {
         breakers.clear();
     }

@@ -83,9 +83,7 @@ public class RateLimitingAspect {
         return limiter.processRequest(ip);
     }
 
-    /**
-     * Flush all limiters (mostly for tests)
-     */
+    /** Flush all limiters (mostly for tests) */
     public void flush() {
         limiterForEndpoint.clear();
     }

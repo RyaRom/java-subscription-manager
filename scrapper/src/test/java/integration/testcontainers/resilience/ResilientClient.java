@@ -89,7 +89,8 @@ public class ResilientClient {
                 throw get400Error();
             }
             return stuff;
-        });    }
+        });
+    }
 
     @Fallback("fallbackMethod")
     @Retry
@@ -141,11 +142,6 @@ public class ResilientClient {
     }
 
     private static WebClientResponseException get400Error() {
-        return new WebClientResponseException(
-                400,
-                "Too Many Requests",
-                HttpHeaders.EMPTY,
-                null,
-                null);
+        return new WebClientResponseException(400, "Too Many Requests", HttpHeaders.EMPTY, null, null);
     }
 }

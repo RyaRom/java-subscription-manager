@@ -1,5 +1,12 @@
 package integration.testcontainers.resilience;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import backend.academy.resilience2.CircuitBreakerAspect;
 import integration.BaseTestcontainersTest;
 import integration.testcontainers.configuration.TestcontainersGenericConfiguration;
@@ -14,24 +21,19 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 @ContextConfiguration(
         classes = {
-                TestcontainersGenericConfiguration.class,
-                ResilientTestConfig.class,
+            TestcontainersGenericConfiguration.class,
+            ResilientTestConfig.class,
         })
 @ExtendWith(MockitoExtension.class)
 public class ResilienceTest extends BaseTestcontainersTest {
     @MockitoSpyBean
     private ResilientClient resilientClient;
+
     @MockitoSpyBean
     private ResilientEndpoint resilientEndpoint;
+
     @Autowired
     private CircuitBreakerAspect circuitBreakerAspect;
 
@@ -45,7 +47,6 @@ public class ResilienceTest extends BaseTestcontainersTest {
 
         Mockito.reset(resilientClient, resilientEndpoint);
     }
-
 
     @Test
     public void testRetry() {
@@ -117,7 +118,6 @@ public class ResilienceTest extends BaseTestcontainersTest {
         verify(resilientEndpoint, atMost(15)).innerLogic();
     }
 
-
     @Test
     public void testRetryWithBreaker() {
         for (int i = 0; i < 5; i++) {
@@ -173,7 +173,6 @@ public class ResilienceTest extends BaseTestcontainersTest {
         verify(resilientClient, times(1)).fallbackMethod(anyString());
         assert result.equals("stuff_afterError");
     }
-
 
     @Test
     public void testMonoFull() {

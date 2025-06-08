@@ -1,9 +1,8 @@
 package backend.academy.resilience2.impl;
 
-import java.time.Instant;
-
 import backend.academy.configuration.ResilienceProps;
 import backend.academy.resilience2.utils.ResilienceUtils;
+import java.time.Instant;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
