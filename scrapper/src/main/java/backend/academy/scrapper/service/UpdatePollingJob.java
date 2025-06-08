@@ -24,7 +24,7 @@ public class UpdatePollingJob {
 
     @Scheduled(cron = "${app.main.update-cron}")
     public void update() {
-        lastUpdated = Instant.now().minus(Duration.ofDays(1000));
+//        lastUpdated = Instant.now().minus(Duration.ofDays(1000));
         log.info("Polling all links");
         Flux.generate(() -> -1L, (lastId, sink) -> {
                     List<LinkEntity> page =

@@ -6,6 +6,7 @@ import backend.academy.bot.clients.ScrapperHttpClient;
 import backend.academy.bot.clients.ScrapperPublisher;
 import backend.academy.bot.clients.ScrapperPublisherCached;
 import backend.academy.bot.config.DataProps;
+import backend.academy.bot.telegram.sdk.utils.TelegramAPI;
 import backend.academy.bot.testcontainers.redis.CacheRedisTest;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import org.mockito.Mockito;
@@ -45,7 +46,7 @@ public class BaseTestcontainersTest {
     public static class IntegrationTestConfig {
         @Bean
         public ScrapperHttpClient scrapperHttpClient() {
-            return new ScrapperHttpClient(Mockito.mock(WebClient.class));
+            return new ScrapperHttpClient(Mockito.mock(WebClient.class), Mockito.mock(TelegramAPI.class));
         }
 
         @Bean
