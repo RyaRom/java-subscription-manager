@@ -114,13 +114,13 @@ public class ScrapperHttpClient implements ScrapperPublisher, ScrapperClient {
     }
 
     public Mono<Void> errorOnChatRegister(Long chatId) {
-        System.err.println("IN CHAT REGISTER FALLBACK");
+        log.debug("IN CHAT REGISTER FALLBACK");
         return Mono.from(telegramAPI.sendMessageAsync(
                 chatId, "Your chat's wasn't registered because server doesn't " + "respond"));
     }
 
     public Mono<ListLinkResponse> errorOnGetLinks(Long chatId) {
-        System.err.println("IN GET LINKS FALLBACK");
+        log.debug("IN GET LINKS FALLBACK");
 
         //        ----------------------------------------------
         //        example of BAD code ---> all sync operation will be executed twice
