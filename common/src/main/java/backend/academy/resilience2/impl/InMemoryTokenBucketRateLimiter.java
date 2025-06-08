@@ -1,10 +1,12 @@
 package backend.academy.resilience2.impl;
 
-import backend.academy.configuration.ResilienceProps;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import backend.academy.configuration.ResilienceProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -13,14 +15,19 @@ import lombok.extern.log4j.Log4j2;
 public class InMemoryTokenBucketRateLimiter implements RateLimiter {
     private final ResilienceProps.RateLimiter rateLimiterProps;
     // possible redis or other shared storage implementation
-    private final Map<String, TokenBucket> tokenBuckets = new ConcurrentHashMap<>();
+    private final Map<String, WeakReference<TokenBucket>> tokenBucketsForIp = new ConcurrentHashMap<>();
 
     @Override
     public int processRequest(String userIp) {
-        TokenBucket tokenBucket = tokenBuckets.computeIfAbsent(
+        TokenBucket tokenBucket = tokenBucketsForIp.computeIfAbsent(
                 userIp,
-                k -> new TokenBucket(
-                        new AtomicInteger(rateLimiterProps.maxTokens()), new AtomicLong(System.currentTimeMillis())));
+                k -> new WeakReference<>(new TokenBucket(
+                        new AtomicInteger(rateLimiterProps.maxTokens()), new AtomicLong(System.currentTimeMillis())))).get();
+        if (tokenBucket == null) {
+            tokenBucketsForIp.put(userIp, new WeakReference<>(new TokenBucket(
+                    new AtomicInteger(rateLimiterProps.maxTokens()), new AtomicLong(System.currentTimeMillis()))));
+            tokenBucket = tokenBucketsForIp.get(userIp).get();
+        }
         if (tokenBucket.refill(rateLimiterProps.tokensPerSecond(), rateLimiterProps.maxTokens())) {
             return -1;
         } else {
